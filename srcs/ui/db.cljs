@@ -25,3 +25,10 @@
  :db/write
  (fn [db [_ path val]]
    (insert-by-path db path val)))
+
+(comment
+  (:fragment
+  @re-frame.db/app-db
+  )
+
+  )

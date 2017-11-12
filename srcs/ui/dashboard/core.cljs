@@ -4,36 +4,26 @@
    [reagent.core :as reagent]
    [ui.pages :as pages]
    [re-frame.core :as rf]
-   [ui.widgets :as wgt]
-   [clojure.string :as str]))
-
-(defn widget []
-  [:div
-   [:ul
-    [:li [:a {:href "#/"} "one"]]
-    [:li [:a {:href "#/"} "two"]]
-    [:li [:a {:href "#/"} "three"]]]])
+   [clojure.string :as str]
+   [sodium.core :as na]))
 
 (defn index [params]
-  (let [route @(rf/subscribe [:route-map/current-route])]
-    [:div.container
-     [:div.row
-      [:div.col-md-4
-       [:h4 (wgt/icon :user) " My patients"]
-       [:hr]
-       [widget]]
-      [:div.col-md-4
-       [:h4 (wgt/icon :bell) " Notifications"]
-       [:hr]
-       [widget]]
-      [:div.col-md-4
-       [:h4 (wgt/icon :scheduled) " Tasks"]
-       [:hr]
-       [widget]]]]))
-
-(defn notifications [params]
-  [:div.container
-   [:h3 "Notifications"]])
+  [na/grid {}
+   [na/grid-row {}
+    [na/grid-column {:width 4}
+     [na/header {} "Dr. Moonlight"]]
+    [na/grid-column {:width 8} [:div]]
+    [na/grid-column {:width 4}
+     [na/button {:basic? true :color :blue :content "Log In" :on-click (na/>event [:goto :login])}]
+     [na/button {:color :blue :content "Sigh up" :on-click (na/>event [:goto :sign-up])}]]
+    ]
+   [na/grid-row {}
+    [na/grid-column {:width 4} [:div]]
+    [na/grid-column {:width 8}
+     [na/container {:text? true}
+      [na/header {} "Medical moonlighting ma easy"]
+      [:p "Find greateclinical jobs without agency"]]]
+    [na/grid-column {:width 4} [:div]]]
+   [na/grid-row {}]])
 
 (pages/reg-page :core/index index)
-(pages/reg-page :core/notifications notifications)

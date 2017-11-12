@@ -11,8 +11,8 @@
 ;; You could use context to init common state for some branch of routes
 
 (def routes {:. :core/index
-             :breadcrumb "Home"
-             "notifications" {:. :core/notifications}})
+             "login" {:. :core/login}
+             "sign-up" {:. :core/sigh-up}})
 
 
 (defn href

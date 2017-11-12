@@ -13,6 +13,8 @@
    [frames.redirect :as redirect]
    [ui.db]
    [ui.dashboard.core]
+   [ui.login.core]
+   [ui.signup.core]
    [ui.pages :as pages]
    [ui.routes :as routes]
    [ui.layout :as layout]))

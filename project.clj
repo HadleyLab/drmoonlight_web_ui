@@ -4,18 +4,20 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.9.0-RC1"]
                  [org.clojure/clojurescript "1.9.946" :scope "provided"]
 
-                 ;; [cljsjs/react-with-addons "15.5.4-0"]
-                 [reagent "0.7.0"] ;;:exclusions [cljsjs/react]]
-                 [re-frame "0.10.2"] ;;:exclusions [cljsjs/react]]
-                 [reagent-utils "0.2.1"];; :exclusions [cljsjs/react]]
-                 [re-frisk "0.5.0"] ;; :exclusions [cljsjs/react]]
+                 [cljsjs/react-with-addons "15.5.4-0"]
+                 [reagent "0.7.0" :exclusions [cljsjs/react]]
+                 [re-frame "0.10.2" :exclusions [cljsjs/react]]
+                 [reagent-utils "0.2.1" :exclusions [cljsjs/react]]
+                 [re-frisk "0.5.0" :exclusions [cljsjs/react]]
                  [binaryage/devtools "0.9.7"]
                  [hiccup "1.0.5"]
                  [garden "1.3.3"]
-                 [route-map "0.0.5"]]
+                 [route-map "0.0.5"]
+                 [soda-ash "0.76.0" :exclusions [cljsjs/react]]
+                 [com.degel/sodium "0.7.0" :exclusions [cljsjs/react]]]
 
   :plugins [[lein-environ "1.1.0"]
             [lein-cljsbuild "1.1.7"]

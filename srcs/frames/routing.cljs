@@ -40,6 +40,16 @@
        (mapv #(select-keys % [:uri :breadcrumb]))))
 
 (rf/reg-event-fx
+ :goto
+ (fn [{db :db} [k & parts]]
+   (let [routes (:route-map/routes db)
+         url (str "/" (str/join "/" (map (fn [x] (if (keyword? x) (name x) (str x))) parts)))]
+        (when-not  (route-map/match [:. url] routes)
+           (.error js/console (str url " is not matches routes")))
+        (window.history.pushState {} "" (str "#" url))
+        {:dispatch [:fragment-changed (str "#" url)]})))
+
+(rf/reg-event-fx
  :fragment-changed
  (fn [{db :db} [k fragment]]
    (if-let [route (route-map/match [:. (str/replace fragment #"^#" "")] (:route-map/routes db))]

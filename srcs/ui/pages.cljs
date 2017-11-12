@@ -3,7 +3,6 @@
   (:require
    [reagent.core :as reagent]
    [re-frame.core :as rf]
-   [ui.widgets :as wgt]
    [clojure.string :as str]))
 
 ;; pages provide reg-page function,
