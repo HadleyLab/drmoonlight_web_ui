@@ -8,15 +8,14 @@
    [clojure.string :as str]
    [sodium.core :as na]))
 
-
 (defn form []
   (let [login-form @(rf/subscribe [:cursor [:login-form]])
         email (reagent/cursor login-form [:email])
         password (reagent/cursor login-form [:password])]
     (fn []
       [na/form {}
-       [na/form-input {:label "Email" :type "email" :on-change (na/>atom email)}]
-       [na/form-input {:label "Password" :type "password" :on-change (na/>atom password)}]
+       [na/form-input {:label "Email" :type "email" :value @email :on-change (na/>atom email)}]
+       [na/form-input {:label "Password" :type "password" :value @password :on-change (na/>atom password)}]
        [na/form-group {}
         [na/form-button {:content "Login"
                          :color :blue
