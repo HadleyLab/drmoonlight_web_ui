@@ -6,6 +6,7 @@
 
 (rf/reg-sub-raw :route (fn [db _] (reaction (:route @db))))
 (rf/reg-sub-raw :db (fn [db] db))
+(rf/reg-sub-raw :cursor (fn [db [k path]] (reaction (reagent/cursor db path))))
 
 (rf/reg-sub-raw :db/by-path
                 (fn [db [_ path]]
