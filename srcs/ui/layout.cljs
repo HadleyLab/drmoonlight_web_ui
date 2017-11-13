@@ -19,4 +19,6 @@
 (defn layout [content]
   (fn []
     (let [route (rf/subscribe [:route-map/current-route])]
-        [:div.container content])))
+      [:div
+        [:style styles/basic-style]
+        [:div.container content]])))
