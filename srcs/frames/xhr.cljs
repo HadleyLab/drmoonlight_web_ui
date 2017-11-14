@@ -26,20 +26,26 @@
                (clj->js fetch-opts))
      (.then (fn [resp]
               (.log js/console "resp" resp)
-              (.then (.json resp)
-                     (fn [doc]
-                       (.log js/console "doc" (.-status resp) doc)
-                       (if (< (.-status resp) 299)
-                         (rf/dispatch [(:event success)
-                                       (merge success
-                                              {:request opts
-                                               :response resp
-                                               :data (js->clj doc :keywordize-keys true)})])
-                         (rf/dispatch [(:event error)
-                                       (merge success
-                                              {:request opts
-                                               :response resp
-                                               :data (js->clj doc :keywordize-keys true)})]))))))
+              (if (= (.-status resp) 204)
+                (rf/dispatch [(:event success)
+                              (merge success
+                                     {:request opts
+                                      :response resp
+                                      :data nil})])
+                (.then (.json resp)
+                       (fn [doc]
+                         (.log js/console "doc" (.-status resp) doc)
+                         (if (< (.-status resp) 299)
+                           (rf/dispatch [(:event success)
+                                         (merge success
+                                                {:request opts
+                                                 :response resp
+                                                 :data (js->clj doc :keywordize-keys true)})])
+                           (rf/dispatch [(:event error)
+                                         (merge success
+                                                {:request opts
+                                                 :response resp
+                                                 :data (js->clj doc :keywordize-keys true)})])))))))
      {})))
 
 (rf/reg-fx :json/fetch json-fetch)

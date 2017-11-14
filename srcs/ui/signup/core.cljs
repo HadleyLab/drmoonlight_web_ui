@@ -4,7 +4,7 @@
    [reagent.core :as reagent]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [form-radio build-form]]
+   [ui.widgets :refer [form-radio build-form form-wrapper]]
    [re-frame.core :as rf]
    [clojure.string :as str]
    [sodium.core :as na]))
@@ -36,9 +36,9 @@
    :mode :resident})
 
 (defn form-content [{mode :mode}]
-    (if (= mode :resident)
-      [build-form {:path [root-path :sign-up-form] :field-sets resident-form-fields}]
-      [build-form {:path [root-path :sign-up-form] :field-sets sceduler-form-fields}]))
+  (if (= mode :resident)
+    [build-form {:path [root-path :sign-up-form] :field-sets resident-form-fields}]
+    [build-form {:path [root-path :sign-up-form] :field-sets sceduler-form-fields}]))
 
 (defn form []
   (let [sign-up-page @(rf/subscribe [:cursor [root-path]])
@@ -59,10 +59,10 @@
 (defn index [params]
   (rf/dispatch [:init-sign-up-page])
   (fn [params]
-    [:div.moonlight-form-wrapper
-     [na/container {:text? true :class-name "moonlight-form"}
-      [na/header {:as :h1 :class-name "moonlight-form-header"} "Welcome to Dr. Moonlight!"]
-      [(form)]]]))
+    [form-wrapper
+       [na/header {:as :h1 :class-name "moonlight-form-header"} "Welcome to Dr. Moonlight!"]
+       [(form)]
+       [:p "Already a member? " [:a {:href (href :login)} "Log In"]]]))
 
 (rf/reg-event-db
  :init-sign-up-page
@@ -90,4 +90,17 @@
        (assoc-in [root-path :sign-up-form :response :status] :failure)
        (assoc-in [root-path :sign-up-form :response :errors] data))))
 
-(pages/reg-page :core/sigh-up index)
+(rf/reg-event-fx
+ :do-sigh-up-succeed
+ (fn [coef [_]]
+   {:dispatch [:goto :sign-up :thanks]}))
+
+(defn thanks [params]
+  [form-wrapper
+     [na/header {:as :h1 :class-name "moonlight-form-header"} "Thanks for registering !"]
+     [:p "You’ve just been sent an email to confirm your email address. Please click on the link in this email to confirm your registration to Dr. Moonlight."]
+     [:p "if you don’t get the email in 10 minutes, you can " [:a {} "resend the confirmation email"] "."]
+     [na/button {:basic? true :color :blue :content "Go Home" :on-click (na/>event [:goto "/"])}]])
+
+(pages/reg-page :core/sign-up index)
+(pages/reg-page :core/sign-up-thanks thanks)

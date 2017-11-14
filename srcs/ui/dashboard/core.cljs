@@ -15,7 +15,7 @@
     [na/grid-column {:width 8} [:div]]
     [na/grid-column {:width 4}
      [na/button {:basic? true :color :blue :content "Log In" :on-click (na/>event [:goto :login])}]
-     [na/button {:color :blue :content "Sigh up" :on-click (na/>event [:goto :sign-up])}]]
+     [na/button {:color :blue :content "Sign up" :on-click (na/>event [:goto :sign-up])}]]
     ]
    [na/grid-row {}
     [na/grid-column {:width 4} [:div]]

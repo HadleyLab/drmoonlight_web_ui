@@ -12,7 +12,10 @@
 
 (def routes {:. :core/index
              "login" {:. :core/login}
-             "sign-up" {:. :core/sigh-up}})
+             "sign-up" {:. :core/sign-up
+                        "thanks" {:. :core/sign-up-thanks}}
+             "forgot-password" {:. :core/forgot-password
+                                "thanks" {:. :core/forgot-password-thanks}}})
 
 
 (defn href

@@ -1,9 +1,9 @@
 (ns ui.login.core
-  (:require-macros [reagent.ratom :refer [reaction]])
   (:require
    [reagent.core :as reagent]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
+   [ui.widgets :refer [form-wrapper]]
    [re-frame.core :as rf]
    [clojure.string :as str]
    [sodium.core :as na]))
@@ -13,28 +13,23 @@
         email (reagent/cursor login-form [:email])
         password (reagent/cursor login-form [:password])]
     (fn []
-      [na/form {}
-       [na/form-input {:label "Email" :type "email" :value @email :on-change (na/>atom email)}]
-       [na/form-input {:label "Password" :type "password" :value @password :on-change (na/>atom password)}]
-       [na/form-group {}
-        [na/form-button {:content "Login"
-                         :color :blue
-                         :on-click (na/>event [:login @email @password])}]
-        [:a {:href (href :forgot-password)} "Forgot password?"]]])))
-
-(defn index [params]
-  [na/grid {}
-   [na/grid-row {}]
-   [na/grid-row {}
-    [na/grid-column {:width 4} [:div]]
-    [na/grid-column {:width 8}
-     [na/container {:text? true}
-      [na/header {} "Welcome back to Dr. Moonlight!"]
       [na/grid {}
        [na/grid-row {}
-        [na/grid-column {:width 12} [(form)]]
-        [na/grid-column {:width 4} [:div [:p "Don't have account yet?"] [:a {:href (href :sign-up)} "Sign Up"]]]]]]
-     [na/grid-column {:width 4} [:div]]]
-    [na/grid-row {}]]])
+        [na/grid-column {:width 10}
+          [na/form {}
+          [na/form-input {:label "Email" :type "email" :value @email :on-change (na/>atom email)}]
+          [na/form-input {:label "Password" :type "password" :value @password :on-change (na/>atom password)}]
+          [na/form-group {}
+            [na/form-button {:content "Login"
+                            :color :blue
+                            :on-click (na/>event [:login @email @password])}]
+           [:a {:href (href :forgot-password)} "Forgot password?"]]]]
+        [na/grid-column {:width 6}
+          [:p "Don't have account yet?"] [:a {:href (href :sign-up)} "Sign Up"]]]])))
+
+(defn index [params]
+  [form-wrapper
+   [na/header {:as :h1 :class-name "moonlight-form-header"} "Welcome back to Dr. Moonlight!"]
+   [(form)]])
 
 (pages/reg-page :core/login index)

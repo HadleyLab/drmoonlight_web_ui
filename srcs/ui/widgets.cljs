@@ -49,3 +49,8 @@
                                (for [[field label] fields]
                                  [(render-input path field label) ])))))))
 
+(defn form-wrapper [& children]
+  [:div.moonlight-form-wrapper
+   [na/container {:text? true :class-name "moonlight-form"}
+    [:div {:class "moonlight-inner-form"}
+     children]]])
