@@ -21,4 +21,4 @@
     (let [route (rf/subscribe [:route-map/current-route])]
       [:div
         [:style styles/basic-style]
-        [:div.container content]])))
+        [:div.moonlight-container content]])))

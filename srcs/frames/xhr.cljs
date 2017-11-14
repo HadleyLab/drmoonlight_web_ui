@@ -38,7 +38,7 @@
                          (rf/dispatch [(:event error)
                                        (merge success
                                               {:request opts
-                                               :respons resp
+                                               :response resp
                                                :data (js->clj doc :keywordize-keys true)})]))))))
      {})))
 
