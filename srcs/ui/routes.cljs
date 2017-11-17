@@ -18,7 +18,6 @@
              "forgot-password" {:. :core/forgot-password
                                 "thanks" {:. :core/forgot-password-thanks}}})
 
-
 (defn href
   ;; helper function to build urls also check url
   ;; is valid for current routing

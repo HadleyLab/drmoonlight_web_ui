@@ -13,7 +13,7 @@
 (def sceduler-form-fields
   {"Personal Information"
    {:firstName "First Name"
-    :lastLame "Last Name"
+    :lastName "Last Name"
     :facilityName "Hospital / Facility name"
     :departmentName "Department name"}
    "Account settings"
@@ -51,7 +51,7 @@
       (let [status (get-in @sign-up-form [:response :status])]
         [na/form {:class-name "moonlight-inner-form" :error? (= status :failure)}
          [form-radio {:items modes :cursor mode :label "Register as"}]
-         (when @sign-up-form [form-content {:mode @mode}])
+         [form-content {:mode @mode}]
          [:div.moonlight-form-group
           [na/form-button {:content "Sign up"
                            :color :blue

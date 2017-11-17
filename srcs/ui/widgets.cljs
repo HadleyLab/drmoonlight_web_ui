@@ -9,15 +9,17 @@
 (defn pp [data]
   [:pre (with-out-str (pp/pprint data))])
 
+(def concatv (comp (partial into []) concat))
+
 (defn form-radio [{items :items cursor :cursor label :label}]
-  (into []
-        (concat [na/form-group {} [:div.field [:label label]]]
-                (for [[key value] items]
-                  [sa/FormRadio {:key key
-                                 :label key
-                                 :value value
-                                 :checked (= @cursor key)
-                                 :on-change #(reset! cursor key)}]))))
+  (concatv [na/form-group {} [:div.field [:label label]]]
+           (->> items
+                (mapv (fn [[key value]]
+                        [sa/FormRadio {:key key
+                                       :label key
+                                       :value value
+                                       :checked (= @cursor key)
+                                       :on-change #(reset! cursor key)}])))))
 
 (defn get-default-type [field]
   (cond
@@ -42,15 +44,17 @@
            [:div {:class "error"} (clojure.string/join " " errors)])]))))
 
 (defn build-form [{field-sets :field-sets path :path}]
-  (into [] (concat [:div]
-                   (for [[title fields] field-sets]
-                     (into [] (concat
-                               [:div [:label title]]
-                               (for [[field label] fields]
-                                 [(render-input path field label) ])))))))
+  (concatv [:div]
+           (->> field-sets
+                (mapv (fn [[title fields]]
+                        (concatv [:div {:key title} [:label title]]
+                                 (->> fields
+                                      (mapv (fn [[field label]]
+                                              [(render-input path field label) {:key field}])))))))))
 
-(defn form-wrapper [& children]
-  [:div.moonlight-form-wrapper
-   [na/container {:text? true :class-name "moonlight-form"}
-    [:div {:class "moonlight-inner-form"}
-     children]]])
+(defn form-wrapper []
+  (let [this (reagent/current-component)]
+    [:div.moonlight-form-wrapper
+     [na/container {:text? true :class-name "moonlight-form"}
+      (into [:div {:class "moonlight-inner-form"}]
+            (reagent/children this))]]))
