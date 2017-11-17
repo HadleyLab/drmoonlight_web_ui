@@ -12,6 +12,7 @@
 
 (def routes {:. :core/index
              "login" {:. :core/login}
+             "activate" {[:uid] {[:token] :core/activate}}
              "sign-up" {:. :core/sign-up
                         "thanks" {:. :core/sign-up-thanks}}
              "forgot-password" {:. :core/forgot-password

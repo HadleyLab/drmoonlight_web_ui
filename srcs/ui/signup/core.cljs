@@ -34,7 +34,8 @@
   {:sign-up-form
    {:fields (into {} (map (fn [[key _]] [key ""]) (mapcat second sceduler-form-fields)))
     :response {:status :not-asked}}
-   :mode :resident})
+   :mode :resident
+   :activation-response {:status :not-asked}})
 
 (defn form-content [{mode :mode}]
   (if (= mode :resident)
@@ -58,12 +59,12 @@
                            :on-click (na/>event [:do-sigh-up])}]]]))))
 
 (defn index [params]
-  (rf/dispatch [::init-sign-up-page])
+  (rf/dispatch-sync [::init-sign-up-page])
   (fn [params]
     [form-wrapper
-       [na/header {:as :h1 :class-name "moonlight-form-header"} "Welcome to Dr. Moonlight!"]
-       [(form)]
-       [:p "Already a member? " [:a {:href (href :login)} "Log In"]]]))
+     [na/header {:as :h1 :class-name "moonlight-form-header"} "Welcome to Dr. Moonlight!"]
+     [(form)]
+     [:p "Already a member? " [:a {:href (href :login)} "Log In"]]]))
 
 (rf/reg-event-db
  ::init-sign-up-page
@@ -99,10 +100,60 @@
 
 (defn thanks [params]
   [form-wrapper
-     [na/header {:as :h1 :class-name "moonlight-form-header"} "Thanks for registering !"]
-     [:p "You’ve just been sent an email to confirm your email address. Please click on the link in this email to confirm your registration to Dr. Moonlight."]
-     [:p "if you don’t get the email in 10 minutes, you can " [:a {} "resend the confirmation email"] "."]
-     [na/button {:basic? true :color :blue :content "Go Home" :on-click (na/>event [:goto "/"])}]])
+   [na/header {:as :h1 :class-name "moonlight-form-header"} "Thanks for registering !"]
+   [:p "You’ve just been sent an email to confirm your email address. Please click on the link in this email to confirm your registration to Dr. Moonlight."]
+   [:p "if you don’t get the email in 10 minutes, you can " [:a {} "resend the confirmation email"] "."]
+   [na/button {:basic? true :color :blue :content "Go Home" :on-click (na/>event [:goto "/"])}]])
+
+(defn activation-loading []
+  [form-wrapper
+   [na/header {:as :h1 :class-name "moonlight-form-header"} "Waiting for the activation!"]
+   [na/button {:basic? true :color :blue :content "Go Home" :on-click (na/>event [:goto "/"])}]])
+
+(defn activation-succeed []
+  [form-wrapper
+   [na/header {:as :h1 :class-name "moonlight-form-header"} "You account is successfully activated"]
+   [na/button {:basic? true :color :blue :content "Sign Up" :on-click (na/>event [:goto :login])}]])
+
+(defn activation-failure [errors]
+  [form-wrapper
+   [na/header {:as :h1 :class-name "moonlight-form-header"} "You account is failed to activate"]
+   [:p.error (:detail errors)]
+   [na/button {:basic? true :color :blue :content "Go Home" :on-click (na/>event [:goto "/"])}]])
+
+(defn activate [params]
+  (rf/dispatch-sync [::init-sign-up-page])
+  (rf/dispatch [:activate params])
+  (let [activation-response @(rf/subscribe [:cursor [root-path :activation-response]])]
+    (fn [params]
+      (cond
+        (= (:status @activation-response) :loading) (activation-loading)
+        (= (:status @activation-response) :succeed) (activation-succeed)
+        (= (:status @activation-response) :failure) (activation-failure (:errors @activation-response))
+        :else [:div (str @activation-response)]))))
+
+(rf/reg-event-fx
+ :activate
+ (fn [{db :db} [_ data]]
+   {:json/fetch {:uri (get-url db "/api/accounts/activate/")
+                 :method "post"
+                 :body data
+                 :success {:event :activate-succeed}
+                 :error {:event :activate-failure}}
+    :db (assoc-in db [root-path :activation-response :status] :loading)}))
+
+(rf/reg-event-db
+ :activate-succeed
+ (fn [db [_]]
+   (assoc-in db [root-path :activation-response :status] :succeed)))
+
+(rf/reg-event-db
+ :activate-failure
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [root-path :activation-response :status] :failure)
+       (assoc-in [root-path :activation-response :errors] data))))
 
 (pages/reg-page :core/sign-up index)
 (pages/reg-page :core/sign-up-thanks thanks)
+(pages/reg-page :core/activate activate)
