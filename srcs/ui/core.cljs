@@ -38,7 +38,7 @@
  ::initialize
  (fn [db]
    {:dispatch [:route-map/init routes/routes]
-    :db {}}))
+    :db {:base-url "http://localhost:8000"}}))
 
 (defn- mount-root []
   (reagent/render

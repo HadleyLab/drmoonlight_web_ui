@@ -27,6 +27,9 @@
  (fn [db [_ path val]]
    (insert-by-path db path val)))
 
+(defn get-url [db path]
+  (str (db :base-url) path))
+
 (comment
   (:fragment
   @re-frame.db/app-db

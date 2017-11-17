@@ -2,6 +2,7 @@
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require
    [reagent.core :as reagent]
+   [ui.db :refer [get-url]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [form-radio build-form form-wrapper]]
@@ -11,18 +12,18 @@
 
 (def sceduler-form-fields
   {"Personal Information"
-   {:first-name "First Name"
-    :last-name "Last Name"
-    :facility-name "Hospital / Facility name"
-    :department-name "Department name"}
+   {:firstName "First Name"
+    :lastLame "Last Name"
+    :facilityName "Hospital / Facility name"
+    :departmentName "Department name"}
    "Account settings"
    {:email "Email"
     :password "Password"}})
 
 (def resident-form-fields
   {"Personal Information"
-   {:first-name "First Name"
-    :last-name "Last Name"}
+   {:firstName "First Name"
+    :lastName "Last Name"}
    "Account settings"
    {:email "Email"
     :password "Password"}})
@@ -57,7 +58,7 @@
                            :on-click (na/>event [:do-sigh-up])}]]]))))
 
 (defn index [params]
-  (rf/dispatch [:init-sign-up-page])
+  (rf/dispatch [::init-sign-up-page])
   (fn [params]
     [form-wrapper
        [na/header {:as :h1 :class-name "moonlight-form-header"} "Welcome to Dr. Moonlight!"]
@@ -65,7 +66,7 @@
        [:p "Already a member? " [:a {:href (href :login)} "Log In"]]]))
 
 (rf/reg-event-db
- :init-sign-up-page
+ ::init-sign-up-page
  (fn [db [_]]
    (if (= (root-path db) nil)
      (assoc-in db [root-path] schema)
@@ -76,7 +77,7 @@
  (fn [{db :db} [_]]
    (let [mode (get-in db [root-path :mode])
          data (get-in db [root-path :sign-up-form :fields])]
-     {:json/fetch {:uri "http://localhost:8000/api/accounts/resident/"
+     {:json/fetch {:uri (get-url db (str "/api/accounts/" (name mode) "/"))
                    :method "post"
                    :body data
                    :success {:event :do-sigh-up-succeed}
@@ -92,8 +93,9 @@
 
 (rf/reg-event-fx
  :do-sigh-up-succeed
- (fn [coef [_]]
-   {:dispatch [:goto :sign-up :thanks]}))
+ (fn [{db :db} [_]]
+   {:dispatch [:goto :sign-up :thanks]
+    :db (assoc-in db [root-path] schema)}))
 
 (defn thanks [params]
   [form-wrapper

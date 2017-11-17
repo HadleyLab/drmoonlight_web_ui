@@ -1,6 +1,7 @@
 (ns ui.forgotpassword.core
   (:require
    [reagent.core :as reagent]
+   [ui.db :refer [get-url]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [form-wrapper]]
@@ -55,7 +56,7 @@
  :rest-password
  (fn [{db :db} [_]]
    (let [email (get-in db [root-path :reset-password-form :email])]
-     {:json/fetch {:uri "http://localhost:8000/api/accounts/password/reset/"
+     {:json/fetch {:uri (get-url db "/api/accounts/password/reset/")
                    :method "post"
                    :body {:email email}
                    :success {:event :rest-password-succeed}

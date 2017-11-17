@@ -46,8 +46,13 @@
          url (str "/" (str/join "/" (map (fn [x] (if (keyword? x) (name x) (str x))) parts)))]
         (when-not  (route-map/match [:. url] routes)
            (.error js/console (str url " is not matches routes")))
-        (window.history.pushState {} "" (str "#" url))
-        {:dispatch [:fragment-changed (str "#" url)]})))
+        {:dispatch [:fragment-changed (str "#" url)]
+         :push-state (str "#" url)})))
+
+(rf/reg-fx
+ :push-state
+ (fn [url]
+    (window.history.pushState {} "" url)))
 
 (rf/reg-event-fx
  :fragment-changed
