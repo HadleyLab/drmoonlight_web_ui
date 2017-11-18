@@ -5,7 +5,7 @@
    [ui.db :refer [get-url]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [form-radio build-form form-wrapper]]
+   [ui.widgets :refer [form-radio build-form form-wrapper fields->schema]]
    [re-frame.core :as rf]
    [clojure.string :as str]
    [sodium.core :as na]))
@@ -32,15 +32,15 @@
 
 (def schema
   {:sign-up-form
-   {:fields (into {} (map (fn [[key _]] [key ""]) (mapcat second sceduler-form-fields)))
+   {:fields (fields->schema sceduler-form-fields)
     :response {:status :not-asked}}
    :mode :resident
    :activation-response {:status :not-asked}})
 
-(defn form-content [mode sign-up-form]
+(defn form-content [mode form-cursor]
   (if (= mode :resident)
-    [build-form sign-up-form resident-form-fields]
-    [build-form sign-up-form sceduler-form-fields]))
+    [build-form form-cursor resident-form-fields]
+    [build-form form-cursor sceduler-form-fields]))
 
 (defn form []
   (let [sign-up-page-cursor @(rf/subscribe [:cursor [root-path]])

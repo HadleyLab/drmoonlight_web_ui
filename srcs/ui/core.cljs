@@ -16,6 +16,7 @@
    [ui.login.core]
    [ui.signup.core]
    [ui.forgotpassword.core]
+   [ui.resident.core]
    [ui.pages :as pages]
    [ui.routes :as routes]
    [ui.layout :as layout]))

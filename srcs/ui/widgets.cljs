@@ -20,6 +20,11 @@
                                        :value value
                                        :checked (= @cursor key)
                                        :on-change #(reset! cursor key)}])))))
+(defn form-toggle [{cursor :cursor label :label}]
+  (na/checkbox {:toggle true
+                :label label
+                :checked? (boolean @cursor)
+                :on-change (na/>atom cursor)}))
 
 (defn get-default-type [field]
   (cond
@@ -30,15 +35,20 @@
 (defn render-input [{cursor :cursor field :field}]
   (let [field-cursor (reagent/cursor cursor [:fields field])
         errors-cursor (reagent/cursor cursor [:response :errors field])]
-    (fn [{field :field label :label}]
+    (fn [{field :field info :info}]
       (let [errors @errors-cursor]
         [na/form-group {}
-         [na/form-input
-          {:label label
-           :type (get-default-type field)
-           :value @field-cursor
-           :error? (not= errors nil)
-           :on-change (na/>atom field-cursor)}]
+         (if (string? info)
+           [na/form-input
+            {:label info
+             :type (get-default-type field)
+             :value @field-cursor
+             :error? (not= errors nil)
+             :on-change (na/>atom field-cursor)}]
+           (cond
+             (= :radio (:type info)) [form-radio (merge {:cursor field-cursor} info)]
+             (= :toggle (:type info)) [form-toggle (merge {:cursor field-cursor} info)]
+             :else [:div (str info)]))
          (if (= errors nil)
            [:div]
            [:div {:class "error"} (clojure.string/join " " errors)])]))))
@@ -49,8 +59,8 @@
                 (mapv (fn [[title fields]]
                         (concatv [:div {:key title} [:label title]]
                                  (->> fields
-                                      (mapv (fn [[field label]]
-                                              [render-input {:cursor cursor :field field :label label :key field}])))))))))
+                                      (mapv (fn [[field info]]
+                                              [render-input {:cursor cursor :field field :info info :key field}])))))))))
 
 (defn form-wrapper []
   (let [this (reagent/current-component)]
@@ -58,3 +68,6 @@
      [na/container {:text? true :class-name "moonlight-form"}
       (into [:div {:class "moonlight-inner-form"}]
             (reagent/children this))]]))
+
+(defn fields->schema [fields]
+  (into {} (map (fn [[key _]] [key ""]) (mapcat second fields))))

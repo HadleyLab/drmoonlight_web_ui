@@ -16,7 +16,13 @@
              "sign-up" {:. :core/sign-up
                         "thanks" {:. :core/sign-up-thanks}}
              "forgot-password" {:. :core/forgot-password
-                                "thanks" {:. :core/forgot-password-thanks}}})
+                                "thanks" {:. :core/forgot-password-thanks}}
+             "resident" {:. :core/resident
+                         "schedule" {:. :core/resident-schedule}
+                         "messages" {:. :core/resident-messages}
+                         "statistics" {:. :core/resident-statistics}
+                         "profile" {:. :core/resident-profile
+                                    "notification" :core/resident-profile-notification}}})
 
 (defn href
   ;; helper function to build urls also check url
