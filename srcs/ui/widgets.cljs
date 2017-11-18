@@ -27,11 +27,11 @@
     (= field :email) :email
     :else :text))
 
-(defn render-input [path field label]
-  (let [cursor @(rf/subscribe [:cursor path])
-        field-cursor (reagent/cursor cursor [:fields field])]
-    (fn []
-      (let [errors (get-in @cursor [:response :errors field])]
+(defn render-input [{cursor :cursor field :field}]
+  (let [field-cursor (reagent/cursor cursor [:fields field])
+        errors-cursor (reagent/cursor cursor [:response :errors field])]
+    (fn [{field :field label :label}]
+      (let [errors @errors-cursor]
         [na/form-group {}
          [na/form-input
           {:label label
@@ -43,14 +43,14 @@
            [:div]
            [:div {:class "error"} (clojure.string/join " " errors)])]))))
 
-(defn build-form [{field-sets :field-sets path :path}]
+(defn build-form [cursor field-sets]
   (concatv [:div]
            (->> field-sets
                 (mapv (fn [[title fields]]
                         (concatv [:div {:key title} [:label title]]
                                  (->> fields
                                       (mapv (fn [[field label]]
-                                              [(render-input path field label) {:key field}])))))))))
+                                              [render-input {:cursor cursor :field field :label label :key field}])))))))))
 
 (defn form-wrapper []
   (let [this (reagent/current-component)]

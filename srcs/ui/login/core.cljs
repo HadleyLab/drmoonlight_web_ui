@@ -8,8 +8,17 @@
    [clojure.string :as str]
    [sodium.core :as na]))
 
+
+(def root-path :login-page)
+
+(def schema
+  {:login-form
+   {:email ""
+    :password ""}
+   :response {:status :not-asked}})
+
 (defn form []
-  (let [login-form @(rf/subscribe [:cursor [:login-form]])
+  (let [login-form @(rf/subscribe [:cursor [root-path :login-form]])
         email (reagent/cursor login-form [:email])
         password (reagent/cursor login-form [:password])]
     (fn []
@@ -28,8 +37,17 @@
           [:p "Don't have account yet?"] [:a {:href (href :sign-up)} "Sign Up"]]]])))
 
 (defn index [params]
-  [form-wrapper
-   [na/header {:as :h1 :class-name "moonlight-form-header"} "Welcome back to Dr. Moonlight!"]
-   [(form)]])
+  (rf/dispatch-sync [::init-login-page])
+  (fn [params]
+    [form-wrapper
+    [na/header {:as :h1 :class-name "moonlight-form-header"} "Welcome back to Dr. Moonlight!"]
+    [(form)]]))
+
+(rf/reg-event-db
+ ::init-login-page
+ (fn [db [_]]
+   (if (= (root-path db) nil)
+     (assoc-in db [root-path] schema)
+     db)))
 
 (pages/reg-page :core/login index)

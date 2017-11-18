@@ -37,21 +37,21 @@
    :mode :resident
    :activation-response {:status :not-asked}})
 
-(defn form-content [{mode :mode}]
+(defn form-content [mode sign-up-form]
   (if (= mode :resident)
-    [build-form {:path [root-path :sign-up-form] :field-sets resident-form-fields}]
-    [build-form {:path [root-path :sign-up-form] :field-sets sceduler-form-fields}]))
+    [build-form sign-up-form resident-form-fields]
+    [build-form sign-up-form sceduler-form-fields]))
 
 (defn form []
-  (let [sign-up-page @(rf/subscribe [:cursor [root-path]])
-        sign-up-form (reagent/cursor sign-up-page [:sign-up-form])
-        mode (reagent/cursor sign-up-page [:mode])
+  (let [sign-up-page-cursor @(rf/subscribe [:cursor [root-path]])
+        sign-up-form-cursor (reagent/cursor sign-up-page-cursor [:sign-up-form])
+        mode-cursor (reagent/cursor sign-up-page-cursor [:mode])
         modes {:resident "Resident" :scheduler "Scheduler"}]
     (fn []
-      (let [status (get-in @sign-up-form [:response :status])]
+      (let [status (get-in @sign-up-form-cursor [:response :status])]
         [na/form {:class-name "moonlight-inner-form" :error? (= status :failure)}
-         [form-radio {:items modes :cursor mode :label "Register as"}]
-         [form-content {:mode @mode}]
+         [form-radio {:items modes :cursor mode-cursor :label "Register as"}]
+         [form-content @mode-cursor sign-up-form-cursor]
          [:div.moonlight-form-group
           [na/form-button {:content "Sign up"
                            :color :blue
@@ -63,7 +63,7 @@
   (fn [params]
     [form-wrapper
      [na/header {:as :h1 :class-name "moonlight-form-header"} "Welcome to Dr. Moonlight!"]
-     [(form)]
+     [form]
      [:p "Already a member? " [:a {:href (href :login)} "Log In"]]]))
 
 (rf/reg-event-db
@@ -93,7 +93,7 @@
        (assoc-in [root-path :sign-up-form :response :errors] data))))
 
 (rf/reg-event-fx
- :do-sigh-up-succeed
+:do-sigh-up-succeed
  (fn [{db :db} [_]]
    {:dispatch [:goto :sign-up :thanks]
     :db (assoc-in db [root-path] schema)}))

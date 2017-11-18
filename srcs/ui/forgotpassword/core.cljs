@@ -38,7 +38,7 @@
           [:a {:href (href :login)} "Back to login"]]]))))
 
 (defn index [params]
-  (rf/dispatch [:init-forgot-password-page])
+  (rf/dispatch-sync [::init-forgot-password-page])
   (fn [params]
     [form-wrapper
      [na/header {:as :h1 :class-name "moonlight-form-header"} "Forgot your password?"]
@@ -46,11 +46,12 @@
      [(form)]]))
 
 (rf/reg-event-db
- :init-forgot-password-page
+ ::init-forgot-password-page
  (fn [db [_]]
-   (if (= (root-path db) nil)
-     (assoc-in db [root-path] schema)
-     db)))
+   (let [login-form-email (get-in db [:login-page :login-form :email])]
+     (assoc-in (if (= (root-path db) nil)
+                 (assoc-in db [root-path] schema)
+                 db) [root-path :reset-password-form :email] login-form-email))))
 
 (rf/reg-event-fx
  :rest-password
@@ -76,13 +77,11 @@
        (assoc-in [root-path :response :status] :failure)
        (assoc-in [root-path :response :errors] data))))
 
-
 (defn thanks [params]
   [form-wrapper
    [na/header {:as :h1 :class-name "moonlight-form-header"} "You have reseted your password!"]
    [:p "You’ve just been sent an email with reset link. Please click on the link in this email to change your password"]
    [na/button {:basic? true :color :blue :content "Go Home" :on-click (na/>event [:goto "/"])}]])
-
 
 (pages/reg-page :core/forgot-password index)
 (pages/reg-page :core/forgot-password-thanks thanks)
