@@ -23,7 +23,13 @@
                                      [:pk] {"apply" {:. :core/resident-messages}}}
                          "statistics" {:. :core/resident-statistics}
                          "profile" {:. :core/resident-profile
-                                    "notification" :core/resident-profile-notification}}})
+                                    "notification" :core/resident-profile-notification}}
+             "scheduler" {:. :core/scheduler
+                         "schedule" {:. :core/scheduler-schedule}
+                         "messages" {:. :core/scheduler-messages
+                                     [:pk] {"apply" {:. :core/scheduler-messages}}}
+                         "statistics" {:. :core/scheduler-statistics}
+                         "profile" {:. :core/scheduler-profile}}})
 
 (defn href
   ;; helper function to build urls also check url

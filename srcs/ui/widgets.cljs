@@ -32,6 +32,11 @@
     (= field :email) :email
     :else :text))
 
+(defn form-textarea [{cursor :cursor label :label}]
+  [:div.field
+   [:label label]
+   [na/text-area {:value @cursor :on-change (na/>atom cursor)}]])
+
 (defn render-input [{cursor :cursor field :field}]
   (let [field-cursor (reagent/cursor cursor [:fields field])
         errors-cursor (reagent/cursor cursor [:response :errors field])]
@@ -48,6 +53,7 @@
            (cond
              (= :radio (:type info)) [form-radio (merge {:cursor field-cursor} info)]
              (= :toggle (:type info)) [form-toggle (merge {:cursor field-cursor} info)]
+             (= :textarea (:type info)) [form-textarea (merge {:cursor field-cursor} info)]
              :else [:div (str info)]))
          (if (= errors nil)
            [:div]
