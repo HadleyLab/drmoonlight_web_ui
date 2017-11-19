@@ -35,7 +35,7 @@
 
 (defn resident-profile-layout [content]
   (let [route (rf/subscribe [:route-map/current-route])]
-    [user-layout
+    [resident-layout
      [na/grid {}
       [na/grid-row {}
        [na/grid-column {:width 4}
