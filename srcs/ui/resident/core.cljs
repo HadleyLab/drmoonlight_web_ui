@@ -4,10 +4,11 @@
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [build-form fields->schema]]
-   [ui.layout :refer [user-layout]]
+   [ui.resident.layout :refer [resident-layout resident-profile-layout]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [sodium.core :as na]))
+   [sodium.core :as na]
+   [ui.resident.schedule.core]))
 
 (def root-path :resident)
 
@@ -33,27 +34,6 @@
    :notification-form
    {:fields (fields->schema resident-notification-form-fields)
     :response {:status :not-asked}}})
-
-(defn resident-layout [content]
-  [user-layout content])
-
-(defn resident-profile-layout [content]
-  (let [route (rf/subscribe [:route-map/current-route])]
-    [user-layout
-     [na/grid {}
-      [na/grid-row {}
-       [na/grid-column {:width 4}
-        [na/menu {:fluid? true :vertical? true :tabular? true}
-         [na/menu-item {:name "Edit Profile"
-                        :active? (= (:match @route) :core/resident-profile)
-                        :on-click #(rf/dispatch [:goto :resident :profile])}]
-         [na/menu-item {:name "Notification Settings"
-                        :active? (= (:match @route) :core/resident-profile-notification)
-                        :on-click #(rf/dispatch [:goto :resident :profile :notification])}]
-         [na/menu-item {:name "Log out"}]]]
-
-       [na/grid-column {:width 12 :class-name :moonlight-white}
-        content]]]]))
 
 (defn resident-notification-form []
   (let [resident-page-cursor @(rf/subscribe [:cursor [root-path]])
@@ -92,7 +72,6 @@
      db)))
 
 (pages/reg-page :core/resident (with-init (fn [] [resident-layout [na/header {} "index"]])))
-(pages/reg-page :core/resident-schedule (with-init (fn [] [resident-layout [na/header {} "schedule"]])))
 (pages/reg-page :core/resident-statistics (with-init (fn [] [resident-layout [na/header {} "statistics"]])))
 (pages/reg-page :core/resident-messages (with-init (fn [] [resident-layout [na/header {} "messages"]])))
 (pages/reg-page :core/resident-profile (with-init (fn [] [resident-profile-layout [resident-profile-form]])))

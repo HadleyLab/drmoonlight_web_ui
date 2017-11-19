@@ -11,7 +11,7 @@
 ;; You could use context to init common state for some branch of routes
 
 (def routes {:. :core/index
-             "login" {:. :core/login}
+             "login" :core/login
              "activate" {[:uid] {[:token] :core/activate}}
              "sign-up" {:. :core/sign-up
                         "thanks" {:. :core/sign-up-thanks}}
@@ -19,7 +19,8 @@
                                 "thanks" {:. :core/forgot-password-thanks}}
              "resident" {:. :core/resident
                          "schedule" {:. :core/resident-schedule}
-                         "messages" {:. :core/resident-messages}
+                         "messages" {:. :core/resident-messages
+                                     [:pk] {"apply" {:. :core/resident-messages}}}
                          "statistics" {:. :core/resident-statistics}
                          "profile" {:. :core/resident-profile
                                     "notification" :core/resident-profile-notification}}})

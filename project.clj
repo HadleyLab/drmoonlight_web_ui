@@ -16,6 +16,7 @@
                  [hiccup "1.0.5"]
                  [garden "1.3.3"]
                  [route-map "0.0.5"]
+                 [com.andrewmcveigh/cljs-time "0.5.2"]
                  [soda-ash "0.76.0" :exclusions [cljsjs/react]]
                  [com.degel/sodium "0.7.0" :exclusions [cljsjs/react]]]
 
