@@ -18,6 +18,7 @@
                  [route-map "0.0.5"]
                  [com.andrewmcveigh/cljs-time "0.5.2"]
                  [soda-ash "0.76.0" :exclusions [cljsjs/react]]
+                 [cljsjs/react-datepicker "0.55.0-0" :exclusions [cljsjs/react]]
                  [com.degel/sodium "0.7.0" :exclusions [cljsjs/react]]]
 
   :plugins [[lein-environ "1.1.0"]

@@ -4,7 +4,23 @@
    [re-frame.core :as rf]
    [cljs.pprint :as pp]
    [soda-ash.core :as sa]
+   [cljs-time.core :as dt]
+   [cljs-time.format :as format]
+   [cljsjs.react-datepicker]
+   [cljsjs.moment]
    [sodium.core :as na]))
+
+
+(defn moment->cljs [m]
+  (format/parse (.format m)))
+
+(defn cljs->moment [c]
+  (let [date-format "yyyy-MM-dd hh:mm a Z"]
+  (if (not= c "")
+    (js/moment (format/unparse (format/formatter date-format) c))
+    (js/moment))))
+
+(def date-picker (reagent/adapt-react-class (.-default js/DatePicker)))
 
 (defn pp [data]
   [:pre (with-out-str (pp/pprint data))])
@@ -25,6 +41,13 @@
                 :label label
                 :checked? (boolean @cursor)
                 :on-change (na/>atom cursor)}))
+
+(defn form-datepicker [{cursor :cursor label :label :as info_}]
+  (let [info (dissoc info_ :cursor :label :type)]
+    [:div.field
+     [:label label]
+     [date-picker (merge {:selected (cljs->moment @cursor) :onChange #(reset! cursor (moment->cljs %))} info)]]))
+
 
 (defn get-default-type [field]
   (cond
@@ -54,6 +77,7 @@
              (= :radio (:type info)) [form-radio (merge {:cursor field-cursor} info)]
              (= :toggle (:type info)) [form-toggle (merge {:cursor field-cursor} info)]
              (= :textarea (:type info)) [form-textarea (merge {:cursor field-cursor} info)]
+             (= :date-picker (:type info)) [form-datepicker (merge {:cursor field-cursor} info)]
              :else [:div (str info)]))
          (if (= errors nil)
            [:div]

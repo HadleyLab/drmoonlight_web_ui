@@ -16,8 +16,20 @@
 (def root-path :scheduler-schedule-page)
 
 (def shift-form-fields
-  {"" {:dateStart "Starts"
-       :dateend "Ends"}
+  {"" {:dateStart
+       {:type :date-picker
+        :label "Starts"
+        :show-time-select true
+        :time-format "HH:mm"
+        :date-format "LLL"
+        :time-intervals 15}
+       :dateEnd
+       {:type :date-picker
+        :label "Ends"
+        :show-time-select true
+        :time-format "HH:mm"
+        :date-format "LLL"
+        :time-intervals 15}}
    "Requid staff" {:speciality "Speciality name"
                    :paymentAmount "Payment amount, $"
                    :description {:type :textarea :label "Description"}
