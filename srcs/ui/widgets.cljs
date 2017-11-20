@@ -10,15 +10,14 @@
    [cljsjs.moment]
    [sodium.core :as na]))
 
-
 (defn moment->cljs [m]
   (format/parse (.format m)))
 
 (defn cljs->moment [c]
   (let [date-format "yyyy-MM-dd hh:mm a Z"]
-  (if (not= c "")
-    (js/moment (format/unparse (format/formatter date-format) c))
-    (js/moment))))
+    (if (not= c "")
+      (js/moment (format/unparse (format/formatter date-format) c))
+      (js/moment))))
 
 (def date-picker (reagent/adapt-react-class (.-default js/DatePicker)))
 
@@ -36,6 +35,7 @@
                                        :value value
                                        :checked (= @cursor key)
                                        :on-change #(reset! cursor key)}])))))
+
 (defn form-toggle [{cursor :cursor label :label}]
   (na/checkbox {:toggle true
                 :label label
@@ -46,8 +46,7 @@
   (let [info (dissoc info_ :cursor :label :type)]
     [:div.field
      [:label label]
-     [date-picker (merge {:selected (cljs->moment @cursor) :onChange #(reset! cursor (moment->cljs %))} info)]]))
-
+     [date-picker (merge {:selected (cljs->moment @cursor) :on-change #(reset! cursor (moment->cljs %))} info)]]))
 
 (defn get-default-type [field]
   (cond
@@ -59,6 +58,16 @@
   [:div.field
    [:label label]
    [na/text-area {:value @cursor :on-change (na/>atom cursor)}]])
+
+(defn form-input-with-drop-down [field-cursor cursor {label :label drop-down :drop-down}]
+  (let [drop-down-cursor (reagent/cursor cursor [(:cursor drop-down)])]
+    (fn [field-cursor cursor {label :label drop-down :drop-down}]
+      [:div.field
+       [:label label]
+       [sa/Input {:label (reagent/as-element
+                          [sa/Dropdown {:default-value true
+                                        :options (:options drop-down)}])
+                  :label-position :right}]])))
 
 (defn render-input [{cursor :cursor field :field}]
   (let [field-cursor (reagent/cursor cursor [:fields field])
@@ -78,6 +87,8 @@
              (= :toggle (:type info)) [form-toggle (merge {:cursor field-cursor} info)]
              (= :textarea (:type info)) [form-textarea (merge {:cursor field-cursor} info)]
              (= :date-picker (:type info)) [form-datepicker (merge {:cursor field-cursor} info)]
+             (= :mock (:type info)) nil
+             (= :input-with-drop-down (:type info)) [form-input-with-drop-down field-cursor cursor info]
              :else [:div (str info)]))
          (if (= errors nil)
            [:div]

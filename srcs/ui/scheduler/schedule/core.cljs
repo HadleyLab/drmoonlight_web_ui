@@ -31,7 +31,12 @@
         :date-format "LLL"
         :time-intervals 15}}
    "Requid staff" {:speciality "Speciality name"
-                   :paymentAmount "Payment amount, $"
+                   :paymentAmount {:type :input-with-drop-down
+                                   :label "Payment amount, $"
+                                   :drop-down {:cursor :paymentPerHour
+                                               :options [{:key true :value true :text "hourly"}
+                                                         {:key false :value false :text "per shift"}]}}
+                   :paymentPerHour {:type :mock}
                    :description {:type :textarea :label "Description"}
                    :residencyProgram "Residency Program"
                    :residencyYearsRequired "Residency yearsrequired"}})

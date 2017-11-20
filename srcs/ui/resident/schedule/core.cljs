@@ -48,10 +48,8 @@
                       :on-click #(reset! selected-cursor (dt/plus @selected-cursor (dt/months 1)))}]
           [na/grid-column {:width 6}]]]
         [na/grid-row {}
-         [na/grid-column {:width 1}]
-         [na/grid-column {:width 14}
-          [calendar @selected-cursor @shifts-cursor shift-label]]
-         [na/grid-column {:width 1}]]]])))
+         [na/grid-column {:width 16}
+          [calendar @selected-cursor @shifts-cursor shift-label]]]]])))
 
 (rf/reg-event-fx
  ::init-resident-shedule-page

@@ -9,13 +9,13 @@
 
 (def basic-style
   (garden/css
+   [:body {:background-color "#F3F8FC"}]
    [:.error {:color :red}]
    [:.moonlight-white {:background-color "#FFF"}]
    [:.moonlight-header {:height (px 80)
                         :background-color "#FFF"
                         :margin-bottom (px 35)
                         :box-shadow "0 2px 1px -1px gray"}]
-   [:div.moonlight-container {:background-color "#F3F8FC"}]
    [:div.moonlight-form-wrapper {:padding-top (px 70)}]
                                   ;; :padding-bottom (px 70)}]
    [:h1.moonlight-form-header {:margin-top "20px!important"
