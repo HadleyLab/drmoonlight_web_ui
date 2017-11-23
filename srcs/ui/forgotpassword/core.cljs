@@ -42,7 +42,7 @@
   (rf/dispatch-sync [::init-forgot-password-page])
   (fn [params]
     [form-wrapper
-     [na/header {:as :h1 :text-align "center"} "Forgot your password?"]
+     [na/header {:as :h1 :class-name "moonlight-form-header"} "Forgot your password?"]
      [:p "Enter your email address below and we'll get you back on track."]
      [(form)]]))
 
