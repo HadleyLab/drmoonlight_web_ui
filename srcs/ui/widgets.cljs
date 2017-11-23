@@ -105,9 +105,9 @@
 
 (defn form-wrapper []
   (let [this (reagent/current-component)]
-    [:div.moonlight-form-wrapper
-     [na/container {:text? true :class-name "moonlight-form"}
-      (into [:div {:class "moonlight-inner-form"}]
+    [na/container {:text? true :class-name "moonlight-form"}
+     [na/segment {:class-name "moonlight-form-inner"}
+      (into [:div {}]
             (reagent/children this))]]))
 
 (defn fields->schema [fields]

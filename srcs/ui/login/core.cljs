@@ -23,9 +23,9 @@
         email (reagent/cursor login-form [:email])
         password (reagent/cursor login-form [:password])]
     (fn []
-      [na/grid {}
+      [na/grid {:divided? true}
        [na/grid-row {}
-        [na/grid-column {:width 10}
+        [na/grid-column {:width 11}
          [na/form {:error? (= (:status @response-cursor) :failure)}
           [na/form-input {:label "Email" :type "email" :value @email :on-change (na/>atom email)}]
           [na/form-input {:label "Password" :type "password" :value @password :on-change (na/>atom password)}]
@@ -35,7 +35,7 @@
                             :loading? (= (:status @response-cursor) :loading)
                             :on-click (na/>event [:login])}]
            [:a {:href (href :forgot-password)} "Forgot password?"]]]]
-        [na/grid-column {:width 6}
+        [na/grid-column {:width 5}
          [:p "Don't have account yet?"] [:a {:href (href :sign-up)} "Sign Up"]]]])))
 
 (defn index [params]

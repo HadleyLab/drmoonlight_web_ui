@@ -39,7 +39,7 @@
   (let [resident-page-cursor @(rf/subscribe [:cursor [root-path]])
         resident-notification-form-cursor (reagent/cursor resident-page-cursor [:notification-form])]
     (fn []
-      [na/form {:class-name "moonlight-inner-form"}
+      [na/form {:class-name "moonlight-form-inner"}
        [build-form resident-notification-form-cursor resident-notification-form-fields]
        [:div.moonlight-form-group
         [na/form-button {:content "Save changes"
@@ -50,14 +50,13 @@
   (let [resident-page-cursor @(rf/subscribe [:cursor [root-path]])
         resident-profile-form-cursor (reagent/cursor resident-page-cursor [:profile-form])]
     (fn []
-      [na/form {:class-name "moonlight-inner-form"}
+      [na/form {:class-name "moonlight-form-inner"}
        [build-form resident-profile-form-cursor resident-profile-form-fields]
        [:div [:label "Account settings"] [:div.field [:label "Email"] [:p "test@me.com"]]]
        [:div.moonlight-form-group
         [na/form-button {:content "Save changes"
                          :color :blue
                          :on-click (na/>event [:udpate-resident-profile])}]]])))
-
 
 (defn with-init [render]
   (fn []

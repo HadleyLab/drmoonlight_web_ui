@@ -59,7 +59,7 @@
    [sa/ModalHeader "Create a new shift"]
    [sa/ModalContent {:image true}
     [sa/ModalDescription
-     [na/form {:class-name "moonlight-inner-form"}
+     [na/form {}
       [build-form new-shift-form-cursor shift-form-fields]]]]
    [sa/ModalActions [na/button {:content "Done" :color :blue}]]])
 

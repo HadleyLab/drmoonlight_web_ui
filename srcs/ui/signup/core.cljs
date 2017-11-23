@@ -49,7 +49,7 @@
         modes {:resident "Resident" :scheduler "Scheduler"}]
     (fn []
       (let [status (get-in @sign-up-form-cursor [:response :status])]
-        [na/form {:class-name "moonlight-inner-form" :error? (= status :failure)}
+        [na/form {:error? (= status :failure)}
          [form-radio {:items modes :cursor mode-cursor :label "Register as"}]
          [form-content @mode-cursor sign-up-form-cursor]
          [:div.moonlight-form-group
@@ -93,7 +93,7 @@
        (assoc-in [root-path :sign-up-form :response :errors] data))))
 
 (rf/reg-event-fx
-:do-sigh-up-succeed
+ :do-sigh-up-succeed
  (fn [{db :db} [_]]
    {:dispatch [:goto :sign-up :thanks]
     :db (assoc-in db [root-path] schema)}))
