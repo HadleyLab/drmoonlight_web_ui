@@ -15,12 +15,12 @@
                    success :success
                    error :error :as opts}]
   (let [headers (merge (or headers {})
-                       {"Content-Type" "application/json"
-                        "Authorization" (str "Bearer " token)})
+                       {"Content-Type" "application/json"}
+                       (if (nil? token) {} {"Authorization" (str "Token " token)}))
         fetch-opts (-> (merge {:method "get"} opts)
                        (dissoc :uri :headers :success :error :params)
                        (assoc :headers headers))
-        fetch-opts (if (:body opts) (assoc fetch-opts :body (.stringify js/JSON (clj->js (:body opts)))))]
+        fetch-opts (if (:body opts) (assoc fetch-opts :body (.stringify js/JSON (clj->js (:body opts)))) fetch-opts)]
     (->
      (js/fetch (str (:uri opts) (when params (str "?" (to-query params))))
                (clj->js fetch-opts))

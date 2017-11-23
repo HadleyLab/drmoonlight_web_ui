@@ -34,6 +34,7 @@
          [na/form-group {}
           [na/form-button {:content "Request reset link"
                            :color :blue
+                           :loading? (= status :loading)
                            :on-click (na/>event [:rest-password])}]
           [:a {:href (href :login)} "Back to login"]]]))))
 
