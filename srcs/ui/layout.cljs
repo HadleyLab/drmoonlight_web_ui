@@ -7,15 +7,7 @@
    [ui.routes :refer [href]]
    [ui.styles :as styles]
    [clojure.string :as str]
-   [soda-ash.core :as sa]
-   [sodium.core :as na]))
-
-(defn current-page? [route key]
-  (= (:match route) key))
-
-(defn nav-item [route k path title]
-  [:li.nav-item {:class (when (current-page? @route k) "active")}
-   [:a.nav-link {:href (apply href path)} title]])
+   [soda-ash.core :as sa]))§
 
 (defn layout [content]
   (fn []
@@ -23,4 +15,3 @@
       [:div
        [:style styles/basic-style]
        [:div.moonlight-container content]])))
-

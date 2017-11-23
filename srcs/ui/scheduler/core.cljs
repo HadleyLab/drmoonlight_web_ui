@@ -3,10 +3,10 @@
    [reagent.core :as reagent]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.scheduler.layout :refer [scheduler-layout]]
+   [ui.scheduler.layout :refer [SchedulerLayout]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [sodium.core :as na]
+   [soda-ash.core :as sa]
    [ui.scheduler.schedule.core]))
 
 (def root-path :scheduler)
@@ -25,7 +25,7 @@
      (assoc-in db [root-path] schema)
      db)))
 
-(pages/reg-page :core/scheduler (with-init (fn [] [scheduler-layout [na/header {} "index"]])))
-(pages/reg-page :core/scheduler-statistics (with-init (fn [] [scheduler-layout [na/header {} "statistics"]])))
-(pages/reg-page :core/scheduler-messages (with-init (fn [] [scheduler-layout [na/header {} "messages"]])))
-(pages/reg-page :core/scheduler-profile (with-init (fn [] [scheduler-layout [na/header {} "profile"]])))
+(pages/reg-page :core/scheduler (with-init (fn [] [SchedulerLayout [sa/Header {} "index"]])))
+(pages/reg-page :core/scheduler-statistics (with-init (fn [] [SchedulerLayout [sa/Header {} "statistics"]])))
+(pages/reg-page :core/scheduler-messages (with-init (fn [] [SchedulerLayout [sa/Header {} "messages"]])))
+(pages/reg-page :core/scheduler-profile (with-init (fn [] [SchedulerLayout [sa/Header {} "profile"]])))

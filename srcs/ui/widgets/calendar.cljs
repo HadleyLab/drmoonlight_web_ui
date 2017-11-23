@@ -4,11 +4,9 @@
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [concatv]]
-   [ui.resident.layout :refer [resident-layout]]
    [re-frame.core :as rf]
    [clojure.string :as str]
    [soda-ash.core :as sa]
-   [sodium.core :as na]
    [cljs-time.core :as dt]
    [cljs-time.format :as format]))
 
@@ -40,7 +38,7 @@
                                         day))]
     (concatv [:div [:p (dt/day cell-date)]] (mapv render-shift-label (get-shifts-for-day shifts cell-date)))))
 
-(defn calendar [selected shifts render-shift-label]
+(defn Calendar [selected shifts render-shift-label]
   (fn [selected shifts]
     [sa/Table {:celled true}
      [sa/TableHeader
@@ -58,3 +56,4 @@
                                (mapv (fn [column]
                                        [sa/TableCell [draw-cell render-shift-label row column selected shifts]])
                                      (range 7)))) (range 5)))]))
+(def calendar Calendar)

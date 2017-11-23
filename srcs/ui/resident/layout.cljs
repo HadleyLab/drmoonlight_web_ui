@@ -1,52 +1,51 @@
 (ns ui.resident.layout
   (:require
    [re-frame.core :as rf]
-   [soda-ash.core :as sa]
-   [sodium.core :as na]))
+   [soda-ash.core :as sa]))
 
-(defn resident-layout [content]
+(defn ResidentLayout [content]
   (let [route (rf/subscribe [:route-map/current-route])]
-    [na/grid {}
-     [na/grid-row {:class-name "moonlight-header"}
-      [na/grid-column {:width 1}]
-      [na/grid-column {:width 7} [na/header {} "Dr.Moonlight"]]
-      [na/grid-column {:width 7}
+    [sa/Grid {}
+     [sa/GridRow {:class-name "moonlight-header"}
+      [sa/GridColumn {:width 1}]
+      [sa/GridColumn {:width 7} [sa/Header {} "Dr.Moonlight"]]
+      [sa/GridColumn {:width 7}
        [sa/ButtonGroup {}
-        [na/button {:content "Schedule"
-                    :icon :calendar
-                    :active? (= (:match @route) :core/resident-schedule)
-                    :on-click #(rf/dispatch [:goto :resident :schedule])}]
-        [na/button {:content "Messages"
-                    :icon :mail
-                    :active? (= (:match @route) :core/resident-messages)
-                    :on-click #(rf/dispatch [:goto :resident :messages])}]
-        [na/button {:content "Statistics"
-                    :icon :table
-                    :active? (= (:match @route) :core/resident-statistics)
-                    :on-click #(rf/dispatch [:goto :resident :statistics])}]
-        [na/button {:content "Profile"
-                    :icon :user
-                    :active? (= (:. (last (:parents @route))) :core/resident-profile)
-                    :on-click #(rf/dispatch [:goto :resident :profile])}]]]]
-     [na/grid-row {}
-      [na/grid-column {:width 1}]
-      [na/grid-column {:width 14} content]
-      [na/grid-column {:width 1}]]]))
+        [sa/Button {:active (= (:match @route) :core/resident-schedule)
+                    :on-click #(rf/dispatch [:goto :resident :schedule])}
+         [sa/Icon {:name :calendar}]
+         "Schedule"]
+        [sa/Button {:active (= (:match @route) :core/resident-messages)
+                    :on-click #(rf/dispatch [:goto :resident :messages])}
+         [sa/Icon {:name :mail}]
+         "Messages"]
+        [sa/Button {:active (= (:match @route) :core/resident-statistics)
+                    :on-click #(rf/dispatch [:goto :resident :statistics])}
+         [sa/Icon {:name :table}]
+         "Statistics"]
+        [sa/Button {:active (= (:. (last (:parents @route))) :core/resident-profile)
+                    :on-click #(rf/dispatch [:goto :resident :profile])}
+         [sa/Icon {:name :user}]
+         "Profile"]]]]
+     [sa/GridRow {}
+      [sa/GridColumn {:width 1}]
+      [sa/GridColumn {:width 14} content]
+      [sa/GridColumn {:width 1}]]]))
 
-(defn resident-profile-layout [content]
+(defn ResidentProfileLayout [content]
   (let [route (rf/subscribe [:route-map/current-route])]
-    [resident-layout
-     [na/grid {}
-      [na/grid-row {}
-       [na/grid-column {:width 4}
-        [na/menu {:fluid? true :vertical? true :tabular? true}
-         [na/menu-item {:name "Edit Profile"
-                        :active? (= (:match @route) :core/resident-profile)
-                        :on-click #(rf/dispatch [:goto :resident :profile])}]
-         [na/menu-item {:name "Notification Settings"
-                        :active? (= (:match @route) :core/resident-profile-notification)
-                        :on-click #(rf/dispatch [:goto :resident :profile :notification])}]
-         [na/menu-item {:name "Log out"}]]]
+    [ResidentLayout
+     [sa/Grid {}
+      [sa/GridRow {}
+       [sa/GridColumn {:width 4}
+        [sa/Menu {:fluid true :vertical true :tabular true}
+         [sa/MenuItem {:name "Edit Profile"
+                       :active (= (:match @route) :core/resident-profile)
+                       :on-click #(rf/dispatch [:goto :resident :profile])}]
+         [sa/MenuItem {:name "Notification Settings"
+                       :active (= (:match @route) :core/resident-profile-notification)
+                       :on-click #(rf/dispatch [:goto :resident :profile :notification])}]
+         [sa/MenuItem {:name "Log out"}]]]
 
-       [na/grid-column {:width 12 :class-name :moonlight-white}
+       [sa/GridColumn {:width 12 :class-name :moonlight-white}
         content]]]]))

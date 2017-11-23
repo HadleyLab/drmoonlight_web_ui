@@ -59,7 +59,6 @@
      (let [contexts (->> (:parents route) (mapv :context) (filterv identity))
            ;; breadcrumbs (mk-breadcrumbs route)
            dispose-context (or  [])]
-       (.log js/console route)
        {:db (assoc db :fragment fragment
                    :route/context contexts
                    ;; :route-map/breadcrumbs breadcrumbs

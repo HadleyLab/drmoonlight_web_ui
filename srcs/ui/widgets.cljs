@@ -1,14 +1,14 @@
 (ns ui.widgets
   (:require
    [reagent.core :as reagent]
+   [ui.db :refer [>event >atom]]
    [re-frame.core :as rf]
    [cljs.pprint :as pp]
-   [soda-ash.core :as sa]
    [cljs-time.core :as dt]
    [cljs-time.format :as format]
    [cljsjs.react-datepicker]
    [cljsjs.moment]
-   [sodium.core :as na]))
+   [soda-ash.core :as sa]))
 
 (defn moment->cljs [m]
   (format/parse (.format m)))
@@ -19,15 +19,15 @@
       (js/moment (format/unparse (format/formatter date-format) c))
       (js/moment))))
 
-(def date-picker (reagent/adapt-react-class (.-default js/DatePicker)))
+(def DatePicker (reagent/adapt-react-class (.-default js/DatePicker)))
 
 (defn pp [data]
   [:pre (with-out-str (pp/pprint data))])
 
 (def concatv (comp (partial into []) concat))
 
-(defn form-radio [{items :items cursor :cursor label :label}]
-  (concatv [na/form-group {} [:div.field [:label label]]]
+(defn FormRadio [{items :items cursor :cursor label :label}]
+  (concatv [sa/FormGroup {} [:div.field [:label label]]]
            (->> items
                 (mapv (fn [[key value]]
                         [sa/FormRadio {:key key
@@ -36,17 +36,18 @@
                                        :checked (= @cursor key)
                                        :on-change #(reset! cursor key)}])))))
 
-(defn form-toggle [{cursor :cursor label :label}]
-  (na/checkbox {:toggle true
-                :label label
-                :checked? (boolean @cursor)
-                :on-change (na/>atom cursor)}))
+(defn FormToggle [{cursor :cursor label :label}]
+  [sa/Checkbox
+   {:toggle true
+    :label label
+    :checked (boolean @cursor)
+    :on-change (>atom cursor)}])
 
-(defn form-datepicker [{cursor :cursor label :label :as info_}]
+(defn FormDatepicker [{cursor :cursor label :label :as info_}]
   (let [info (dissoc info_ :cursor :label :type)]
     [:div.field
      [:label label]
-     [date-picker (merge {:selected (cljs->moment @cursor) :on-change #(reset! cursor (moment->cljs %))} info)]]))
+     [DatePicker (merge {:selected (cljs->moment @cursor) :on-change #(reset! cursor (moment->cljs %))} info)]]))
 
 (defn get-default-type [field]
   (cond
@@ -54,12 +55,12 @@
     (= field :email) :email
     :else :text))
 
-(defn form-textarea [{cursor :cursor label :label}]
+(defn FormTextarea [{cursor :cursor label :label}]
   [:div.field
    [:label label]
-   [na/text-area {:value @cursor :on-change (na/>atom cursor)}]])
+   [sa/TextArea {:value @cursor :on-change (>atom cursor)}]])
 
-(defn form-input-with-drop-down [field-cursor cursor {label :label drop-down :drop-down}]
+(defn FormInputWithDropDown [field-cursor cursor {label :label drop-down :drop-down}]
   (let [drop-down-cursor (reagent/cursor cursor [(:cursor drop-down)])]
     (fn [field-cursor cursor {label :label drop-down :drop-down}]
       [:div.field
@@ -69,44 +70,44 @@
                                         :options (:options drop-down)}])
                   :label-position :right}]])))
 
-(defn render-input [{cursor :cursor field :field}]
+(defn RenderInput [{cursor :cursor field :field}]
   (let [field-cursor (reagent/cursor cursor [:fields field])
         errors-cursor (reagent/cursor cursor [:response :errors field])]
     (fn [{field :field info :info}]
       (let [errors @errors-cursor]
-        [na/form-group {}
+        [sa/FormGroup {}
          (if (string? info)
-           [na/form-input
-            {:label info
-             :type (get-default-type field)
-             :value @field-cursor
-             :error? (not= errors nil)
-             :on-change (na/>atom field-cursor)}]
+           [sa/FormField
+            [:label info]
+            [sa/Input {:type (get-default-type field)
+                       :value @field-cursor
+                       :error (not= errors nil)
+                       :on-change (>atom field-cursor)}]]
            (cond
-             (= :radio (:type info)) [form-radio (merge {:cursor field-cursor} info)]
-             (= :toggle (:type info)) [form-toggle (merge {:cursor field-cursor} info)]
-             (= :textarea (:type info)) [form-textarea (merge {:cursor field-cursor} info)]
-             (= :date-picker (:type info)) [form-datepicker (merge {:cursor field-cursor} info)]
+             (= :radio (:type info)) [FormRadio (merge {:cursor field-cursor} info)]
+             (= :toggle (:type info)) [FormToggle (merge {:cursor field-cursor} info)]
+             (= :textarea (:type info)) [FormTextarea (merge {:cursor field-cursor} info)]
+             (= :date-picker (:type info)) [FormDatepicker (merge {:cursor field-cursor} info)]
              (= :mock (:type info)) nil
-             (= :input-with-drop-down (:type info)) [form-input-with-drop-down field-cursor cursor info]
+             (= :input-with-drop-down (:type info)) [FormInputWithDropDown field-cursor cursor info]
              :else [:div (str info)]))
          (if (= errors nil)
            [:div]
            [:div {:class "error"} (clojure.string/join " " errors)])]))))
 
-(defn build-form [cursor field-sets]
+(defn BuildForm [cursor field-sets]
   (concatv [:div]
            (->> field-sets
                 (mapv (fn [[title fields]]
                         (concatv [:div {:key title} [:label title]]
                                  (->> fields
                                       (mapv (fn [[field info]]
-                                              [render-input {:cursor cursor :field field :info info :key field}])))))))))
+                                              [RenderInput {:cursor cursor :field field :info info :key field}])))))))))
 
-(defn form-wrapper []
+(defn FormWrapper []
   (let [this (reagent/current-component)]
-    [na/container {:text? true :class-name "moonlight-form"}
-     [na/segment {:class-name "moonlight-form-inner"}
+    [sa/Container {:text true :class-name "moonlight-form"}
+     [sa/Segment {:class-name "moonlight-form-inner"}
       (into [:div {}]
             (reagent/children this))]]))
 

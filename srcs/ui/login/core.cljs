@@ -1,13 +1,13 @@
 (ns ui.login.core
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [get-url]]
+   [ui.db :refer [get-url >event >atom]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [form-wrapper pp]]
+   [ui.widgets :refer [FormWrapper pp]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [sodium.core :as na]))
+   [soda-ash.core :as sa]))
 
 (def root-path :login-page)
 
@@ -17,33 +17,36 @@
     :password ""}
    :response {:status :not-asked}})
 
-(defn form []
+(defn Form []
   (let [login-form @(rf/subscribe [:cursor [root-path :login-form]])
         response-cursor @(rf/subscribe [:cursor [root-path :response]])
         email (reagent/cursor login-form [:email])
         password (reagent/cursor login-form [:password])]
     (fn []
-      [na/grid {:divided? true}
-       [na/grid-row {}
-        [na/grid-column {:width 11}
-         [na/form {:error? (= (:status @response-cursor) :failure)}
-          [na/form-input {:label "Email" :type "email" :value @email :on-change (na/>atom email)}]
-          [na/form-input {:label "Password" :type "password" :value @password :on-change (na/>atom password)}]
-          [na/form-group {}
-           [na/form-button {:content "Login"
-                            :color :blue
-                            :loading? (= (:status @response-cursor) :loading)
-                            :on-click (na/>event [:login])}]
+      [sa/Grid {:divided true}
+       [sa/GridRow {}
+        [sa/GridColumn {:width 11}
+         [sa/Form {:error (= (:status @response-cursor) :failure)}
+          [sa/FormField
+           [:label "Email"]
+           [sa/Input {:type "email" :value @email :on-change (>atom email)}]]
+          [sa/FormField
+           [:label "Password"]
+           [sa/Input {:type "password" :value @password :on-change (>atom password)}]]
+          [sa/FormGroup {}
+           [sa/FormButton {:color :blue
+                           :loading (= (:status @response-cursor) :loading)
+                           :on-click (>event [:login])} "Login"]
            [:a {:href (href :forgot-password)} "Forgot password?"]]]]
-        [na/grid-column {:width 5}
+        [sa/GridColumn {:width 5}
          [:p "Don't have account yet?"] [:a {:href (href :sign-up)} "Sign Up"]]]])))
 
-(defn index [params]
+(defn Index [params]
   (rf/dispatch-sync [::init-login-page])
   (fn [params]
-    [form-wrapper
-     [na/header {:as :h1 :class-name "moonlight-form-header"} "Welcome back to Dr. Moonlight!"]
-     [(form)]]))
+    [FormWrapper
+     [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Welcome back to Dr. Moonlight!"]
+     [Form]]))
 
 (rf/reg-event-db
  ::init-login-page
@@ -66,9 +69,9 @@
 (rf/reg-event-fx
  :login-succeed
  (fn [{db :db} [_ {data :data}]]
-   {:db (assoc-in db [:account] {:token (:authToken data)})
+   {:db (assoc-in db [:account] {:token (:auth-token data)})
     :json/fetch {:uri (get-url db "/api/accounts/me/")
-                 :token (:authToken data)
+                 :token (:auth-token data)
                  :success {:event :loaded-login-data}
                  :error {:event :login-failure}}}))
 
@@ -76,10 +79,9 @@
  :loaded-login-data
  (fn [{db :db} [_ {data :data}]]
    (let [user-type (cond
-                     (:isResident data) :resident
-                     (:isScheduler data) :scheduler
-                     (:isAccountManager data) :account-manager)
-         _ (.log js/console data)
+                     (:is-resident data) :resident
+                     (:is-scheduler data) :scheduler
+                     (:is-account-manager data) :account-manager)
          token (get-in db [:account :token])]
      {:db (assoc-in db [:account :user-type] user-type)
       :json/fetch {:uri (get-url db (str "/api/accounts/" (name user-type) "/" (:pk data) "/"))
@@ -102,4 +104,4 @@
        (assoc-in [root-path :response :status] :failure)
        (assoc-in [root-path :response :errors] data))))
 
-(pages/reg-page :core/login index)
+(pages/reg-page :core/login Index)

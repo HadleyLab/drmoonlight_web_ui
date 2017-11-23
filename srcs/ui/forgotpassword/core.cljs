@@ -1,13 +1,13 @@
 (ns ui.forgotpassword.core
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [get-url]]
+   [ui.db :refer [get-url >event >atom]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [form-wrapper]]
+   [ui.widgets :refer [FormWrapper]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [sodium.core :as na]))
+   [soda-ash.core :as sa]))
 
 (def root-path :reset-password-page)
 
@@ -16,35 +16,37 @@
    {:email ""}
    :response {:status :not-asked}})
 
-(defn form []
+(defn Form []
   (let [reset-password-page @(rf/subscribe [:cursor [root-path]])
         email (reagent/cursor reset-password-page [:reset-password-form :email])
         response (reagent/cursor reset-password-page [:response])]
     (fn []
       (let [status (:status @response)
             email-errors (:email (:errors @response))]
-        [na/form {:error? (= status :failure)}
-         [na/form-input {:label "Email"
-                         :type "email"
-                         :error? (not= email-errors nil)
-                         :value @email
-                         :on-change (na/>atom email)}]
+        [sa/Form {:error (= status :failure)}
+         [sa/FormField
+          [:label "Email"]
+          [sa/Input
+           {:type "email"
+            :error (not= email-errors nil)
+            :value @email
+            :on-change (>atom email)}]]
          (when email-errors
            [:div {:class "error"} (clojure.string/join " " email-errors)])
-         [na/form-group {}
-          [na/form-button {:content "Request reset link"
-                           :color :blue
-                           :loading? (= status :loading)
-                           :on-click (na/>event [:rest-password])}]
+         [sa/FormGroup
+          [sa/FormButton {:color :blue
+                          :loading (= status :loading)
+                          :on-click (>event [:rest-password])}
+           "Request reset link"]
           [:a {:href (href :login)} "Back to login"]]]))))
 
-(defn index [params]
+(defn Index [params]
   (rf/dispatch-sync [::init-forgot-password-page])
   (fn [params]
-    [form-wrapper
-     [na/header {:as :h1 :class-name "moonlight-form-header"} "Forgot your password?"]
+    [FormWrapper
+     [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Forgot your password?"]
      [:p "Enter your email address below and we'll get you back on track."]
-     [(form)]]))
+     [Form]]))
 
 (rf/reg-event-db
  ::init-forgot-password-page
@@ -52,7 +54,7 @@
    (let [login-form-email (get-in db [:login-page :login-form :email])]
      (assoc-in (if (= (root-path db) nil)
                  (assoc-in db [root-path] schema)
-                 db) [root-path :reset-password-form :email] login-form-email))))
+                 db) [root-path :reset-password-form :email] (or login-form-email "")))))
 
 (rf/reg-event-fx
  :rest-password
@@ -78,11 +80,11 @@
        (assoc-in [root-path :response :status] :failure)
        (assoc-in [root-path :response :errors] data))))
 
-(defn thanks [params]
-  [form-wrapper
-   [na/header {:as :h1 :class-name "moonlight-form-header"} "You have reseted your password!"]
+(defn Thanks [params]
+  [FormWrapper
+   [sa/Header {:as :h1 :class-name "moonlight-form-header"} "You have reseted your password!"]
    [:p "You’ve just been sent an email with reset link. Please click on the link in this email to change your password"]
-   [na/button {:basic? true :color :blue :content "Go Home" :on-click (na/>event [:goto "/"])}]])
+   [sa/Button {:basic true :color :blue :content "Go Home" :on-click (>event [:goto "/"])}]])
 
-(pages/reg-page :core/forgot-password index)
-(pages/reg-page :core/forgot-password-thanks thanks)
+(pages/reg-page :core/forgot-password Index)
+(pages/reg-page :core/forgot-password-thanks Thanks)
