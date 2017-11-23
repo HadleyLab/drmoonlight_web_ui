@@ -11,7 +11,6 @@
                  [reagent "0.7.0" :exclusions [cljsjs/react]]
                  [re-frame "0.10.2" :exclusions [cljsjs/react]]
                  [reagent-utils "0.2.1" :exclusions [cljsjs/react]]
-                 [re-frisk "0.5.0" :exclusions [cljsjs/react]]
                  [binaryage/devtools "0.9.7"]
                  [hiccup "1.0.5"]
                  [garden "1.3.3"]
@@ -52,6 +51,7 @@
                                   [ring/ring-devel "1.6.2"]
                                   [prone "1.1.4"]
                                   [figwheel-sidecar "0.5.14"]
+                                  [re-frisk "0.5.2" :exclusions [cljs/react]]
                                   [org.clojure/tools.nrepl "0.2.13"]
                                   [com.cemerick/piggieback "0.2.2-SNAPSHOT"]
                                   [pjstadig/humane-test-output "0.8.3"]]
@@ -72,6 +72,7 @@
                            :source-map true
                            :optimizations :none
                            :pretty-print  true
+                           :preloads [re-frisk.preload]
 
                            ;; :foreign-libs []
 
