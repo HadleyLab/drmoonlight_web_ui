@@ -22,6 +22,12 @@
       (assoc (or m []) k value)
       (assoc (or m {}) k value))))
 
+(defn get-path-from-cursor [cursor]
+  (cond
+    (= reagent.ratom/RAtom (type cursor)) []
+    (= reagent.ratom/RCursor (type cursor)) (let [path (.-path cursor)
+                                                  ratom (.-ratom cursor)]
+                                              (into [] (concat (get-path-from-cursor ratom) path)))))
 (rf/reg-event-db
  :db/write
  (fn [db [_ path val]]
