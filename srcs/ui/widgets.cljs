@@ -71,12 +71,22 @@
                   :label-position :right}]])))
 
 (defn FormSelect [{cursor :cursor label :label items :items}]
-  [sa/FormSelect {:placeholder label :label label :on-change (>atom cursor) :options (items)}])
+  [sa/FormSelect {:value @cursor
+                  :placeholder label
+                  :label label
+                  :on-change (>atom cursor)
+                  :options (items)}])
 
 (defn FormMultySelect [{cursor :cursor label :label items :items}]
   [:div.field
    [:label label]
-   [sa/Dropdown {:placeholder label :fluid true :multiple true :selection true :on-change (>atom cursor) :options (items)}]])
+   [sa/Dropdown {:value @cursor
+                 :placeholder label
+                 :fluid true
+                 :multiple true
+                 :selection true
+                 :on-change (>atom cursor)
+                 :options (items)}]])
 
 (defn RenderInput [{cursor :cursor field :field}]
   (let [field-cursor (reagent/cursor cursor [:fields field])

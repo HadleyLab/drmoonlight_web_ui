@@ -30,8 +30,7 @@
                 (rf/dispatch [(:event success)
                               (merge success
                                      {:request opts
-                                      :response resp
-                                      :data nil})])
+                                      :response resp})])
                 (.then (.json resp)
                        (fn [doc]
                          (.log js/console "doc" (.-status resp) doc)

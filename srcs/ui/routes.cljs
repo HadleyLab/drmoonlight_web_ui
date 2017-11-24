@@ -17,6 +17,9 @@
 (defn is-scheduler []
   (= (<sub [:user-type]) :scheduler))
 
+(defn is-approved []
+  (= (<sub [:user-state]) 3))
+
 (def routes {:. :core/index
              "login" :core/login
              "activate" {[:uid] {[:token] :core/activate}}
@@ -26,10 +29,13 @@
                                 "thanks" {:. :core/forgot-password-thanks}}
              "resident" {:interceptors [is-resident]
                          :. :core/resident
-                         "schedule" {:. :core/resident-schedule}
+                         "schedule" {:. :core/resident-schedule
+                                     :interceptors [is-approved]}
                          "messages" {:. :core/resident-messages
-                                     [:pk] {"apply" {:. :core/resident-messages}}}
-                         "statistics" {:. :core/resident-statistics}
+                                     [:pk] {"apply" {:. :core/resident-messages}}
+                                     :interceptors [is-approved]}
+                         "statistics" {:. :core/resident-statistics
+                                       :interceptors [is-approved]}
                          "profile" {:. :core/resident-profile
                                     "notification" :core/resident-profile-notification}}
              "scheduler" {:interceptors [is-scheduler]

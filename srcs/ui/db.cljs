@@ -41,8 +41,8 @@
  (fn [db [_ path val]]
    (insert-by-path db path val)))
 
-(defn get-url [db path]
-  (str (db :base-url) path))
+(defn get-url [db & rest]
+  (apply str (cons (db :base-url) rest)))
 
 (defn- negligible?
   [x]
@@ -117,6 +117,13 @@
  :user-type
  (fn [db _]
    (get-in db [:account :user-type])))
+
+(rf/reg-sub
+ :user-state
+ (fn [db _]
+   (get-in db [:account :user-info :state])))
+
+
 
 (rf/reg-event-fx
  :logout
