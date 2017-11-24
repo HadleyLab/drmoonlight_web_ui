@@ -38,11 +38,15 @@
 ;; user in cookies or in location string (after OpenId redirect)
 (rf/reg-event-fx
  ::initialize
- (fn [db]
-   (let [base-url "http://localhost:8000"]
-     {:dispatch [:route-map/init routes/routes]
-      :db {:base-url base-url
-           :constants {:status :loading}}
+ [(rf/inject-cofx :store)]
+ (fn [{store :store}]
+   (let [base-url "http://localhost:8000"
+         token (:token store)]
+     {:dispatch-n (concat [[:route-map/init routes/routes]] [(when-not (nil? token) [:load-account-info token])])
+      :db (merge
+           {:base-url base-url
+            :constants {:status :loading}}
+           (when-not (nil? token) {:account {:token token}}))
       :json/fetch {:uri (str base-url "/api/constants/")
                    :success {:event :constants-succeed}
                    :error {:event :constants-failure}}})))

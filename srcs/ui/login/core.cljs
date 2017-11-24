@@ -69,12 +69,18 @@
 
 (rf/reg-event-fx
  :login-succeed
- (fn [{db :db} [_ {data :data}]]
+ [(rf/inject-cofx :store)]
+ (fn [{db :db store :store} [_ {data :data}]]
    {:db (assoc-in db [:account] {:token (:auth-token data)})
-    :json/fetch {:uri (get-url db "/api/accounts/me/")
-                 :token (:auth-token data)
-                 :success {:event :loaded-login-data}
-                 :error {:event :login-failure}}}))
+    :store (assoc store :token (:auth-token data))
+    :dispatch [:load-account-info (:auth-token data)]}))
+
+(rf/reg-event-fx
+ :load-account-info
+ (fn [{db :db} [_ token]] {:json/fetch {:uri (get-url db "/api/accounts/me/")
+                                        :token token
+                                        :success {:event :loaded-login-data}
+                                        :error {:event :login-failure}}}))
 
 (rf/reg-event-fx
  :loaded-login-data

@@ -2,7 +2,12 @@
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
+            [akiroz.re-frame.storage :refer [reg-co-fx!]]
             [clojure.string :as str]))
+
+(reg-co-fx! :de-moonlight
+            {:fx :store
+             :cofx :store})
 
 (def <sub (comp deref re-frame.core/subscribe))
 (def >evt re-frame.core/dispatch)
@@ -115,8 +120,10 @@
 
 (rf/reg-event-fx
  :logout
- (fn [{db :db} _]
+ [(rf/inject-cofx :store)]
+ (fn [{db :db store :store} _]
    {:db (dissoc db :account)
+    :store (dissoc store :token)
     :dispatch [:goto "/"]}))
 
 (defn as-options [get-text data]
