@@ -1,10 +1,10 @@
 (ns ui.scheduler.schedule.core
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [dispatch-set!]]
+   [ui.db :refer [dispatch-set! <sub >event get-url]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [concatv BuildForm fields->schema]]
+   [ui.widgets :refer [concatv BuildForm fields->schema cljstime->drf-date-time convert-shifts]]
    [ui.widgets.calendar :refer [Calendar]]
    [ui.scheduler.layout :refer [SchedulerLayout]]
    [re-frame.core :as rf]
@@ -30,49 +30,60 @@
         :time-format "HH:mm"
         :date-format "LLL"
         :time-intervals 15}}
-   "Requid staff" {:speciality "Speciality name"
+   "Requid staff" {:speciality
+                   {:type :select
+                    :label "Speciality name"
+                    :items #(<sub [:speciality-as-options])}
+
                    :payment-amount {:type :input-with-drop-down
-                                   :label "Payment amount, $"
-                                   :drop-down {:cursor :payment-per-hour
-                                               :options [{:key true :value true :text "hourly"}
-                                                         {:key false :value false :text "per shift"}]}}
+                                    :label "Payment amount, $"
+                                    :drop-down {:cursor :payment-per-hour
+                                                :options [{:key "true" :value "true" :text "hourly"}
+                                                          {:key "false" :value "false" :text "per shift"}]}}
                    :payment-per-hour {:type :mock}
                    :description {:type :textarea :label "Description"}
-                   :residency-program "Residency Program"
+                   :residency-program {:type :select
+                                       :label "Residency Program"
+                                       :items #(<sub [:residency-program-as-options])}
                    :residency-years-required "Residency years required"}})
 
 (defn schema []
   {:selected (dt/date-time (dt/year (dt/now)) (dt/month (dt/now)) 1)
    :shift-form
    {:fields (fields->schema shift-form-fields)
+    :shift-modal-open false
     :response {:status :not-asked}}
    :shifts {:status :not-asked}})
 
-(defn ShiftLabel [{title :title start :start finish :finish total :total pk :pk}]
+(defn ShiftLabel [{speciality :speciality}]
   [:div
-   [sa/Label {:color :blue} title] [:br] [:br]])
+   [sa/Label {:color :blue} (:name (<sub [:speciality speciality]))] [:br] [:br]])
 
-(defn CreateNewShift [new-shift-form-cursor]
-  [sa/Modal {:trigger (reagent/as-element [sa/Button {:color :blue} [sa/Icon {:name :plus}] "Create new shift"])
+(defn CreateNewShift [new-shift-form-cursor modal-cursor]
+  [sa/Modal {:trigger (reagent/as-element [sa/Button {:color :blue
+                                                      :on-click #(dispatch-set! modal-cursor true)}
+                                           [sa/Icon {:name :plus}] "Create new shift"])
              :dimmer :blurring
+             :open @modal-cursor
              :size :small}
    [sa/ModalHeader "Create a new shift"]
    [sa/ModalContent {:image true}
     [sa/ModalDescription
      [sa/Form {}
       [BuildForm new-shift-form-cursor shift-form-fields]]]]
-   [sa/ModalActions [sa/Button {:color :blue} "Done"]]])
+   [sa/ModalActions [sa/Button {:color :blue :on-click (>event [:create-new-shift])} "Done"]]])
 
 (defn Index [params]
   (rf/dispatch-sync [::init-scheduler-shedule-page])
   (let [selected-cursor @(rf/subscribe [:cursor [root-path :selected]])
         shifts-cursor @(rf/subscribe [:cursor [root-path :shifts]])
-        new-shift-form-cursor @(rf/subscribe [:cursor [root-path :shift-form]])]
+        new-shift-form-cursor @(rf/subscribe [:cursor [root-path :shift-form]])
+        modal-cursor @(rf/subscribe [:cursor [root-path :shift-form :shift-modal-open]])]
     (fn [params]
       [SchedulerLayout
        [sa/Grid {}
         [sa/GridRow {}
-         [sa/GridColumn {:width 3} [CreateNewShift new-shift-form-cursor]]
+         [sa/GridColumn {:width 3} [CreateNewShift new-shift-form-cursor modal-cursor]]
          [sa/GridColumn {:width 3}]
          [sa/GridColumn {:width 4}
           [sa/Button {:icon "angle left"
@@ -94,21 +105,56 @@
           db)
     :dispatch [::load-shifts]}))
 
+(rf/reg-event-fx
+ :create-new-shift
+ (fn [{db :db} [_]]
+   {:db (assoc-in db [root-path :shift-form :response :status] :loading)
+    :json/fetch {:uri (get-url db "/api/shifts/shift/")
+                 :method "POST"
+                 :token (<sub [:token])
+                 :body (-> db
+                           (get-in [root-path :shift-form :fields])
+                           (update-in [:date-start] cljstime->drf-date-time)
+                           (update-in [:date-end] cljstime->drf-date-time))
+                 :success {:event :create-new-shift-succeed}
+                 :error {:event :create-new-shift-failure}}}))
+
+(rf/reg-event-fx
+ :create-new-shift-succeed
+ (fn [{db :db} _]
+   {:db (assoc-in db [root-path :shift-form] (:shift-form (schema)))
+    :dispatch [::load-shifts]}))
+
 (rf/reg-event-db
+ :create-new-shift-failure
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [root-path :shift-form :response :status] :failure)
+       (assoc-in [root-path :shift-form :response :errors] data))))
+
+
+(rf/reg-event-fx
  ::load-shifts
- (fn [db [_]]
-   (assoc-in db [root-path :shifts]
-             {:status :succeed
-              :data {"2017-11-30" [{:pk 1 :date (dt/date-time 2017 11 30) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}
-                                   {:pk 2 :date (dt/date-time 2017 11 30) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}
-                                   {:pk 3 :date (dt/date-time 2017 11 30) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-01" [{:pk 4 :date (dt/date-time 2017 12 1) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-02" [{:pk 5 :date (dt/date-time 2017 12 1) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-03" [{:pk 6 :date (dt/date-time 2017 12 1) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-04" [{:pk 7 :date (dt/date-time 2017 12 1) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-05" [{:pk 8 :date (dt/date-time 2017 12 1) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-06" [{:pk 9 :date (dt/date-time 2017 12 6) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}
-                                   {:pk 10 :date (dt/date-time 2017 12 6) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}
-                                   {:pk 11 :date (dt/date-time 2017 12 6) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]}})))
+ (fn [{db :db} [_]]
+   {:db (assoc-in db [root-path :shifts :status] :loading)
+    :json/fetch {:uri (get-url db "/api/shifts/shift/")
+                 :token (<sub [:token])
+                 :success {:event ::load-shifts-succeed}
+                 :error {:event ::load-shifts-failure}}}))
+
+(rf/reg-event-db
+ ::load-shifts-succeed
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [root-path :shifts :status] :success)
+       (assoc-in [root-path :shifts :data] (convert-shifts data)))))
+
+(rf/reg-event-db
+ ::load-shifts-failure
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [root-path :shifts :status] :failure)
+       (assoc-in [root-path :shifts :errors] data))))
+
 
 (pages/reg-page :core/scheduler-schedule Index)

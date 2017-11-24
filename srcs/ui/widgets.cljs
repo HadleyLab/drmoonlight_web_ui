@@ -10,11 +10,23 @@
    [cljsjs.moment]
    [soda-ash.core :as sa]))
 
+(defn get-date [date-time]
+  (try
+    (let [date-format "yyyy-MM-dd"]
+      (format/unparse (format/formatter date-format) (format/parse date-time)))
+    (catch js/Object e "")))
+
+(defn cljstime->drf-date-time [date-time]
+  (try
+    (let [date-format "yyyy-MM-dd'T'HH:mm"]
+      (format/unparse (format/formatter date-format) date-time))
+    (catch js/Object e "")))
+
 (defn moment->cljs [m]
   (format/parse (.format m)))
 
 (defn cljs->moment [c]
-  (let [date-format "yyyy-MM-dd hh:mm a Z"]
+  (let [date-format "yyyy-MM-dd HH:mm Z"]
     (if (not= c "")
       (js/moment (format/unparse (format/formatter date-format) c))
       (js/moment))))
@@ -61,13 +73,17 @@
    [sa/TextArea {:value @cursor :on-change (>atom cursor)}]])
 
 (defn FormInputWithDropDown [field-cursor cursor {label :label drop-down :drop-down}]
-  (let [drop-down-cursor (reagent/cursor cursor [(:cursor drop-down)])]
+  (let [drop-down-cursor (reagent/cursor cursor [:fields (:cursor drop-down)])
+        _ (.log js/console drop-down)]
     (fn [field-cursor cursor {label :label drop-down :drop-down}]
       [:div.field
        [:label label]
        [sa/Input {:label (reagent/as-element
-                          [sa/Dropdown {:default-value true
+                          [sa/Dropdown {:value @drop-down-cursor
+                                        :on-change (>atom drop-down-cursor)
                                         :options (:options drop-down)}])
+                  :value @field-cursor
+                  :on-change (>atom field-cursor)
                   :label-position :right}]])))
 
 (defn FormSelect [{cursor :cursor label :label items :items}]
@@ -138,3 +154,6 @@
 (defn setup-form-initial-values [initial-values]
   (fn [data]
     (into {} (map (fn [[key value]] [key (initial-values key value)]) data))))
+
+(defn convert-shifts [data]
+  (group-by (comp get-date :date-start) data))

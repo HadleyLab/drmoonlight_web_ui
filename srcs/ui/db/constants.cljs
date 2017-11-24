@@ -6,8 +6,8 @@
 (rf/reg-event-fx
  :load-constants
  (fn [{db :db}] {:json/fetch {:uri (get-url db "/api/constants/")
-                      :success {:event :constants-succeed}
-                      :error {:event :constants-failure}}}))
+                              :success {:event :constants-succeed}
+                              :error {:event :constants-failure}}}))
 
 (defn list->map [data]
   (into {} (map (fn [{pk :pk :as item}] [pk item]) data)))
@@ -31,8 +31,10 @@
 
 (rf/reg-sub
  :residency-program
- (fn [db _]
-   (get-in db [:constants :data :residency-program] [])))
+ (fn [db [_ id]]
+   (if (nil? id)
+     (get-in db [:constants :data :residency-program] [])
+     (get-in db [:constants :data :residency-program id]))))
 
 (rf/reg-sub
  :residency-program-as-options
@@ -41,8 +43,10 @@
 
 (rf/reg-sub
  :speciality
- (fn [db _]
-   (get-in db [:constants :data :speciality] [])))
+ (fn [db [_ id]]
+   (if (nil? id)
+     (get-in db [:constants :data :speciality] [])
+     (get-in db [:constants :data :speciality id]))))
 
 (rf/reg-sub
  :speciality-as-options

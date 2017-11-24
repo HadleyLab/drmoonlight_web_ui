@@ -1,10 +1,10 @@
 (ns ui.resident.schedule.core
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [>event dispatch-set!]]
+   [ui.db :refer [>event dispatch-set! get-url <sub]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [concatv]]
+   [ui.widgets :refer [concatv convert-shifts]]
    [ui.widgets.calendar :refer [Calendar]]
    [ui.resident.layout :refer [ResidentLayout]]
    [re-frame.core :as rf]
@@ -19,16 +19,15 @@
   {:selected (dt/date-time (dt/year (dt/now)) (dt/month (dt/now)) 1)
    :shifts {:status :not-asked}})
 
-(defn ShiftLabel [{title :title start :start finish :finish total :total pk :pk}]
+(defn ShiftLabel [{speciality :speciality start :date-start finish :date-end pk :pk}]
   [:div [sa/Popup
-         {:trigger (reagent/as-element [sa/Label {:color :blue} title])
+         {:trigger (reagent/as-element [sa/Label {:color :blue} (:name (<sub [:speciality speciality]))])
           :flowing true
           :position "left center"
           :hoverable true}
          [:div
           [:p [:strong "start"] start]
           [:p [:strong "finish"] finish]
-          [:p [:strong "total"] total]
           [sa/Button {:on-click (>event [:goto :resident :messages pk :apply])} "Apply"]]] [:br] [:br]])
 
 (defn Index [params]
@@ -59,21 +58,27 @@
           db)
     :dispatch [::load-shifts]}))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  ::load-shifts
- (fn [db [_]]
-   (assoc-in db [root-path :shifts]
-             {:status :succeed
-              :data {"2017-11-30" [{:pk 1 :date (dt/date-time 2017 11 30) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}
-                                   {:pk 2 :date (dt/date-time 2017 11 30) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}
-                                   {:pk 3 :date (dt/date-time 2017 11 30) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-01" [{:pk 4 :date (dt/date-time 2017 12 1) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-02" [{:pk 5 :date (dt/date-time 2017 12 1) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-03" [{:pk 6 :date (dt/date-time 2017 12 1) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-04" [{:pk 7 :date (dt/date-time 2017 12 1) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-05" [{:pk 8 :date (dt/date-time 2017 12 1) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]
-                     "2017-12-06" [{:pk 9 :date (dt/date-time 2017 12 6) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}
-                                   {:pk 10 :date (dt/date-time 2017 12 6) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}
-                                   {:pk 11 :date (dt/date-time 2017 12 6) :title "doctor" :start "8pm" :finish "11pm" :total "6 hours"}]}})))
+ (fn [{db :db} [_]]
+   {:db (assoc-in db [root-path :shifts :status] :loading)
+    :json/fetch {:uri (get-url db "/api/shifts/shift/")
+                 :token (<sub [:token])
+                 :success {:event ::load-shifts-succeed}
+                 :error {:event ::load-shifts-failure}}}))
+
+(rf/reg-event-db
+ ::load-shifts-succeed
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [root-path :shifts :status] :success)
+       (assoc-in [root-path :shifts :data] (convert-shifts data)))))
+
+(rf/reg-event-db
+ ::load-shifts-failure
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [root-path :shifts :status] :failure)
+       (assoc-in [root-path :shifts :errors] data))))
 
 (pages/reg-page :core/resident-schedule Index)
