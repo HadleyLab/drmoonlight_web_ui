@@ -4,6 +4,9 @@
             [re-frame.core :as rf]
             [clojure.string :as str]))
 
+(def <sub (comp deref re-frame.core/subscribe))
+(def >evt re-frame.core/dispatch)
+
 (rf/reg-sub-raw :route (fn [db _] (reaction (:route @db))))
 (rf/reg-sub-raw :db (fn [db] db))
 (rf/reg-sub-raw :cursor (fn [db [k path]] (reaction (reagent/cursor db path))))

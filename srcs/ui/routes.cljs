@@ -1,5 +1,6 @@
 (ns ui.routes
   (:require [clojure.string :as str]
+            [ui.db :refer [<sub]]
             [route-map.core :as route-map]))
 
 ;; application routes represented as hash-map (see https://github.com/niquola/route-map)
@@ -10,6 +11,12 @@
 ;; We also save previos contexts and fire event with :deinit flag for disposed contexts
 ;; You could use context to init common state for some branch of routes
 
+(defn is-resident []
+  (= (<sub [:user-type]) :resident))
+
+(defn is-scheduler []
+  (= (<sub [:user-type]) :scheduler))
+
 (def routes {:. :core/index
              "login" :core/login
              "activate" {[:uid] {[:token] :core/activate}}
@@ -17,14 +24,16 @@
                         "thanks" {:. :core/sign-up-thanks}}
              "forgot-password" {:. :core/forgot-password
                                 "thanks" {:. :core/forgot-password-thanks}}
-             "resident" {:. :core/resident
+             "resident" {:interceptors [is-resident]
+                         :. :core/resident
                          "schedule" {:. :core/resident-schedule}
                          "messages" {:. :core/resident-messages
                                      [:pk] {"apply" {:. :core/resident-messages}}}
                          "statistics" {:. :core/resident-statistics}
                          "profile" {:. :core/resident-profile
                                     "notification" :core/resident-profile-notification}}
-             "scheduler" {:. :core/scheduler
+             "scheduler" {:interceptors [is-scheduler]
+                          :. :core/scheduler
                          "schedule" {:. :core/scheduler-schedule}
                          "messages" {:. :core/scheduler-messages
                                      [:pk] {"apply" {:. :core/scheduler-messages}}}

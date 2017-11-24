@@ -57,16 +57,20 @@
  (fn [{db :db} [k fragment]]
    (if-let [route (route-map/match (str/replace fragment #"^#" "") (:route-map/routes db))]
      (let [contexts (->> (:parents route) (mapv :context) (filterv identity))
+           interceptors (into [] (mapcat :interceptors (:parents route)))
+           has-permissions-for-route (every? true? (map apply interceptors))
            ;; breadcrumbs (mk-breadcrumbs route)
            dispose-context (or  [])]
-       {:db (assoc db :fragment fragment
-                   :route/context contexts
-                   ;; :route-map/breadcrumbs breadcrumbs
-                   :route-map/current-route route)
-        :dispatch-n (contexts-diff (:route/context db)
-                                   contexts
-                                   (:params route)
-                                   (get-in db [:route-map/current-route :params]))})
+       (if has-permissions-for-route
+        {:db (assoc db :fragment fragment
+                    :route/context contexts
+                    ;; :route-map/breadcrumbs breadcrumbs
+                    :route-map/current-route route)
+          :dispatch-n (contexts-diff (:route/context db)
+                                    contexts
+                                    (:params route)
+                                    (get-in db [:route-map/current-route :params]))}
+        {:db (assoc db :fragment fragment :route-map/current-route nil)}))
      {:db (assoc db :fragment fragment :route-map/current-route nil)})))
 
 (rf/reg-event-fx
