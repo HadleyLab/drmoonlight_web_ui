@@ -1,7 +1,7 @@
 (ns ui.widgets
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [>event >atom]]
+   [ui.db :refer [>event >atom dispatch-set!]]
    [re-frame.core :as rf]
    [cljs.pprint :as pp]
    [cljs-time.core :as dt]
@@ -30,11 +30,11 @@
   (concatv [sa/FormGroup {} [:div.field [:label label]]]
            (->> items
                 (mapv (fn [[key value]]
-                        [sa/FormRadio {:key key
+                        [sa/FormRadio {:key value
                                        :label key
                                        :value value
-                                       :checked (= @cursor key)
-                                       :on-change #(reset! cursor key)}])))))
+                                       :checked (= @cursor value)
+                                       :on-change #(dispatch-set! cursor value)}])))))
 
 (defn FormToggle [{cursor :cursor label :label}]
   [sa/Checkbox
@@ -70,6 +70,14 @@
                                         :options (:options drop-down)}])
                   :label-position :right}]])))
 
+(defn FormSelect [{cursor :cursor label :label items :items}]
+  [sa/FormSelect {:placeholder label :label label :on-change (>atom cursor) :options (items)}])
+
+(defn FormMultySelect [{cursor :cursor label :label items :items}]
+  [:div.field
+   [:label label]
+   [sa/Dropdown {:placeholder label :fluid true :multiple true :selection true :on-change (>atom cursor) :options (items)}]])
+
 (defn RenderInput [{cursor :cursor field :field}]
   (let [field-cursor (reagent/cursor cursor [:fields field])
         errors-cursor (reagent/cursor cursor [:response :errors field])]
@@ -90,6 +98,8 @@
              (= :date-picker (:type info)) [FormDatepicker (merge {:cursor field-cursor} info)]
              (= :mock (:type info)) nil
              (= :input-with-drop-down (:type info)) [FormInputWithDropDown field-cursor cursor info]
+             (= :select (:type info)) [FormSelect (merge {:cursor field-cursor} info)]
+             (= :multy-select (:type info)) [FormMultySelect (merge {:cursor field-cursor} info)]
              :else [:div (str info)]))
          (if (= errors nil)
            [:div]
@@ -113,3 +123,7 @@
 
 (defn fields->schema [fields]
   (into {} (map (fn [[key _]] [key ""]) (mapcat second fields))))
+
+(defn setup-form-initial-values [initial-values]
+  (fn [data]
+    (into {} (map (fn [[key value]] [key (initial-values key value)]) data))))

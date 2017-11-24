@@ -1,10 +1,10 @@
 (ns ui.resident.core
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [>event]]
+   [ui.db :refer [>event <sub]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [BuildForm fields->schema]]
+   [ui.widgets :refer [BuildForm fields->schema setup-form-initial-values]]
    [ui.resident.layout :refer [ResidentLayout ResidentProfileLayout]]
    [re-frame.core :as rf]
    [clojure.string :as str]
@@ -16,11 +16,19 @@
 (def resident-profile-form-fields
   {"Personal Information" {:first-name "First Name"
                            :last-name "Last Name"}
-   "Reidency" {:residency-program "Residency Program"
-               :specialities "Specialities"
+   "Reidency" {:residency-program {:type :select
+                                   :label "Residency Program"
+                                   :items #(<sub [:residency-program-as-options])}
+               :specialities {:type :multy-select
+                              :label "Specialities"
+                              :items #(<sub [:speciality-as-options])}
                :residency-year "Residency Year"
-               :state-licence {:type :radio :label "State Licence" :items {"Yes" true "No" false}}
-               :board-score {:type :radio :label "Board Score" :items {"Yes" true "No" false}}}})
+               :state-licence {:type :radio
+                               :label "State Licence"
+                               :items {"Yes" true "No" false}}
+               :board-score {:type :radio
+                             :label "Board Score"
+                             :items {"Yes" true "No" false}}}})
 
 (def resident-notification-form-fields
   {"I would like to recieve emails when:"
@@ -48,11 +56,12 @@
 
 (defn ResidentProfileForm []
   (let [resident-page-cursor @(rf/subscribe [:cursor [root-path]])
-        resident-profile-form-cursor (reagent/cursor resident-page-cursor [:profile-form])]
+        resident-profile-form-cursor (reagent/cursor resident-page-cursor [:profile-form])
+        email (get-in (<sub [:account]) [:user-info :email])]
     (fn []
       [sa/Form {:class-name "moonlight-form-inner"}
        [BuildForm resident-profile-form-cursor resident-profile-form-fields]
-       [:div [:label "Account settings"] [:div.field [:label "Email"] [:p "test@me.com"]]]
+       [:div [:label "Account settings"] [:div.field [:label "Email"] [:p email]]]
        [:div.moonlight-form-group
         [sa/FormButton {:color :blue
                         :on-click (>event [:udpate-resident-profile])} "save changes"]]])))
@@ -64,10 +73,11 @@
 
 (rf/reg-event-db
  ::init-resident-page
- (fn [db [_]]
-   (if (= (root-path db) nil)
-     (assoc-in db [root-path] schema)
-     db)))
+ (fn [db _]
+   (-> db
+      (assoc-in [root-path] schema)
+      (update-in [root-path :profile-form :fields] (setup-form-initial-values (:user-info (<sub [:account]))))
+      (update-in [root-path :notification-form :fields] (setup-form-initial-values (:user-info (<sub [:account])))))))
 
 (pages/reg-page :core/resident (with-init (fn [] [ResidentLayout [sa/Header {} "index"]])))
 (pages/reg-page :core/resident-statistics (with-init (fn [] [ResidentLayout [sa/Header {} "statistics"]])))

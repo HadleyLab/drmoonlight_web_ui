@@ -1,5 +1,6 @@
 (ns ui.resident.layout
   (:require
+   [ui.db :refer [>evt]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
 
@@ -12,19 +13,19 @@
       [sa/GridColumn {:width 7}
        [sa/ButtonGroup {}
         [sa/Button {:active (= (:match @route) :core/resident-schedule)
-                    :on-click #(rf/dispatch [:goto :resident :schedule])}
+                    :on-click #(>evt [:goto :resident :schedule])}
          [sa/Icon {:name :calendar}]
          "Schedule"]
         [sa/Button {:active (= (:match @route) :core/resident-messages)
-                    :on-click #(rf/dispatch [:goto :resident :messages])}
+                    :on-click #(>evt [:goto :resident :messages])}
          [sa/Icon {:name :mail}]
          "Messages"]
         [sa/Button {:active (= (:match @route) :core/resident-statistics)
-                    :on-click #(rf/dispatch [:goto :resident :statistics])}
+                    :on-click #(>evt [:goto :resident :statistics])}
          [sa/Icon {:name :table}]
          "Statistics"]
         [sa/Button {:active (= (:. (last (:parents @route))) :core/resident-profile)
-                    :on-click #(rf/dispatch [:goto :resident :profile])}
+                    :on-click #(>evt [:goto :resident :profile])}
          [sa/Icon {:name :user}]
          "Profile"]]]]
      [sa/GridRow {}
@@ -41,11 +42,12 @@
         [sa/Menu {:fluid true :vertical true :tabular true}
          [sa/MenuItem {:name "Edit Profile"
                        :active (= (:match @route) :core/resident-profile)
-                       :on-click #(rf/dispatch [:goto :resident :profile])}]
+                       :on-click #(>evt [:goto :resident :profile])}]
          [sa/MenuItem {:name "Notification Settings"
                        :active (= (:match @route) :core/resident-profile-notification)
-                       :on-click #(rf/dispatch [:goto :resident :profile :notification])}]
-         [sa/MenuItem {:name "Log out"}]]]
+                       :on-click #(>evt [:goto :resident :profile :notification])}]
+         [sa/MenuItem {:name "Log out"
+                       :on-click #(>evt [:logout])}]]]
 
        [sa/GridColumn {:width 12 :class-name :moonlight-white}
         content]]]]))

@@ -7,7 +7,7 @@
    [ui.routes :refer [href]]
    [ui.styles :as styles]
    [clojure.string :as str]
-   [soda-ash.core :as sa]))§
+   [soda-ash.core :as sa]))
 
 (defn layout [content]
   (fn []

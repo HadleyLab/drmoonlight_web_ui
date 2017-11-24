@@ -1,4 +1,4 @@
-(ns ui.db 
+(ns ui.db
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
@@ -59,10 +59,10 @@
    (>event event default identity))
   ([event default coercer]
    #(rf/dispatch (let [value (or (.-value %2) (.-checked %2))]
-            (conj event
-                  (coercer (if (negligible? value)
-                             default
-                             value)))))))
+                   (conj event
+                         (coercer (if (negligible? value)
+                                    default
+                                    value)))))))
 
 (defn >events
   "Utility function to dispatch multiple events from an on-* hander.
@@ -103,9 +103,41 @@
          coercer
          (dispatch-set! atom))))
 
-(comment
-  (:fragment
-  @re-frame.db/app-db
-  )
+(rf/reg-sub
+ :account
+ (fn [db _]
+   (get-in db [:account])))
 
-  )
+(rf/reg-sub
+ :user-type
+ (fn [db _]
+   (get-in db [:account :user-type])))
+
+(rf/reg-event-fx
+ :logout
+ (fn [{db :db} _]
+   {:db (dissoc db :account)
+    :dispatch [:goto "/"]}))
+
+(defn as-options [get-text data]
+  (map (fn [[key value]] {:key key :text (get-text value) :value key}) data))
+
+(rf/reg-sub
+ :residency-program
+ (fn [db _]
+   (get-in db [:constants :data :residency-program] [])))
+
+(rf/reg-sub
+ :residency-program-as-options
+ #(rf/subscribe [:residency-program])
+ #(as-options :name %))
+
+(rf/reg-sub
+ :speciality
+ (fn [db _]
+   (get-in db [:constants :data :speciality] [])))
+
+(rf/reg-sub
+ :speciality-as-options
+ #(rf/subscribe [:speciality])
+ #(as-options :name %))

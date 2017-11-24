@@ -29,7 +29,7 @@
     (if page
       (if-let [cmp (get @pages/pages page)]
         [:div [cmp params]]
-        [:div.not-found (str "Page not found [" (str page) "]" )])
+        [:div.not-found (str "Page not found [" (str page) "]")])
       [:div.not-found (str "Route not found ")])))
 
 ;; this is first event, which should initialize
@@ -39,8 +39,30 @@
 (rf/reg-event-fx
  ::initialize
  (fn [db]
-   {:dispatch [:route-map/init routes/routes]
-    :db {:base-url "http://localhost:8000"}}))
+   (let [base-url "http://localhost:8000"]
+     {:dispatch [:route-map/init routes/routes]
+      :db {:base-url base-url
+           :constants {:status :loading}}
+      :json/fetch {:uri (str base-url "/api/constants/")
+                   :success {:event :constants-succeed}
+                   :error {:event :constants-failure}}})))
+
+(defn list->map [data]
+  (into {} (map (fn [{pk :pk :as item}] [pk item]) data)))
+
+(rf/reg-event-db
+ :constants-succeed
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [:constants :status] :succeed)
+       (assoc-in [:constants :data] (into {} (map (fn [[key values]] [key (list->map values)]) data))))))
+
+(rf/reg-event-db
+ :constants-failure
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [:constants :status] :failure)
+       (assoc-in [:constants :error] :data))))
 
 (defn- mount-root []
   (reagent/render
