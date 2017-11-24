@@ -1,6 +1,7 @@
 (ns ui.scheduler.schedule.core
   (:require
    [reagent.core :as reagent]
+   [ui.db :refer [dispatch-set!]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [concatv BuildForm fields->schema]]
@@ -75,10 +76,10 @@
          [sa/GridColumn {:width 3}]
          [sa/GridColumn {:width 4}
           [sa/Button {:icon "angle left"
-                      :on-click #(reset! selected-cursor (dt/minus @selected-cursor (dt/months 1)))}]
+                      :on-click #(dispatch-set! selected-cursor (dt/minus @selected-cursor (dt/months 1)))}]
           [:span (format/unparse (format/formatter "MMMM YYYY") @selected-cursor)]
           [sa/Button {:icon "angle right"
-                      :on-click #(reset! selected-cursor (dt/plus @selected-cursor (dt/months 1)))}]
+                      :on-click #(dispatch-set! selected-cursor (dt/plus @selected-cursor (dt/months 1)))}]
           [sa/GridColumn {:width 6}]]]
         [sa/GridRow {}
          [sa/GridColumn {:width 3}]

@@ -13,8 +13,16 @@
  #(deref (rf/subscribe [:account :user-type])))
 
 (rf/reg-sub
+ :user-email
+ #(deref (rf/subscribe [:account :user-info :email])))
+
+(rf/reg-sub
  :user-state
  #(deref (rf/subscribe [:account :user-info :state])))
+
+(rf/reg-sub
+ :user-id
+ #(deref (rf/subscribe [:account :user-info :id])))
 
 (rf/reg-sub
  :token
@@ -65,10 +73,3 @@
          fxs (if (fn? succeed-fx) (succeed-fx db) succeed-fx)]
      (merge
       {:db (assoc-in db [:account :user-info] data)} fxs))))
-
-   ;; {:db (-> db
-   ;;          (assoc-in [:account :user-info] data)
-   ;;          (assoc-in [root-path] schema))
-   ;;  :dispatch [:goto (get-in db [:account :user-type])]}))
-
-

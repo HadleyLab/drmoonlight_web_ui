@@ -58,7 +58,7 @@
   (let [resident-page-cursor @(rf/subscribe [:cursor [root-path]])
         resident-profile-form-cursor (reagent/cursor resident-page-cursor [:profile-form])
         status-cursor (reagent/cursor resident-profile-form-cursor [:response :status])
-        email (get-in (<sub [:account]) [:user-info :email])]
+        email (<sub [:user-email])]
     (fn []
       [sa/Form {:class-name "moonlight-form-inner"}
        [BuildForm resident-profile-form-cursor resident-profile-form-fields]
@@ -84,10 +84,10 @@
 (rf/reg-event-fx
  :update-resident-profile
  (fn [{db :db} _]
-   (let [pk (get-in db [:account :user-info :id])
-         token (get-in db [:account :token])
+   (let [pk (<sub [:user-id])
+         token (<sub [:token])
          body (get-in db [root-path :profile-form :fields])
-         state (get-in db [:account :user-info :state])
+         state (<sub [:user-state])
          url (if (= state 1)
                (get-url db "/api/accounts/resident/" pk "/fill_profile/")
                (get-url db "/api/accounts/resident/" pk "/"))]
