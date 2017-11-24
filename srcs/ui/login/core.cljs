@@ -63,46 +63,11 @@
      {:json/fetch {:uri (get-url db "/api/accounts/token/create/")
                    :method "post"
                    :body body
-                   :success {:event :login-succeed}
+                   :success {:event :login-succeed
+                             :fxs {:succeed-fx (fn [db2]
+                                                 {:dispatch [:goto (get-in db2 [:account :user-type])]})}}
                    :error {:event :login-failure}}
       :db (assoc-in db [root-path :response :status] :loading)})))
-
-(rf/reg-event-fx
- :login-succeed
- [(rf/inject-cofx :store)]
- (fn [{db :db store :store} [_ {data :data}]]
-   {:db (assoc-in db [:account] {:token (:auth-token data)})
-    :store (assoc store :token (:auth-token data))
-    :dispatch [:load-account-info (:auth-token data)]}))
-
-(rf/reg-event-fx
- :load-account-info
- (fn [{db :db} [_ token]] {:json/fetch {:uri (get-url db "/api/accounts/me/")
-                                        :token token
-                                        :success {:event :loaded-login-data}
-                                        :error {:event :login-failure}}}))
-
-(rf/reg-event-fx
- :loaded-login-data
- (fn [{db :db} [_ {data :data}]]
-   (let [user-type (cond
-                     (:is-resident data) :resident
-                     (:is-scheduler data) :scheduler
-                     (:is-account-manager data) :account-manager)
-         token (get-in db [:account :token])]
-     {:db (assoc-in db [:account :user-type] user-type)
-      :json/fetch {:uri (get-url db (str "/api/accounts/" (name user-type) "/" (:pk data) "/"))
-                   :token token
-                   :success {:event :loaded-user-data}
-                   :error {:event :login-failure}}})))
-
-(rf/reg-event-fx
- :loaded-user-data
- (fn [{db :db} [_ {data :data}]]
-   {:db (-> db
-            (assoc-in [:account :user-info] data)
-            (assoc-in [root-path] schema))
-    :dispatch [:goto (get-in db [:account :user-type])]}))
 
 (rf/reg-event-db
  :login-failure

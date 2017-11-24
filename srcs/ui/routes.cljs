@@ -18,7 +18,7 @@
   (= (<sub [:user-type]) :scheduler))
 
 (defn is-approved []
-  (= (<sub [:user-state]) 3))
+  (= (<sub [:user-state])  3))
 
 (def routes {:. :core/index
              "login" :core/login
@@ -40,11 +40,11 @@
                                     "notification" :core/resident-profile-notification}}
              "scheduler" {:interceptors [is-scheduler]
                           :. :core/scheduler
-                         "schedule" {:. :core/scheduler-schedule}
-                         "messages" {:. :core/scheduler-messages
-                                     [:pk] {"apply" {:. :core/scheduler-messages}}}
-                         "statistics" {:. :core/scheduler-statistics}
-                         "profile" {:. :core/scheduler-profile}}})
+                          "schedule" {:. :core/scheduler-schedule}
+                          "messages" {:. :core/scheduler-messages
+                                      [:pk] {"apply" {:. :core/scheduler-messages}}}
+                          "statistics" {:. :core/scheduler-statistics}
+                          "profile" {:. :core/scheduler-profile}}})
 
 (defn href
   ;; helper function to build urls also check url

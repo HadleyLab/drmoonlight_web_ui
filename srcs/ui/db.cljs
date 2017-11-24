@@ -3,7 +3,12 @@
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
             [akiroz.re-frame.storage :refer [reg-co-fx!]]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ui.db.account]
+            [ui.db.constants]))
+
+(defn get-url [db & rest]
+  (apply str (cons (db :base-url) rest)))
 
 (reg-co-fx! :de-moonlight
             {:fx :store
@@ -40,9 +45,6 @@
  :db/write
  (fn [db [_ path val]]
    (insert-by-path db path val)))
-
-(defn get-url [db & rest]
-  (apply str (cons (db :base-url) rest)))
 
 (defn- negligible?
   [x]
@@ -107,51 +109,3 @@
          js->clj
          coercer
          (dispatch-set! atom))))
-
-(rf/reg-sub
- :account
- (fn [db _]
-   (get-in db [:account])))
-
-(rf/reg-sub
- :user-type
- (fn [db _]
-   (get-in db [:account :user-type])))
-
-(rf/reg-sub
- :user-state
- (fn [db _]
-   (get-in db [:account :user-info :state])))
-
-
-
-(rf/reg-event-fx
- :logout
- [(rf/inject-cofx :store)]
- (fn [{db :db store :store} _]
-   {:db (dissoc db :account)
-    :store (dissoc store :token)
-    :dispatch [:goto "/"]}))
-
-(defn as-options [get-text data]
-  (map (fn [[key value]] {:key key :text (get-text value) :value key}) data))
-
-(rf/reg-sub
- :residency-program
- (fn [db _]
-   (get-in db [:constants :data :residency-program] [])))
-
-(rf/reg-sub
- :residency-program-as-options
- #(rf/subscribe [:residency-program])
- #(as-options :name %))
-
-(rf/reg-sub
- :speciality
- (fn [db _]
-   (get-in db [:constants :data :speciality] [])))
-
-(rf/reg-sub
- :speciality-as-options
- #(rf/subscribe [:speciality])
- #(as-options :name %))

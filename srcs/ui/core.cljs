@@ -12,6 +12,8 @@
    [frames.openid :as openid]
    [frames.redirect :as redirect]
    [ui.db]
+   [ui.db.account]
+   [ui.db.constants]
    [ui.dashboard.core]
    [ui.login.core]
    [ui.signup.core]
@@ -42,31 +44,17 @@
  (fn [{store :store}]
    (let [base-url "http://localhost:8000"
          token (:token store)]
-     {:dispatch-n (concat [[:route-map/init routes/routes]] [(when-not (nil? token) [:load-account-info token])])
-      :db (merge
-           {:base-url base-url
-            :constants {:status :loading}}
-           (when-not (nil? token) {:account {:token token}}))
-      :json/fetch {:uri (str base-url "/api/constants/")
-                   :success {:event :constants-succeed}
-                   :error {:event :constants-failure}}})))
-
-(defn list->map [data]
-  (into {} (map (fn [{pk :pk :as item}] [pk item]) data)))
-
-(rf/reg-event-db
- :constants-succeed
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [:constants :status] :succeed)
-       (assoc-in [:constants :data] (into {} (map (fn [[key values]] [key (list->map values)]) data))))))
-
-(rf/reg-event-db
- :constants-failure
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [:constants :status] :failure)
-       (assoc-in [:constants :error] :data))))
+     {:dispatch-n (concat
+                   [[:load-constants]]
+                   [(if (nil? token)
+                      [:route-map/init routes/routes]
+                      [:load-account-info token {:succeed-fx
+                                                 {:dispatch [:route-map/init routes/routes]}}])])
+      :db
+      (merge
+       {:base-url base-url
+        :constants {:status :loading}}
+       (if (nil? token) {} {:account {:token token}}))})))
 
 (defn- mount-root []
   (reagent/render
