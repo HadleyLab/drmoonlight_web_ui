@@ -13,10 +13,16 @@
    [:body {:background-color "#F3F8FC"}]
    [:.full-screen {:height "100vh"
                    :min-height (px 600)}]
-   [:.flex-direction._column {:flex-direction "column"}]
+   [:.flex-direction._column
+    :.field.flex-direction._column {:flex-direction "column!important"}]
    [:.flex._1 {:flex 1}]
    [:.align-items._center
-    :.row.align-items._center {:align-items "center"}]
+    :.row.align-items._center
+    :.column.align-items._center {:align-items "center"
+                                  :justify-content "center"}]
+   [:.justify-content._space-between {:justify-content "space-between"}]
+   [:.position._relative {:position "relative"}]
+   [:.gray-font {:color "#8C97B2"}]
    [:.moonlight-white {:background-color "#FFF"}]
    [:.moonlight-header {:height (px 80)
                         :background-color "#FFF"
@@ -24,14 +30,36 @@
                         :box-shadow "0 2px 1px -1px gray"}]
 
    ; dashboard styles
-   [:.dashboard-header {:margin-top (px -100)}]
+   [:.dashboard__header {:margin-top (px -100)}]
+   [:.dashboard__subheader {:margin-top "30px!important"}]
+
+   ; login screen styles
+   [:.login__right-column {:text-align "center"
+                           :display "inline-flex!important"
+                           :flex-direction "column"}]
+   [:.field.login__forgot-password {:padding-top (px 10)
+                                    :text-align "right"}]
+
+   ; forgot password screen styles
+   [:.forgot-password__subheader {:margin-bottom (px 30)
+                                  :text-align "center"}]
+   [:.forgot-password__back {:padding-top (px 30)
+                             :text-align "center"}]
+   ; signup screen styles
+   [:.signup__to-login {:text-align "center"
+                        :margin-top (px 30)}]
 
    ; form styles
+   [:.input-info {:display "flex"
+                  :align-items "center"
+                  :padding-top (px 23)}]
    [:.error {:color :red}]
    [:.moonlight-form-header {:margin-bottom "40px!important"
                              :text-align "center"}]
    [:.moonlight-form {:padding "70px 0"}]
    [:.moonlight-form-inner
     :.segment.moonlight-form-inner {:padding "40px 70px 70px"}]
-   [:div.moonlight-form-group {:margin-top (px 40)}]
-   [:div.moonlight-form-group [:label {:color :gray}]]))
+   [:.moonlight-form-group {:margin-top (px 30)}]
+   [:.moonlight-form-group [:label {:display "inline-block"
+                                    :color "#8C97B2"
+                                    :margin-bottom (px 10)}]]))

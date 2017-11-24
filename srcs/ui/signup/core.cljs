@@ -48,14 +48,17 @@
         modes {:resident "Resident" :scheduler "Scheduler"}]
     (fn []
       (let [status (get-in @sign-up-form-cursor [:response :status])]
-        [sa/Form {:error? (= status :failure)}
-         [FormRadio {:items modes :cursor mode-cursor :label "Register as"}]
+        [sa/Form {:error (= status :failure) :class-name "position _relative"}
+         [sa/FormGroup
+          [sa/FormField {:width 10}
+           [FormRadio {:items modes :cursor mode-cursor :label "Register as"}]]
+          [sa/FormField {:width 6 :class-name "gray-font"}
+           "Scheduler is a user, who is able to create shifts for booking"]]
          [FormContent @mode-cursor sign-up-form-cursor]
-         [:div.moonlight-form-group
-          [sa/FormButton {
-                           :color :blue
-                           :loading (= status :loading)
-                           :on-click (>event [:do-sigh-up])} "Sign up"]]]))))
+         [:div
+          [sa/FormButton {:color :blue
+                          :loading (= status :loading)
+                          :on-click (>event [:do-sigh-up])} "Sign up"]]]))))
 
 (defn Index [params]
   (rf/dispatch-sync [::init-sign-up-page])
@@ -63,7 +66,8 @@
     [FormWrapper
      [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Welcome to Dr. Moonlight!"]
      [Form]
-     [:p "Already a member? " [:a {:href (href :login)} "Log In"]]]))
+     [:div {:class-name "signup__to-login"}
+      [:p "Already a member? " [:a {:href (href :login)} "Log In"]]]]))
 
 (rf/reg-event-db
  ::init-sign-up-page

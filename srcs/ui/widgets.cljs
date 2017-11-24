@@ -85,7 +85,7 @@
       (let [errors @errors-cursor]
         [sa/FormGroup {}
          (if (string? info)
-           [sa/FormField
+           [sa/FormField {:width 10}
             [:label info]
             [sa/Input {:type (get-default-type field)
                        :value @field-cursor
@@ -102,14 +102,15 @@
              (= :multy-select (:type info)) [FormMultySelect (merge {:cursor field-cursor} info)]
              :else [:div (str info)]))
          (if (= errors nil)
-           [:div]
-           [:div {:class "error"} (clojure.string/join " " errors)])]))))
+           [sa/FormField {:width 6 :class-name "input-info gray-font"} ""]
+           [sa/FormField {:width 6 :class-name "input-info error"}
+            (clojure.string/join " " errors)])]))))
 
 (defn BuildForm [cursor field-sets]
   (concatv [:div]
            (->> field-sets
                 (mapv (fn [[title fields]]
-                        (concatv [:div {:key title} [:label title]]
+                        (concatv [:div {:key title :class-name "moonlight-form-group"} [:label title]]
                                  (->> fields
                                       (mapv (fn [[field info]]
                                               [RenderInput {:cursor cursor :field field :info info :key field}])))))))))

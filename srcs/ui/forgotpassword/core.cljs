@@ -33,19 +33,21 @@
             :on-change (>atom email)}]]
          (when email-errors
            [:div {:class "error"} (clojure.string/join " " email-errors)])
-         [sa/FormGroup
+         [sa/FormGroup {:class-name "flex-direction _column"}
           [sa/FormButton {:color :blue
                           :loading (= status :loading)
                           :on-click (>event [:rest-password])}
            "Request reset link"]
-          [:a {:href (href :login)} "Back to login"]]]))))
+          [sa/FormField {:class-name "forgot-password__back"}
+           [:a {:href (href :login)} "Back to login"]]]]))))
 
 (defn Index [params]
   (rf/dispatch-sync [::init-forgot-password-page])
   (fn [params]
     [FormWrapper
      [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Forgot your password?"]
-     [:p "Enter your email address below and we'll get you back on track."]
+     [:div {:class-name "forgot-password__subheader"}
+      "Enter your email address below and we'll get you back on track."]
      [Form]]))
 
 (rf/reg-event-db

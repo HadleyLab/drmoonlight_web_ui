@@ -33,13 +33,14 @@
           [sa/FormField
            [:label "Password"]
            [sa/Input {:type "password" :value @password :on-change (>atom password)}]]
-          [sa/FormGroup {}
+          [sa/FormGroup {:class-name "justify-content _space-between"}
            [sa/FormButton {:color :blue
                            :loading (= (:status @response-cursor) :loading)
                            :on-click (>event [:login])} "Login"]
-           [:a {:href (href :forgot-password)} "Forgot password?"]]]]
-        [sa/GridColumn {:width 5}
-         [:p "Don't have account yet?"] [:a {:href (href :sign-up)} "Sign Up"]]]])))
+           [sa/FormField {:class-name "login__forgot-password"}
+            [:a {:href (href :forgot-password)} "Forgot password?"]]]]]
+        [sa/GridColumn {:width 5 :class-name "login__right-column align-items _center"}
+         [:div "Don't have account yet?"] [:a {:href (href :sign-up)} "Sign Up"]]]])))
 
 (defn Index [params]
   (rf/dispatch-sync [::init-login-page])

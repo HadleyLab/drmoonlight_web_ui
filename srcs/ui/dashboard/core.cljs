@@ -17,10 +17,11 @@
      [sa/Button {:basic true :color :blue :content "Log In" :on-click (>event [:goto :login])}]
      [sa/Button {:color :blue :content "Sign up" :on-click (>event [:goto :sign-up])}]]]
    [sa/GridRow {:centered true :class-name "flex _1 align-items _center"}
-    [:div {:class-name "dashboard-header"}
+    [:div {:class-name "dashboard__header"}
      [sa/Header {:as "h1" :text-align "left"}
       [sa/HeaderContent {}
        [:div "Medical moonlighting made easy"]
-       [sa/HeaderSubheader "Find great clinical jobs without agency recruiters"]]]]]])
+       [sa/HeaderSubheader {:class-name "dashboard__subheader"}
+        "Find great clinical jobs without agency recruiters"]]]]]])
 
 (pages/reg-page :core/index Index)
