@@ -25,10 +25,10 @@
                :residency-years "Residency Years"
                :state-license {:type :radio
                                :label "State Licence"
-                               :items {"Yes" true "No" false}}
+                               :items {true "Yes" false "No"}}
                :board-score {:type :radio
                              :label "Board Score"
-                             :items {"Yes" true "No" false}}}})
+                             :items {true "Yes" false "No"}}}})
 
 (def resident-notification-form-fields
   {"I would like to recieve emails when:"

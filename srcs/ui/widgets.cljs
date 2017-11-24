@@ -30,11 +30,11 @@
   (concatv [sa/FormGroup {} [:div.field [:label label]]]
            (->> items
                 (mapv (fn [[key value]]
-                        [sa/FormRadio {:key value
-                                       :label key
-                                       :value value
-                                       :checked (= @cursor value)
-                                       :on-change #(dispatch-set! cursor value)}])))))
+                        [sa/FormRadio {:key key
+                                       :label value
+                                       :value key
+                                       :checked (= @cursor key)
+                                       :on-change #(dispatch-set! cursor key)}])))))
 
 (defn FormToggle [{cursor :cursor label :label}]
   [sa/Checkbox
