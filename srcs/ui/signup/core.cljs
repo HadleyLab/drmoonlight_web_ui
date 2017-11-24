@@ -1,7 +1,7 @@
 (ns ui.signup.core
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [get-url >event]]
+   [ui.db :refer [get-url >event >atom]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [FormRadio BuildForm FormWrapper fields->schema]]
@@ -34,7 +34,9 @@
    {:fields (fields->schema sceduler-form-fields)
     :response {:status :not-asked}}
    :mode :resident
-   :activation-response {:status :not-asked}})
+   :activation-response {:status :not-asked}
+   :password-reset {:response {:status :not-asked}
+                    :password ""}})
 
 (defn FormContent [mode form-cursor]
   (if (= mode :resident)
@@ -130,9 +132,9 @@
   (let [activation-response @(rf/subscribe [:cursor [root-path :activation-response]])]
     (fn [params]
       (cond
-        (= (:status @activation-response) :loading) (ActivationLoading)
-        (= (:status @activation-response) :succeed) (ActivationSucceed)
-        (= (:status @activation-response) :failure) (ActivationFailure (:errors @activation-response))
+        (= (:status @activation-response) :loading) [ActivationLoading]
+        (= (:status @activation-response) :succeed) [ActivationSucceed]
+        (= (:status @activation-response) :failure) [ActivationFailure (:errors @activation-response)]
         :else [:div (str @activation-response)]))))
 
 (rf/reg-event-fx
@@ -157,6 +159,62 @@
        (assoc-in [root-path :activation-response :status] :failure)
        (assoc-in [root-path :activation-response :errors] data))))
 
+(defn Confirm [params]
+  (rf/dispatch-sync [::init-sign-up-page])
+  (let [password-reset-response-cursor @(rf/subscribe [:cursor [root-path :password-reset :response]])
+        password-cursor @(rf/subscribe [:cursor [root-path :password-reset :password]])
+        status-cursor (reagent/cursor password-reset-response-cursor [:status])
+        errors-cursor (reagent/cursor password-reset-response-cursor [:errors])]
+    (fn [params]
+      (let [status @status-cursor
+            password-errors (or (:new-password @errors-cursor)
+                                (:non-field-errors @errors-cursor))]
+      [FormWrapper
+       [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Setup you new password"]
+       [sa/Form {:error (= status :failure)}
+        [sa/FormField
+         [:label "Password"]
+         [sa/Input
+          {:type "password"
+           :error (not= password-errors nil)
+           :value @password-cursor
+           :on-change (>atom password-cursor)}]]
+        (when password-errors
+          [:div {:class "error"} (clojure.string/join " " password-errors)])
+        [sa/FormGroup {:class-name "flex-direction _column"}
+         [sa/FormButton {:color :blue
+                         :loading (= status :loading)
+                         :on-click (>event [:confirm-rest-password (merge params {:new-password @password-cursor})])}
+          "Setup new password"]]]
+       [sa/FormField {:class-name "forgot-password__back"}
+        [:a {:href (href :login)} "Back to login"]]]))))
+
+(rf/reg-event-fx
+ :confirm-rest-password
+ (fn [{db :db} [_ data]]
+   {:json/fetch {:uri (get-url db "/api/accounts/password/reset/confirm/")
+                 :method "post"
+                 :body data
+                 :success {:event :confirm-rest-password-succeed}
+                 :error {:event :confirm-rest-password-failure}}
+    :db (assoc-in db [root-path :password-reset :response :status] :loading)}))
+
+(rf/reg-event-fx
+ :confirm-rest-password-succeed
+ (fn [{db :db} [_]]
+   {:db (assoc-in db [root-path :password-reset] (:password-reset schema))
+    :dispatch [:goto :login]}))
+
+(rf/reg-event-db
+ :confirm-rest-password-failure
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [root-path :password-reset :response :status] :failure)
+       (assoc-in [root-path :password-reset :response :errors] data))))
+
+
+
 (pages/reg-page :core/sign-up Index)
 (pages/reg-page :core/sign-up-thanks Thanks)
 (pages/reg-page :core/activate Activate)
+(pages/reg-page :core/confirm Confirm)
