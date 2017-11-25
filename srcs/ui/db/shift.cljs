@@ -7,11 +7,17 @@
 (defn- get-date [date-time]
   (try
     (let [date-format "yyyy-MM-dd"]
-      (format/unparse (format/formatter date-format) (format/parse date-time)))
+      (format/unparse (format/formatter date-format) date-time))
     (catch js/Object e "")))
 
+(defn- parse-date-time [shifts]
+  (let [date-keys #{:date-start :date-end :date-created :date-modified}]
+    (map (fn [shift] (into {} (map (fn [[key value]]
+                                     (if (date-keys key) [key (format/parse value)]
+                                         [key value])) shift))) shifts)))
+
 (defn- convert-shifts [data]
-  (group-by (comp get-date :date-start) data))
+  (group-by (comp get-date :date-start) (parse-date-time data)))
 
 (rf/reg-event-fx
  :load-shifts

@@ -18,16 +18,41 @@
 (defn schema []
   {:selected (dt/date-time (dt/year (dt/now)) (dt/month (dt/now)) 1)})
 
-(defn ShiftLabel [{speciality :speciality start :date-start finish :date-end pk :pk}]
-  [:div [sa/Popup
-         {:trigger (reagent/as-element [sa/Label {:color :blue} (:name (<sub [:speciality speciality]))])
-          :flowing true
-          :position "left center"
-          :hoverable true}
-         [:div
-          [:p [:strong "start"] start]
-          [:p [:strong "finish"] finish]
-          [sa/Button {:on-click (>event [:goto :resident :messages pk :apply])} "Apply"]]] [:br] [:br]])
+(defn- as-apply-date-time [date-time]
+  (try
+    (let [date-format "dd/mm/yyyy' at 'hh:mm a"]
+      (format/unparse (format/formatter date-format) date-time))
+    (catch js/Object e "")))
+
+(defn- as-hours-interval [start finish]
+  (/
+   (dt/in-minutes
+    (dt/interval
+     start
+     finish))
+   60))
+
+(defn ShiftLabel [{speciality :speciality
+                   start :date-start
+                   finish :date-end
+                   pk :pk
+                   payment-amount :payment-amount
+                   payment-per-hour :payment-per-hour
+                   description :description}]
+  (let [speciality-name (:name (<sub [:speciality speciality]))]
+    [:div [sa/Popup
+           {:trigger (reagent/as-element [sa/Label {:color :blue} speciality-name])
+            :flowing true
+            :position "left center"
+            :hoverable true}
+           [:div
+            [:p [:strong "Starts: "] (as-apply-date-time start)]
+            [:p [:strong "Ends: "] (as-apply-date-time finish)]
+            [:p [:strong "Total: "] (as-hours-interval start finish) " hours"]
+            [:p [:strong "Required staff: "] speciality-name]
+            [:p [:strong "Payment amount: "] (str "$" payment-amount " per " (if payment-per-hour "hour" "shift"))]
+            [:p description]
+            [sa/Button {:on-click (>event [:goto :resident :messages pk :apply])} "Apply"]]] [:br] [:br]]))
 
 (defn Index [params]
   (rf/dispatch-sync [::init-resident-shedule-page])
