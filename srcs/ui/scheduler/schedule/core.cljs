@@ -49,6 +49,7 @@
 
 (defn schema []
   {:selected (dt/date-time (dt/year (dt/now)) (dt/month (dt/now)) 1)
+   :filter-state nil
    :shift-form
    {:fields (fields->schema shift-form-fields)
     :shift-modal-open false
@@ -78,22 +79,57 @@
         new-shift-form-cursor @(rf/subscribe [:cursor [root-path :shift-form]])
         modal-cursor @(rf/subscribe [:cursor [root-path :shift-form :shift-modal-open]])]
     (fn [params]
-      [SchedulerLayout
-       [sa/Grid {}
-        [sa/GridRow {}
-         [sa/GridColumn {:width 3} [CreateNewShift new-shift-form-cursor modal-cursor]]
-         [sa/GridColumn {:width 3}]
-         [sa/GridColumn {:width 4}
-          [sa/Button {:icon "angle left"
-                      :on-click #(dispatch-set! selected-cursor (dt/minus @selected-cursor (dt/months 1)))}]
-          [:span (format/unparse (format/formatter "MMMM YYYY") @selected-cursor)]
-          [sa/Button {:icon "angle right"
-                      :on-click #(dispatch-set! selected-cursor (dt/plus @selected-cursor (dt/months 1)))}]
-          [sa/GridColumn {:width 6}]]]
-        [sa/GridRow {}
-         [sa/GridColumn {:width 3}]
-         [sa/GridColumn {:width 13}
-          [Calendar @selected-cursor (<sub [:shifts]) ShiftLabel]]]]])))
+      (let [shifts (<sub [:shifts])
+            state-count (into {}
+                              (map (fn [[key value]] [key (count value)])
+                                   (group-by identity
+                                             (mapcat (fn [[key values]]
+                                                       (map :state values))
+                                                     (:data shifts)))))
+            filter-state (<sub [:filter-state])
+            filtered-shifts (if (nil? filter-state) shifts
+                                {:status (:status shifts)
+                                 :data (into {}
+                                             (map
+                                              (fn [[key values]]
+                                                [key (filter #(= filter-state (:state %)) values)])
+                                              (:data shifts)))})]
+        [SchedulerLayout
+         [sa/Grid {}
+          [sa/GridRow {}
+           [sa/GridColumn {:width 3} [CreateNewShift new-shift-form-cursor modal-cursor]]
+           [sa/GridColumn {:width 3}]
+           [sa/GridColumn {:width 4}
+            [sa/Button {:icon "angle left"
+                        :on-click #(dispatch-set! selected-cursor (dt/minus @selected-cursor (dt/months 1)))}]
+            [:span (format/unparse (format/formatter "MMMM YYYY") @selected-cursor)]
+            [sa/Button {:icon "angle right"
+                        :on-click #(dispatch-set! selected-cursor (dt/plus @selected-cursor (dt/months 1)))}]
+            [sa/GridColumn {:width 6}]]]
+          [sa/GridRow {}
+           [sa/GridColumn {:width 3}
+            (for [state ["completed" "active" "without_applies" "coverage_completed" "require_approval"]]
+              [:div {:key state}
+               [sa/Label {:active (= state filter-state)
+                          :on-click (>event [:set-filter-state state])}
+                state
+                [sa/LabelDetail (state-count state 0)]]
+               [:br]
+               [:br]])]
+           [sa/GridColumn {:width 13}
+            [Calendar @selected-cursor filtered-shifts ShiftLabel]]]]]))))
+
+(rf/reg-sub
+ :filter-state
+ (fn [db]
+   (get-in db [root-path :filter-state])))
+
+(rf/reg-event-db
+ :set-filter-state
+ (fn [db [_ state]]
+   (let [new-state (if (= state (<sub [:filter-state]))
+                     nil state)]
+     (assoc-in db [root-path :filter-state] new-state))))
 
 (rf/reg-event-fx
  ::init-scheduler-shedule-page
@@ -129,6 +165,5 @@
    (-> db
        (assoc-in [root-path :shift-form :response :status] :failure)
        (assoc-in [root-path :shift-form :response :errors] data))))
-
 
 (pages/reg-page :core/scheduler-schedule Index)
