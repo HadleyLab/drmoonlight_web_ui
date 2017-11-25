@@ -10,12 +10,6 @@
    [cljsjs.moment]
    [soda-ash.core :as sa]))
 
-(defn get-date [date-time]
-  (try
-    (let [date-format "yyyy-MM-dd"]
-      (format/unparse (format/formatter date-format) (format/parse date-time)))
-    (catch js/Object e "")))
-
 (defn cljstime->drf-date-time [date-time]
   (try
     (let [date-format "yyyy-MM-dd'T'HH:mm"]
@@ -154,6 +148,3 @@
 (defn setup-form-initial-values [initial-values]
   (fn [data]
     (into {} (map (fn [[key value]] [key (initial-values key value)]) data))))
-
-(defn convert-shifts [data]
-  (group-by (comp get-date :date-start) data))

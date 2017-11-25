@@ -53,7 +53,8 @@
       :db
       (merge
        {:base-url base-url
-        :constants {:status :loading}}
+        :constants {:status :loading}
+        :shifts {:status :loading}}
        (if (nil? token) {} {:account {:token token}}))})))
 
 (defn- mount-root []

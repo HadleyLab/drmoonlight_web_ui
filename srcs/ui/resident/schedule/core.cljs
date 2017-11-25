@@ -4,7 +4,7 @@
    [ui.db :refer [>event dispatch-set! get-url <sub]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [concatv convert-shifts]]
+   [ui.widgets :refer [concatv]]
    [ui.widgets.calendar :refer [Calendar]]
    [ui.resident.layout :refer [ResidentLayout]]
    [re-frame.core :as rf]
@@ -16,8 +16,7 @@
 (def root-path :resident-schedule-page)
 
 (defn schema []
-  {:selected (dt/date-time (dt/year (dt/now)) (dt/month (dt/now)) 1)
-   :shifts {:status :not-asked}})
+  {:selected (dt/date-time (dt/year (dt/now)) (dt/month (dt/now)) 1)})
 
 (defn ShiftLabel [{speciality :speciality start :date-start finish :date-end pk :pk}]
   [:div [sa/Popup
@@ -32,8 +31,7 @@
 
 (defn Index [params]
   (rf/dispatch-sync [::init-resident-shedule-page])
-  (let [selected-cursor @(rf/subscribe [:cursor [root-path :selected]])
-        shifts-cursor @(rf/subscribe [:cursor [root-path :shifts]])]
+  (let [selected-cursor @(rf/subscribe [:cursor [root-path :selected]])]
     (fn [params]
       [ResidentLayout
        [sa/Grid {}
@@ -48,7 +46,7 @@
           [sa/GridColumn {:width 6}]]]
         [sa/GridRow {}
          [sa/GridColumn {:width 16}
-          [Calendar @selected-cursor @shifts-cursor ShiftLabel]]]]])))
+          [Calendar @selected-cursor (<sub [:shifts]) ShiftLabel]]]]])))
 
 (rf/reg-event-fx
  ::init-resident-shedule-page
@@ -56,29 +54,6 @@
    {:db (if (= (root-path db) nil)
           (assoc-in db [root-path] (schema))
           db)
-    :dispatch [::load-shifts]}))
-
-(rf/reg-event-fx
- ::load-shifts
- (fn [{db :db} [_]]
-   {:db (assoc-in db [root-path :shifts :status] :loading)
-    :json/fetch {:uri (get-url db "/api/shifts/shift/")
-                 :token (<sub [:token])
-                 :success {:event ::load-shifts-succeed}
-                 :error {:event ::load-shifts-failure}}}))
-
-(rf/reg-event-db
- ::load-shifts-succeed
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [root-path :shifts :status] :success)
-       (assoc-in [root-path :shifts :data] (convert-shifts data)))))
-
-(rf/reg-event-db
- ::load-shifts-failure
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [root-path :shifts :status] :failure)
-       (assoc-in [root-path :shifts :errors] data))))
+    :dispatch [:load-shifts]}))
 
 (pages/reg-page :core/resident-schedule Index)

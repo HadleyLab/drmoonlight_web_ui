@@ -5,7 +5,8 @@
             [akiroz.re-frame.storage :refer [reg-co-fx!]]
             [clojure.string :as str]
             [ui.db.account]
-            [ui.db.constants]))
+            [ui.db.constants]
+            [ui.db.shift]))
 
 (defn get-url [db & rest]
   (apply str (cons (db :base-url) rest)))

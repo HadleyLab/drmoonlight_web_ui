@@ -4,7 +4,7 @@
    [ui.db :refer [dispatch-set! <sub >event get-url]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [concatv BuildForm fields->schema cljstime->drf-date-time convert-shifts]]
+   [ui.widgets :refer [concatv BuildForm fields->schema cljstime->drf-date-time]]
    [ui.widgets.calendar :refer [Calendar]]
    [ui.scheduler.layout :refer [SchedulerLayout]]
    [re-frame.core :as rf]
@@ -52,8 +52,7 @@
    :shift-form
    {:fields (fields->schema shift-form-fields)
     :shift-modal-open false
-    :response {:status :not-asked}}
-   :shifts {:status :not-asked}})
+    :response {:status :not-asked}}})
 
 (defn ShiftLabel [{speciality :speciality}]
   [:div
@@ -76,7 +75,6 @@
 (defn Index [params]
   (rf/dispatch-sync [::init-scheduler-shedule-page])
   (let [selected-cursor @(rf/subscribe [:cursor [root-path :selected]])
-        shifts-cursor @(rf/subscribe [:cursor [root-path :shifts]])
         new-shift-form-cursor @(rf/subscribe [:cursor [root-path :shift-form]])
         modal-cursor @(rf/subscribe [:cursor [root-path :shift-form :shift-modal-open]])]
     (fn [params]
@@ -95,7 +93,7 @@
         [sa/GridRow {}
          [sa/GridColumn {:width 3}]
          [sa/GridColumn {:width 13}
-          [Calendar @selected-cursor @shifts-cursor ShiftLabel]]]]])))
+          [Calendar @selected-cursor (<sub [:shifts]) ShiftLabel]]]]])))
 
 (rf/reg-event-fx
  ::init-scheduler-shedule-page
@@ -103,7 +101,7 @@
    {:db (if (= (root-path db) nil)
           (assoc-in db [root-path] (schema))
           db)
-    :dispatch [::load-shifts]}))
+    :dispatch [:load-shifts]}))
 
 (rf/reg-event-fx
  :create-new-shift
@@ -123,7 +121,7 @@
  :create-new-shift-succeed
  (fn [{db :db} _]
    {:db (assoc-in db [root-path :shift-form] (:shift-form (schema)))
-    :dispatch [::load-shifts]}))
+    :dispatch [:load-shifts]}))
 
 (rf/reg-event-db
  :create-new-shift-failure
@@ -131,30 +129,6 @@
    (-> db
        (assoc-in [root-path :shift-form :response :status] :failure)
        (assoc-in [root-path :shift-form :response :errors] data))))
-
-
-(rf/reg-event-fx
- ::load-shifts
- (fn [{db :db} [_]]
-   {:db (assoc-in db [root-path :shifts :status] :loading)
-    :json/fetch {:uri (get-url db "/api/shifts/shift/")
-                 :token (<sub [:token])
-                 :success {:event ::load-shifts-succeed}
-                 :error {:event ::load-shifts-failure}}}))
-
-(rf/reg-event-db
- ::load-shifts-succeed
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [root-path :shifts :status] :success)
-       (assoc-in [root-path :shifts :data] (convert-shifts data)))))
-
-(rf/reg-event-db
- ::load-shifts-failure
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [root-path :shifts :status] :failure)
-       (assoc-in [root-path :shifts :errors] data))))
 
 
 (pages/reg-page :core/scheduler-schedule Index)
