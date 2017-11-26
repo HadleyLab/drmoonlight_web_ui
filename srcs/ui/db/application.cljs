@@ -3,7 +3,55 @@
   (:require
    [reagent.core :as reagent]
    [ui.db.misc :refer [get-url]]
+   [ui.db.shift :refer [parse-date-time]]
    [re-frame.core :as rf]))
+
+(rf/reg-event-fx
+ :get-applications
+ (fn [{db :db} _]
+   {:db (assoc-in db [:applications :status] :loading)
+    :json/fetch {:uri (get-url db "/api/shifts/application/")
+                 :token @(rf/subscribe [:token])
+                 :success {:event :get-applications-succeed}
+                 :error {:event :get-applications-failure}}}))
+
+(rf/reg-event-db
+ :get-applications-succeed
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [:applications :status] :succeed)
+       (assoc-in [:applications :data] (map #(update-in % [:shift] parse-date-time) data)))))
+
+(rf/reg-event-db
+ :get-applications-failure
+ (fn [db [_ {data :data}]]
+   (-> db
+       (assoc-in [:applications :status] :failure)
+       (assoc-in [:applications :errors] data))))
+
+(rf/reg-sub
+ :applications
+ (fn [db _]
+   (get-in db [:applications] {:status :not-asked})))
+
+(rf/reg-event-db
+ :set-applications-filter-state
+ (fn [db [_ state]]
+   (let [current-state @(rf/subscribe [:applications-filter-state])]
+     (assoc db :applications-filter-state (if (= current-state state) nil state)))))
+
+(rf/reg-sub
+ :applications-filter-state
+ (fn [db _]
+   (get-in db [:applications-filter-state])))
+
+(rf/reg-sub
+ :count-applications-by-state
+ (fn [db [_ state]]
+   (count
+    (filter
+     #(= state (:state %))
+     (get-in db [:applications :data] [])))))
 
 (rf/reg-event-fx
  :get-application-info
@@ -96,7 +144,6 @@
                  :body {:message @@(rf/subscribe [:comment-cursor])}
                  :success {:event :add-comment-succeed :application-pk application-pk}
                  :error {:event :add-comment-failure :application-pk application-pk}}}))
-
 
 (rf/reg-event-db
  :add-comment-succeed

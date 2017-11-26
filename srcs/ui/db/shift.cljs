@@ -13,12 +13,6 @@
       (format/unparse (format/formatter date-format) date-time))
     (catch js/Object e "")))
 
-(defn- parse-date-time [shift]
-  (let [date-keys #{:date-start :date-end :date-created :date-modified}]
-    (into {} (map (fn [[key value]]
-                    (if (date-keys key) [key (format/parse value)]
-                        [key value])) shift))))
-
 (defn- convert-shifts [data]
   (group-by (comp get-date :date-start) (map parse-date-time data)))
 
@@ -26,7 +20,7 @@
 
 (defn as-apply-date-time [date-time]
   (try
-    (let [date-format "dd/mm/yyyy' at 'hh:mm a"]
+    (let [date-format "dd/MM/yyyy' at 'hh:mm a"]
       (format/unparse (format/formatter date-format) date-time))
     (catch js/Object e "")))
 
@@ -37,6 +31,12 @@
      start
      finish))
    60))
+
+(defn parse-date-time [shift]
+  (let [date-keys #{:date-start :date-end :date-created :date-modified}]
+    (into {} (map (fn [[key value]]
+                    (if (date-keys key) [key (format/parse value)]
+                        [key value])) shift))))
 
 ;; API for calendar
 
