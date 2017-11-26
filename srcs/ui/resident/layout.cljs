@@ -1,30 +1,31 @@
 (ns ui.resident.layout
   (:require
-   [ui.db :refer [>evt]]
+   [ui.db :refer [>evt <sub]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
 
 (defn ResidentLayout [content]
-  (let [route (rf/subscribe [:route-map/current-route])]
+  (let [route (<sub [:route-map/current-route])]
     [sa/Grid {}
      [sa/GridRow {:class-name "moonlight-header"}
       [sa/GridColumn {:width 1}]
       [sa/GridColumn {:width 7} [sa/Header {} "Dr.Moonlight"]]
       [sa/GridColumn {:width 7}
        [sa/ButtonGroup {}
-        [sa/Button {:active (= (:match @route) :core/resident-schedule)
+        [sa/Button {:active (= (:match route) :core/resident-schedule)
                     :on-click #(>evt [:goto :resident :schedule])}
          [sa/Icon {:name :calendar}]
          "Schedule"]
-        [sa/Button {:active (= (:match @route) :core/resident-messages)
+        [sa/Button {:active (= (:. (nth (:parents route) 2))
+                               :core/resident-messages)
                     :on-click #(>evt [:goto :resident :messages])}
          [sa/Icon {:name :mail}]
          "Messages"]
-        [sa/Button {:active (= (:match @route) :core/resident-statistics)
+        [sa/Button {:active (= (:match route) :core/resident-statistics)
                     :on-click #(>evt [:goto :resident :statistics])}
          [sa/Icon {:name :table}]
          "Statistics"]
-        [sa/Button {:active (= (:. (last (:parents @route))) :core/resident-profile)
+        [sa/Button {:active (= (:. (last (:parents route))) :core/resident-profile)
                     :on-click #(>evt [:goto :resident :profile])}
          [sa/Icon {:name :user}]
          "Profile"]]]]

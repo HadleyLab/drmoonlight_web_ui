@@ -27,13 +27,14 @@
              "sign-up" {:. :core/sign-up
                         "thanks" {:. :core/sign-up-thanks}}
              "forgot-password" {:. :core/forgot-password
-                                "thanks" {:. :core/forgot-password-thanks}}
+                                "thanks" :core/forgot-password-thanks}
              "resident" {:interceptors [is-resident]
                          :. :core/resident
                          "schedule" {:. :core/resident-schedule
                                      :interceptors [is-approved]}
                          "messages" {:. :core/resident-messages
-                                     [:pk] {"apply" {:. :core/resident-messages}}
+                                     [:shift-pk] {:. :core/resident-messages-apply
+                                                  "discuss" {[:application-pk] :core/resident-messages-discuss}}
                                      :interceptors [is-approved]}
                          "statistics" {:. :core/resident-statistics
                                        :interceptors [is-approved]}
@@ -42,8 +43,7 @@
              "scheduler" {:interceptors [is-scheduler]
                           :. :core/scheduler
                           "schedule" {:. :core/scheduler-schedule}
-                          "messages" {:. :core/scheduler-messages
-                                      [:pk] {"apply" {:. :core/scheduler-messages}}}
+                          "messages" {:. :core/scheduler-messages}
                           "statistics" {:. :core/scheduler-statistics}
                           "profile" {:. :core/scheduler-profile}}})
 

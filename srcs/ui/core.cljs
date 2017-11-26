@@ -54,7 +54,7 @@
       (merge
        {:base-url base-url
         :constants {:status :loading}
-        :shifts {:status :loading}}
+        :shifts {:status :not-asked}}
        (if (nil? token) {} {:account {:token token}}))})))
 
 (defn- mount-root []

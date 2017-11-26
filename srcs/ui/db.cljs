@@ -5,8 +5,26 @@
             [akiroz.re-frame.storage :refer [reg-co-fx!]]
             [clojure.string :as str]
             [ui.db.account]
+            [ui.db.application]
             [ui.db.constants]
-            [ui.db.shift]))
+            [ui.db.shift]
+            [clojure.string :refer [replace escape]]))
+
+(defn reduce-statuses [& statuses]
+  (cond
+    (some #(= :loading %) statuses) :loading
+    (every? #(= :succeed %) statuses) :succeed
+    (some #(= :not-asked %) statuses) :not-asked
+    (some #(= :failure %) statuses) :failure))
+
+(defn text-with-br [text]
+  (replace (escape
+            text
+            {\< "&lt;"
+             \> "&gt;"
+             \& "&amp;"})
+           #"\n"
+           "<br/>"))
 
 (defn get-url [db & rest]
   (apply str (cons (db :base-url) rest)))

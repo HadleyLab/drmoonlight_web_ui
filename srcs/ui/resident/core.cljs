@@ -9,7 +9,8 @@
    [re-frame.core :as rf]
    [clojure.string :as str]
    [soda-ash.core :as sa]
-   [ui.resident.schedule.core]))
+   [ui.resident.schedule.core]
+   [ui.resident.message]))
 
 (def root-path :resident)
 
@@ -116,6 +117,5 @@
 
 (pages/reg-page :core/resident (with-init (fn [] [ResidentLayout [sa/Header {} "index"]])))
 (pages/reg-page :core/resident-statistics (with-init (fn [] [ResidentLayout [sa/Header {} "statistics"]])))
-(pages/reg-page :core/resident-messages (with-init (fn [] [ResidentLayout [sa/Header {} "messages"]])))
-(pages/reg-page :core/resident-profile (with-init (fn [] [ResidentProfileLayout [ResidentProfileForm]])))
+(pages/reg-page :core/resident-profile (with-init (fn [] [ResidentProfileLayout [ResidentProfileForm]]))) 
 (pages/reg-page :core/resident-profile-notification (with-init (fn [] [ResidentProfileLayout [ResidentNotificationForm]])))

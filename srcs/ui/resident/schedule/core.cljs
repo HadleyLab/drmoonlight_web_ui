@@ -2,6 +2,7 @@
   (:require
    [reagent.core :as reagent]
    [ui.db :refer [>event dispatch-set! get-url <sub]]
+   [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [concatv]]
@@ -17,20 +18,6 @@
 
 (defn schema []
   {:selected (dt/date-time (dt/year (dt/now)) (dt/month (dt/now)) 1)})
-
-(defn- as-apply-date-time [date-time]
-  (try
-    (let [date-format "dd/mm/yyyy' at 'hh:mm a"]
-      (format/unparse (format/formatter date-format) date-time))
-    (catch js/Object e "")))
-
-(defn- as-hours-interval [start finish]
-  (/
-   (dt/in-minutes
-    (dt/interval
-     start
-     finish))
-   60))
 
 (defn ShiftLabel [{speciality :speciality
                    start :date-start
@@ -51,8 +38,8 @@
             [:p [:strong "Total: "] (as-hours-interval start finish) " hours"]
             [:p [:strong "Required staff: "] speciality-name]
             [:p [:strong "Payment amount: "] (str "$" payment-amount " per " (if payment-per-hour "hour" "shift"))]
-            [:p description]
-            [sa/Button {:on-click (>event [:goto :resident :messages pk :apply])} "Apply"]]] [:br] [:br]]))
+            ;; [:p description] TODO fix max width
+            [sa/Button {:on-click (>event [:goto :resident :messages pk])} "Apply"]]] [:br] [:br]]))
 
 (defn Index [params]
   (rf/dispatch-sync [::init-resident-shedule-page])
