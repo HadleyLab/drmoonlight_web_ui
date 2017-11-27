@@ -3,6 +3,7 @@
    [reagent.core :as reagent]
    [ui.db :refer [>event >atom <sub get-url reduce-statuses text-with-br]]
    [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
+   [ui.db.application :refer [application-statuses]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [concatv]]
@@ -25,7 +26,7 @@
 
 (defn ShiftLayout [shift-pk content]
   (let [{status :status shift :data} (<sub [:shift-info shift-pk])
-        data-is-loading (and (nil? shift) (= status :loading))]
+        data-is-loading (or (and (nil? shift) (= status :loading)) (= status :not-asked))]
     [ResidentLayout
      [sa/Grid {}
       [sa/GridRow {}
@@ -71,16 +72,6 @@
           {messages-status :status messages :data} (<sub [:application-messages application-pk])
           status (reduce-statuses shift-status application-status messages-status)]
       [ShiftLayout shift-pk [Discussion shift application messages status]])))
-
-(def application-statuses
-  {1 "New"
-   2 "Approved"
-   3 "Rejected"
-   4 "Postponed"
-   5 "Confirmed"
-   6 "Cancelled"
-   7 "Failed"
-   8 "Completed"})
 
 (defn ShowAllApplications [params]
   (rf/dispatch [:get-applications])

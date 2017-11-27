@@ -6,6 +6,17 @@
    [ui.db.shift :refer [parse-date-time]]
    [re-frame.core :as rf]))
 
+
+(def application-statuses
+  {1 "New"
+   2 "Approved"
+   3 "Rejected"
+   4 "Postponed"
+   5 "Confirmed"
+   6 "Cancelled"
+   7 "Failed"
+   8 "Completed"})
+
 (rf/reg-event-fx
  :get-applications
  (fn [{db :db} _]
@@ -13,7 +24,6 @@
                        :uri (get-url db "/api/shifts/application/")
                        :token @(rf/subscribe [:token])
                        :map-result (fn [data] (map #(update-in % [:shift] parse-date-time) data))}}))
-
 (rf/reg-sub
  :applications
  (fn [db _]
@@ -70,7 +80,7 @@
    (let [scheduler (get-in db [:applications-info application-pk :data :shift :owner])
          resident (get-in db [:applications-info application-pk :data :owner])
          {first-name :first-name
-          last-name :last-name} (if (= (:pk scheduler) participant-id) scheduler resident)]
+          last-name :last-name} (if (= (:id scheduler) participant-id) scheduler resident)]
      (str first-name " " last-name))))
 
 (rf/reg-event-fx

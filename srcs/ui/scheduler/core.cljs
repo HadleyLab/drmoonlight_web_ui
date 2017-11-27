@@ -7,7 +7,8 @@
    [re-frame.core :as rf]
    [clojure.string :as str]
    [soda-ash.core :as sa]
-   [ui.scheduler.schedule.core]))
+   [ui.scheduler.schedule.core]
+   [ui.scheduler.message]))
 
 (def root-path :scheduler)
 
@@ -27,5 +28,4 @@
 
 (pages/reg-page :core/scheduler (with-init (fn [] [SchedulerLayout [sa/Header {} "index"]])))
 (pages/reg-page :core/scheduler-statistics (with-init (fn [] [SchedulerLayout [sa/Header {} "statistics"]])))
-(pages/reg-page :core/scheduler-messages (with-init (fn [] [SchedulerLayout [sa/Header {} "messages"]])))
 (pages/reg-page :core/scheduler-profile (with-init (fn [] [SchedulerLayout [sa/Header {} "profile"]])))

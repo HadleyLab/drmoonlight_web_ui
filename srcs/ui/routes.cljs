@@ -43,7 +43,8 @@
              "scheduler" {:interceptors [is-scheduler]
                           :. :core/scheduler
                           "schedule" {:. :core/scheduler-schedule}
-                          "messages" {:. :core/scheduler-messages}
+                          "messages" {:. :core/scheduler-messages
+                                      [:shift-pk] {"discuss" {[:application-pk] :core/scheduler-messages-discuss}}}
                           "statistics" {:. :core/scheduler-statistics}
                           "profile" {:. :core/scheduler-profile}}})
 
