@@ -16,7 +16,7 @@
                     :on-click #(>evt [:goto :resident :schedule])}
          [sa/Icon {:name :calendar}]
          "Schedule"]
-        [sa/Button {:active (= (:. (nth (:parents route) 2))
+        [sa/Button {:active (= (:. (nth (:parents route) 2 nil))
                                :core/resident-messages)
                     :on-click #(>evt [:goto :resident :messages])}
          [sa/Icon {:name :mail}]
