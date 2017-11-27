@@ -39,14 +39,15 @@
       [sa/FormButton {:color :green :on-click (>event [:apply-for-shift shift-pk])} "Apply"]]]))
 
 (defn ShiftLayout [shift-pk content]
-  (let [{status :status shift :data} (<sub [:shift-info shift-pk])]
+  (let [{status :status shift :data} (<sub [:shift-info shift-pk])
+        data-is-loading (and (nil? shift) (= status :loading))]
     [ResidentLayout
      [sa/Grid {}
       [sa/GridRow {}
        [sa/GridColumn {:width 3}
         [sa/Segment
-         [sa/Dimmer {:active (and (nil? shift) (= status :loading))} [sa/Loader]]
-         (when (= status :succeed)
+         [sa/Dimmer {:active  data-is-loading} [sa/Loader]]
+         (when (not data-is-loading)
            (let [{speciality :speciality
                   start :date-start
                   finish :date-end
