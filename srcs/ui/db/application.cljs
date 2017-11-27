@@ -114,9 +114,9 @@
 
 (rf/reg-event-fx
  :add-comment
- (fn [{db :db} [_ application-pk]]
+ (fn [{db :db} [_ application-pk transition]]
    {:json/fetch->path {:path [:comment-form :response]
-                       :uri (get-url db "/api/shifts/application/" application-pk "/message/")
+                       :uri (get-url db "/api/shifts/application/" application-pk "/" transition "/")
                        :method "POST"
                        :token @(rf/subscribe [:token])
                        :body {:message @@(rf/subscribe [:comment-cursor])}

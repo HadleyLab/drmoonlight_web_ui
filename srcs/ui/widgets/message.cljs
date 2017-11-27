@@ -5,7 +5,8 @@
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
 
-(defn MessageForm [application-pk]
+(defn MessageForm [{application-pk :pk
+                    available-transitions :available-transitions}]
   (rf/dispatch-sync [:init-comment-form])
   (let [comment-cursor (<sub [:comment-cursor])]
     (fn []
@@ -17,8 +18,13 @@
                          :value @comment-cursor
                          :on-change (>atom comment-cursor)}]
           (when-not (nil? (:message errors)) [:div.error (str (:message errors))])
-          [sa/FormButton {:color :blue
-                          :on-click (>event [:add-comment application-pk])} "Send Message"]]]))))
+          [sa/ButtonGroup
+           (for [transition (conj available-transitions "message")]
+             [sa/FormButton
+              {:color :blue
+               :key transition
+               :on-click (>event [:add-comment application-pk] transition)}
+              transition])]]]))))
 
 (defn Message [message]
   (let [user-id (<sub [:user-id])
@@ -37,5 +43,5 @@
     [sa/Loader]
     (concatv [sa/SegmentGroup]
              (map (fn [m] [Message m]) (reverse messages))
-             [[MessageForm (:pk application)]])))
+             [[MessageForm application]])))
 
