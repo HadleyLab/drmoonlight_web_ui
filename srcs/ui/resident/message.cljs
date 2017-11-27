@@ -6,26 +6,11 @@
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [concatv]]
+   [ui.widgets.message :refer [Discussion]]
    [ui.resident.layout :refer [ResidentLayout ResidentProfileLayout]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [soda-ash.core :as sa]
-   [ui.resident.schedule.core]))
-
-(defn MessageForm [application-pk]
-  (rf/dispatch-sync [:init-comment-form])
-  (let [comment-cursor (<sub [:comment-cursor])]
-    (fn []
-      (let [{status :status errors :errors} (<sub [:comment-form])]
-        [sa/Segment
-         [sa/Form {:error (= status :failure)}
-          [sa/FormInput {:placeholder "Add comment ..."
-                         :error (= status :failure)
-                         :value @comment-cursor
-                         :on-change (>atom comment-cursor)}]
-          (when-not (nil? (:message errors)) [:div.error (str (:message errors))])
-          [sa/FormButton {:color :blue
-                          :on-click (>event [:add-comment application-pk])} "Send Message"]]]))))
+   [soda-ash.core :as sa]))
 
 (defn ApplyForm [shift-pk name]
   (let [apply-for-shift-result (<sub [:apply-for-shift shift-pk])]
@@ -75,25 +60,6 @@
           [ApplyForm
            shift-pk
            (:name (<sub [:speciality (:speciality shift)]))])]])))
-
-(defn Message [message]
-  (let [user-id (<sub [:user-id])
-        owner-id (:owner message)
-        author (if (= user-id owner-id)
-                 "You"
-                 (<sub [:application-owner (str (:application message))]))]
-    [sa/Segment
-     [sa/Grid
-      [sa/GridColumn {:width 2} [:p author ":"]]
-      [sa/GridColumn {:width 12} [:div {"dangerouslySetInnerHTML"
-                                        #js{:__html (text-with-br (:message message))}}]]]]))
-
-(defn Discussion [shift application messages status]
-  (if (= status :loading)
-    [sa/Loader]
-    (concatv [sa/SegmentGroup]
-             (map (fn [m] [Message m]) (reverse messages))
-             [[MessageForm (:pk application)]])))
 
 (defn DiscussShift [{application-pk :application-pk shift-pk :shift-pk}]
   (rf/dispatch [:get-shift-info shift-pk])

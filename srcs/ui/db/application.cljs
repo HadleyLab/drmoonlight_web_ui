@@ -65,11 +65,12 @@
    (get-in db [:applications-info application-pk] {:status :not-asked})))
 
 (rf/reg-sub
- :application-owner
- (fn [db [_ application-pk]]
-   (let [{first-name :first-name
-          last-name :last-name} (get-in db
-                                        [:applications-info application-pk :data :shift :owner])]
+ :application-participant
+ (fn [db [_ application-pk participant-id]]
+   (let [scheduler (get-in db [:applications-info application-pk :data :shift :owner])
+         resident (get-in db [:applications-info application-pk :data :owner])
+         {first-name :first-name
+          last-name :last-name} (if (= (:pk scheduler) participant-id) scheduler resident)]
      (str first-name " " last-name))))
 
 (rf/reg-event-fx
