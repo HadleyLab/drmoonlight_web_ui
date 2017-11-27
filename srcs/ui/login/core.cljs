@@ -21,31 +21,31 @@
   (let [login-form @(rf/subscribe [:cursor [root-path :login-form]])
         response-cursor @(rf/subscribe [:cursor [root-path :response]])
         email (reagent/cursor login-form [:email])
-        password (reagent/cursor login-form [:password])
-        errors @(rf/subscribe [:cursor [root-path :response :errors]])]
+        password (reagent/cursor login-form [:password])]
     (fn []
-      [sa/Grid {:divided true}
-       [sa/GridRow {}
-        [sa/GridColumn {:width 11}
-         [sa/Form {:error (= (:status @response-cursor) :failure)}
-          [sa/FormField {:error (contains? :email @errors)}
-           [:label "Email"]
-           [sa/Input {:type "email" :value @email :on-change (>atom email)}]]
-          [sa/FormField {:error (contains? :password @errors)}
-           [:label "Password"]
-           [sa/Input {:type "password" :value @password :on-change (>atom password)}]]
-          [sa/Message {:error true
-                       :visible (= (:status @response-cursor) :failure)
-                       :header "There was some errors with your submission"
-                       :list (vals @errors)}]
-          [sa/FormGroup {:class-name "justify-content _space-between"}
-           [sa/FormButton {:color :blue
-                           :loading (= (:status @response-cursor) :loading)
-                           :on-click (>event [:login])} "Log in"]
-           [sa/FormField {:class-name "login__forgot-password"}
-            [:a {:href (href :forgot-password)} "Forgot password?"]]]]]
-        [sa/GridColumn {:width 5 :class-name "login__right-column align-items _center"}
-         [:div "Don't have account yet?"] [:a {:href (href :sign-up)} "Sign up"]]]])))
+      (let [{status :status errors :errors} @response-cursor]
+        [sa/Grid {:divided true}
+         [sa/GridRow {}
+          [sa/GridColumn {:width 11}
+           [sa/Form {:error (= status :failure)}
+            [sa/FormField {:error (contains? errors :email)}
+             [:label "Email"]
+             [sa/Input {:type "email" :value @email :on-change (>atom email)}]]
+            [sa/FormField {:error (contains? errors :password)}
+             [:label "Password"]
+             [sa/Input {:type "password" :value @password :on-change (>atom password)}]]
+            [sa/Message {:error true
+                         :visible (= status :failure)
+                         :header "There was some errors with your submission"
+                         :list (vals errors)}]
+            [sa/FormGroup {:class-name "justify-content _space-between"}
+             [sa/FormButton {:color :blue
+                             :loading (= status :loading)
+                             :on-click (>event [:login])} "Log in"]
+             [sa/FormField {:class-name "login__forgot-password"}
+              [:a {:href (href :forgot-password)} "Forgot password?"]]]]]
+          [sa/GridColumn {:width 5 :class-name "login__right-column align-items _center"}
+           [:div "Don't have account yet?"] [:a {:href (href :sign-up)} "Sign up"]]]]))))
 
 (defn Index [params]
   (rf/dispatch-sync [::init-login-page])
