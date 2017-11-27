@@ -65,6 +65,7 @@
                                            [sa/Icon {:name :plus}] "Create new shift"])
              :dimmer :blurring
              :open @modal-cursor
+             :on-close #(dispatch-set! modal-cursor false)
              :size :small}
    [sa/ModalHeader "Create a new shift"]
    [sa/ModalContent {:image true}
