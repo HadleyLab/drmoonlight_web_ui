@@ -51,8 +51,8 @@
 
 (rf/reg-event-db
  ::init-login-page
- (fn [db [_]]
-   (if (= (root-path db) nil)
+ (fn [db [_ & force]]
+   (if (or force (= (root-path db) nil))
      (assoc-in db [root-path] schema)
      db)))
 
@@ -65,7 +65,9 @@
                    :body body
                    :success {:event :login-succeed
                              :fxs {:succeed-fx (fn [db2]
-                                                 {:dispatch [:goto (get-in db2 [:account :user-type])]})}}
+                                                 {:dispatch-n
+                                                  [[::init-login-page :force]
+                                                   [:goto (get-in db2 [:account :user-type])]]})}}
                    :error {:event :login-failure}}
       :db (assoc-in db [root-path :response :status] :loading)})))
 

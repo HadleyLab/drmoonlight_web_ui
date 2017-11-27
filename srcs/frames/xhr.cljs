@@ -46,8 +46,51 @@
                                                  :response resp
                                                  :data (js->clj doc :keywordize-keys true)})])))))))
      {})))
-
 (rf/reg-fx :json/fetch json-fetch)
+
+(defn- dispatch-write-with-fx [path data fx]
+  (rf/dispatch [:db/write path data])
+  (cond
+    (nil? fx) nil
+    (fn? fx) (rf/dispatch (fx (:data data)))
+    :else (rf/dispatch fx)))
+
+(defn json-fetch->path [{path :path
+                         uri :uri
+                         token :token
+                         headers :headers
+                         params :params
+                         map-result :map-result
+                         succeed-fx :succeed-fx
+                         failure-fx :failure-fx :as opts}]
+  (let [headers (merge (or headers {})
+                       {"Content-Type" "application/json"}
+                       (if (nil? token) {} {"Authorization" (str "Token " token)}))
+        fetch-opts (-> (merge {:method "get"} opts)
+                       (dissoc :uri :headers :success :error :params)
+                       (assoc :headers headers))
+        fetch-opts (if (:body opts)
+                     (assoc fetch-opts :body (.stringify js/JSON (clj->js (:body opts))))
+                     fetch-opts)
+        status-path (conj path :status)
+        map-result (or map-result identity)]
+    (rf/dispatch [:db/write status-path :loading])
+    (->
+     (js/fetch (str (:uri opts) (when params (str "?" (to-query params))))
+               (clj->js fetch-opts))
+     (.then (fn [resp]
+              (if (= (.-status resp) 204)
+                (dispatch-write-with-fx status-path :succeed succeed-fx)
+                (-> (.json resp)
+                    (.then #(js->clj % :keywordize-keys true))
+                    (.then (fn [doc]
+                             (.log js/console "doc" (.-status resp) doc)
+                             (if (>= (.-status resp) 400)
+                               (dispatch-write-with-fx path {:status :failure
+                                                       :errors doc} failure-fx)
+                               (dispatch-write-with-fx path {:status :succeed
+                                                       :data (map-result doc)} succeed-fx)))))))))))
+(rf/reg-fx :json/fetch->path json-fetch->path)
 
 (rf/reg-fx
  ::fetch

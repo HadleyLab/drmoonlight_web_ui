@@ -83,25 +83,11 @@
  (fn [{db :db} [_]]
    (let [mode (get-in db [root-path :mode])
          data (get-in db [root-path :sign-up-form :fields])]
-     {:json/fetch {:uri (get-url db (str "/api/accounts/" (name mode) "/"))
-                   :method "post"
-                   :body data
-                   :success {:event :do-sigh-up-succeed}
-                   :error {:event :do-sigh-up-failure}}
-      :db (assoc-in db [root-path :sign-up-form :response :status] :loading)})))
-
-(rf/reg-event-db
- :do-sigh-up-failure
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [root-path :sign-up-form :response :status] :failure)
-       (assoc-in [root-path :sign-up-form :response :errors] data))))
-
-(rf/reg-event-fx
- :do-sigh-up-succeed
- (fn [{db :db} [_]]
-   {:dispatch [:goto :sign-up :thanks]
-    :db (assoc-in db [root-path] schema)}))
+     {:json/fetch->path {:path [root-path :sign-up-form :response]
+                         :uri (get-url db (str "/api/accounts/" (name mode) "/"))
+                         :method "post"
+                         :body data
+                         :succeed-fx [:goto :sign-up :thanks]}})))
 
 (defn Thanks [params]
   [FormWrapper
@@ -140,24 +126,10 @@
 (rf/reg-event-fx
  :activate
  (fn [{db :db} [_ data]]
-   {:json/fetch {:uri (get-url db "/api/accounts/activate/")
-                 :method "post"
-                 :body data
-                 :success {:event :activate-succeed}
-                 :error {:event :activate-failure}}
-    :db (assoc-in db [root-path :activation-response :status] :loading)}))
-
-(rf/reg-event-db
- :activate-succeed
- (fn [db [_]]
-   (assoc-in db [root-path :activation-response :status] :succeed)))
-
-(rf/reg-event-db
- :activate-failure
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [root-path :activation-response :status] :failure)
-       (assoc-in [root-path :activation-response :errors] data))))
+   {:json/fetch->path {:path [root-path :activation-response]
+                       :uri (get-url db "/api/accounts/activate/")
+                       :method "post"
+                       :body data}}))
 
 (defn Confirm [params]
   (rf/dispatch-sync [::init-sign-up-page])
@@ -169,50 +141,34 @@
       (let [status @status-cursor
             password-errors (or (:new-password @errors-cursor)
                                 (:non-field-errors @errors-cursor))]
-      [FormWrapper
-       [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Setup you new password"]
-       [sa/Form {:error (= status :failure)}
-        [sa/FormField
-         [:label "Password"]
-         [sa/Input
-          {:type "password"
-           :error (not= password-errors nil)
-           :value @password-cursor
-           :on-change (>atom password-cursor)}]]
-        (when password-errors
-          [:div {:class "error"} (clojure.string/join " " password-errors)])
-        [sa/FormGroup {:class-name "flex-direction _column"}
-         [sa/FormButton {:color :blue
-                         :loading (= status :loading)
-                         :on-click (>event [:confirm-rest-password (merge params {:new-password @password-cursor})])}
-          "Setup new password"]]]
-       [sa/FormField {:class-name "forgot-password__back"}
-        [:a {:href (href :login)} "Back to login"]]]))))
+        [FormWrapper
+         [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Setup you new password"]
+         [sa/Form {:error (= status :failure)}
+          [sa/FormField
+           [:label "Password"]
+           [sa/Input
+            {:type "password"
+             :error (not= password-errors nil)
+             :value @password-cursor
+             :on-change (>atom password-cursor)}]]
+          (when password-errors
+            [:div {:class "error"} (clojure.string/join " " password-errors)])
+          [sa/FormGroup {:class-name "flex-direction _column"}
+           [sa/FormButton {:color :blue
+                           :loading (= status :loading)
+                           :on-click (>event [:confirm-rest-password (merge params {:new-password @password-cursor})])}
+            "Setup new password"]]]
+         [sa/FormField {:class-name "forgot-password__back"}
+          [:a {:href (href :login)} "Back to login"]]]))))
 
 (rf/reg-event-fx
  :confirm-rest-password
  (fn [{db :db} [_ data]]
-   {:json/fetch {:uri (get-url db "/api/accounts/password/reset/confirm/")
-                 :method "post"
-                 :body data
-                 :success {:event :confirm-rest-password-succeed}
-                 :error {:event :confirm-rest-password-failure}}
-    :db (assoc-in db [root-path :password-reset :response :status] :loading)}))
-
-(rf/reg-event-fx
- :confirm-rest-password-succeed
- (fn [{db :db} [_]]
-   {:db (assoc-in db [root-path :password-reset] (:password-reset schema))
-    :dispatch [:goto :login]}))
-
-(rf/reg-event-db
- :confirm-rest-password-failure
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [root-path :password-reset :response :status] :failure)
-       (assoc-in [root-path :password-reset :response :errors] data))))
-
-
+   {:json/fetch->path {:path [root-path :password-reset :response]
+                       :uri (get-url db "/api/accounts/password/reset/confirm/")
+                       :method "post"
+                       :body data
+                       :succeed-fx [:goto :login]}}))
 
 (pages/reg-page :core/sign-up Index)
 (pages/reg-page :core/sign-up-thanks Thanks)

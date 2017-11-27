@@ -62,25 +62,11 @@
  :rest-password
  (fn [{db :db} [_]]
    (let [email (get-in db [root-path :reset-password-form :email])]
-     {:json/fetch {:uri (get-url db "/api/accounts/password/reset/")
-                   :method "post"
-                   :body {:email email}
-                   :success {:event :rest-password-succeed}
-                   :error {:event :rest-password-failure}}
-      :db (assoc-in db [root-path :response :status] :loading)})))
-
-(rf/reg-event-fx
- :rest-password-succeed
- (fn [{db :db} [_]]
-   {:dispatch [:goto :forgot-password :thanks]
-    :db (assoc-in db [root-path] schema)}))
-
-(rf/reg-event-db
- :rest-password-failure
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [root-path :response :status] :failure)
-       (assoc-in [root-path :response :errors] data))))
+     {:json/fetch->path {:path [root-path :response]
+                         :uri (get-url db "/api/accounts/password/reset/")
+                         :method "post"
+                         :body {:email email}
+                         :succeed-fx [:goto :forgot-password :thanks]}})))
 
 (defn Thanks [params]
   [FormWrapper

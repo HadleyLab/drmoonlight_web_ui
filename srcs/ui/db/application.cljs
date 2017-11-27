@@ -9,25 +9,10 @@
 (rf/reg-event-fx
  :get-applications
  (fn [{db :db} _]
-   {:db (assoc-in db [:applications :status] :loading)
-    :json/fetch {:uri (get-url db "/api/shifts/application/")
-                 :token @(rf/subscribe [:token])
-                 :success {:event :get-applications-succeed}
-                 :error {:event :get-applications-failure}}}))
-
-(rf/reg-event-db
- :get-applications-succeed
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [:applications :status] :succeed)
-       (assoc-in [:applications :data] (map #(update-in % [:shift] parse-date-time) data)))))
-
-(rf/reg-event-db
- :get-applications-failure
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [:applications :status] :failure)
-       (assoc-in [:applications :errors] data))))
+   {:json/fetch->path {:path [:applications]
+                       :uri (get-url db "/api/shifts/application/")
+                       :token @(rf/subscribe [:token])
+                       :map-result (fn [data] (map #(update-in % [:shift] parse-date-time) data))}}))
 
 (rf/reg-sub
  :applications
@@ -56,11 +41,9 @@
 (rf/reg-event-fx
  :get-application-info
  (fn [{db :db} [_ application-pk]]
-   {:db (assoc-in db [:applications-info application-pk :status] :loading)
-    :json/fetch {:uri (get-url db "/api/shifts/application/" application-pk "/")
-                 :token @(rf/subscribe [:token])
-                 :success {:event :get-application-info-succeed :application-pk application-pk}
-                 :error {:event :get-application-info-failure :application-pk application-pk}}}))
+   {:json/fetch->path {:path [:applications-info application-pk]
+                       :uri (get-url db "/api/shifts/application/" application-pk "/")
+                       :token @(rf/subscribe [:token])}}))
 
 (rf/reg-event-db
  :get-application-info-succeed
@@ -92,25 +75,9 @@
 (rf/reg-event-fx
  :get-application-messages
  (fn [{db :db} [_ application-pk]]
-   {:db (assoc-in db [:applications-messages application-pk :status] :loading)
-    :json/fetch {:uri (get-url db "/api/shifts/application/" application-pk "/message/")
-                 :token @(rf/subscribe [:token])
-                 :success {:event :get-application-messages-succeed :application-pk application-pk}
-                 :error {:event :get-application-messages-failure :application-pk application-pk}}}))
-
-(rf/reg-event-db
- :get-application-messages-succeed
- (fn [db [_ {data :data application-pk :application-pk}]]
-   (-> db
-       (assoc-in [:applications-messages application-pk :status] :succeed)
-       (assoc-in [:applications-messages application-pk :data] data))))
-
-(rf/reg-event-db
- :get-application-messages-failure
- (fn [db [_ {data :data application-pk :application-pk}]]
-   (-> db
-       (assoc-in [:applications-messages application-pk :status] :failure)
-       (assoc-in [:applications-messages application-pk :errors] data))))
+   {:json/fetch->path {:path [:applications-messages application-pk]
+                       :uri (get-url db "/api/shifts/application/" application-pk "/message/")
+                       :token @(rf/subscribe [:token])}}))
 
 (rf/reg-sub
  :application-messages
@@ -137,25 +104,14 @@
 (rf/reg-event-fx
  :add-comment
  (fn [{db :db} [_ application-pk]]
-   {:db (assoc-in db [:comment-form :response :staus] :loading)
-    :json/fetch {:uri (get-url db "/api/shifts/application/" application-pk "/message/")
-                 :method "POST"
-                 :token @(rf/subscribe [:token])
-                 :body {:message @@(rf/subscribe [:comment-cursor])}
-                 :success {:event :add-comment-succeed :application-pk application-pk}
-                 :error {:event :add-comment-failure :application-pk application-pk}}}))
+   {:json/fetch->path {:path [:comment-form :response]
+                       :uri (get-url db "/api/shifts/application/" application-pk "/message/")
+                       :method "POST"
+                       :token @(rf/subscribe [:token])
+                       :body {:message @@(rf/subscribe [:comment-cursor])}
+                       :succeed-fx (fn [data] [:add-new-message-to-list application-pk data])}}))
 
 (rf/reg-event-db
- :add-comment-succeed
- (fn [db [_ {data :data application-pk :application-pk}]]
-   (-> db
-       (assoc-in [:comment-form :response :status] :succeed)
-       (assoc-in [:comment-form :response :data] data)
-       (update-in [:applications-messages (str application-pk) :data] #(cons data %)))))
-
-(rf/reg-event-db
- :add-comment-failure
- (fn [db [_ {data :data application-pk :application-pk}]]
-   (-> db
-       (assoc-in [:comment-form :response :status] :failure)
-       (assoc-in [:comment-form :response :errors] data))))
+ :add-new-message-to-list
+ (fn [db [_ application-pk data]]
+   (update-in db [:applications-messages (str application-pk) :data] #(cons data %))))

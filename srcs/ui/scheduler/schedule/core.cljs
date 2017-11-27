@@ -142,28 +142,20 @@
 (rf/reg-event-fx
  :create-new-shift
  (fn [{db :db} [_]]
-   {:db (assoc-in db [root-path :shift-form :response :status] :loading)
-    :json/fetch {:uri (get-url db "/api/shifts/shift/")
-                 :method "POST"
-                 :token (<sub [:token])
-                 :body (-> db
-                           (get-in [root-path :shift-form :fields])
-                           (update-in [:date-start] cljstime->drf-date-time)
-                           (update-in [:date-end] cljstime->drf-date-time))
-                 :success {:event :create-new-shift-succeed}
-                 :error {:event :create-new-shift-failure}}}))
+   {:json/fetch->path {:path [root-path :shift-form :response]
+                       :uri (get-url db "/api/shifts/shift/")
+                       :method "POST"
+                       :token (<sub [:token])
+                       :body (-> db
+                                 (get-in [root-path :shift-form :fields])
+                                 (update-in [:date-start] cljstime->drf-date-time)
+                                 (update-in [:date-end] cljstime->drf-date-time))
+                       :succeed-fx [:create-new-shift-succeed]}}))
 
 (rf/reg-event-fx
  :create-new-shift-succeed
  (fn [{db :db} _]
    {:db (assoc-in db [root-path :shift-form] (:shift-form (schema)))
     :dispatch [:load-shifts]}))
-
-(rf/reg-event-db
- :create-new-shift-failure
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [root-path :shift-form :response :status] :failure)
-       (assoc-in [root-path :shift-form :response :errors] data))))
 
 (pages/reg-page :core/scheduler-schedule Index)

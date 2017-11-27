@@ -45,7 +45,7 @@
       [sa/GridRow {}
        [sa/GridColumn {:width 3}
         [sa/Segment
-         [sa/Dimmer {:active (= status :loading)} [sa/Loader]]
+         [sa/Dimmer {:active (and (nil? shift) (= status :loading))} [sa/Loader]]
          (when (= status :succeed)
            (let [{speciality :speciality
                   start :date-start

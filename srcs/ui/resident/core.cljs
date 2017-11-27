@@ -92,30 +92,23 @@
          url (if (= state 1)
                (get-url db "/api/accounts/resident/" pk "/fill_profile/")
                (get-url db "/api/accounts/resident/" pk "/"))]
-     {:db (assoc-in db [root-path :profile-form :response :status] :loading)
-      :json/fetch {:uri url
-                   :method (if (= state 1) "POST" "PATCH")
-                   :token token
-                   :body body
-                   :success (merge
-                             {:event :update-resident-profile-succeed}
-                             (when (= state 1)
-                               {:data (merge body {:state 2})}))
-                   :error {:event :update-resident-profile-failure}}})))
-
+     {:json/fetch->path {:path [root-path :profile-form :response]
+                         :uri url
+                         :method (if (= state 1) "POST" "PATCH")
+                         :token token
+                         :body body
+                         :succeed-fx
+                         (fn [data]
+                           [:update-resident-profile-succeed
+                            (if (= state 1)
+                              (merge body {:state 2})
+                              data)])}})))
 (rf/reg-event-db
  :update-resident-profile-succeed
- (fn [db [_ {data :data}]]
-   (-> db
-       (assoc-in [root-path :profile-form :response] {:status :succeed :data data})
-       (update-in [:account :user-info] #(merge % data)))))
-
-(rf/reg-event-db
- :update-resident-profile-failure
- (fn [db [_ {data :data}]]
-   (assoc-in db [root-path :profile-form :response] {:status :failure :errors data})))
+ (fn [db [_ data]]
+   (update-in db [:account :user-info] #(merge % data))))
 
 (pages/reg-page :core/resident (with-init (fn [] [ResidentLayout [sa/Header {} "index"]])))
 (pages/reg-page :core/resident-statistics (with-init (fn [] [ResidentLayout [sa/Header {} "statistics"]])))
-(pages/reg-page :core/resident-profile (with-init (fn [] [ResidentProfileLayout [ResidentProfileForm]]))) 
+(pages/reg-page :core/resident-profile (with-init (fn [] [ResidentProfileLayout [ResidentProfileForm]])))
 (pages/reg-page :core/resident-profile-notification (with-init (fn [] [ResidentProfileLayout [ResidentNotificationForm]])))
