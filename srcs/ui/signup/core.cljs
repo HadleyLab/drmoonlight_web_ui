@@ -68,7 +68,7 @@
     [FormWrapper
      [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Welcome to Dr. Moonlight!"]
      [Form]
-     [:div {:class-name "signup__to-login"}
+     [:div {:class-name "signup__back"}
       [:p "Already a member? " [:a {:href (href :login)} "Log In"]]]]))
 
 (rf/reg-event-db
@@ -88,29 +88,41 @@
                          :method "post"
                          :body data
                          :succeed-fx [:goto :sign-up :thanks]}})))
+(defn BackButton [url text]
+  [sa/Button {:basic true
+              :color :blue
+              :on-click (>event [:goto url])
+              :class-name "signup__back"} text])
 
 (defn Thanks [params]
   [FormWrapper
-   [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Thanks for registering !"]
-   [:p "You’ve just been sent an email to confirm your email address. Please click on the link in this email to confirm your registration to Dr. Moonlight."]
-   [:p "if you don’t get the email in 10 minutes, you can " [:a {} "resend the confirmation email"] "."]
-   [sa/Button {:basic true :color :blue :on-click (>event [:goto "/"])} "Go Home"]])
-
+   [:div {:class-name "signup-thanks__wrapper"}
+    [sa/Icon {:name "check circle" :color "green" :size "huge"}]
+    [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Thanks for registering!"]
+    [:p "You’ve just been sent an email to confirm your email address. Please click on the link in this email to confirm your registration to Dr. Moonlight."]
+    [:p "if you don’t get the email in 10 minutes, you can " [:a {} "resend the confirmation email"] "."]
+    [BackButton "/" "Back to Home"]]])
 (defn ActivationLoading []
   [FormWrapper
-   [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Waiting for the activation!"]
-   [sa/Button {:basic true :color :blue :on-click (>event [:goto "/"])} "Go Home"]])
+   [:div {:class-name "signup-thanks__wrapper"}
+    [sa/Icon {:name "wait" :color "blue" :size "huge"}]
+    [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Waiting for the activation!"]
+    [BackButton "/" "Back to Home"]]])
 
 (defn ActivationSucceed []
   [FormWrapper
-   [sa/Header {:as :h1 :class-name "moonlight-form-header"} "You account is successfully activated"]
-   [sa/Button {:basic true :color :blue :on-click (>event [:goto :login])} "Sign Up"]])
+   [:div {:class-name "signup-thanks__wrapper"}
+    [sa/Icon {:name "check circle" :color "green" :size "huge"}]
+    [sa/Header {:as :h1 :class-name "moonlight-form-header"} "You account is successfully activated"]
+    [BackButton :login "Log in"]]])
 
 (defn ActivationFailure [errors]
   [FormWrapper
-   [sa/Header {:as :h1 :class-name "moonlight-form-header"} "You account is failed to activate"]
-   [:p.error (:detail errors)]
-   [sa/Button {:basic true :color :blue :on-click (>event [:goto "/"])} "Go Home"]])
+   [:div {:class-name "signup-thanks__wrapper"}
+    [sa/Icon {:name "remove circle" :color "red" :size "huge"}]
+    [sa/Header {:as :h1 :class-name "moonlight-form-header"} "You account is failed to activate"]
+    [:p.error (:detail errors)]
+    [BackButton "/" "Back to Home"]]])
 
 (defn Activate [params]
   (rf/dispatch-sync [::init-sign-up-page])

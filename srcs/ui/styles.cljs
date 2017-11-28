@@ -30,8 +30,18 @@
                         :box-shadow "0 2px 1px -1px gray"}]
 
    ; dashboard styles
-   [:.dashboard__header {:margin-top (px -100)}]
-   [:.dashboard__subheader {:margin-top "30px!important"}]
+   [:.dashboard__header {:font-size (px 46)
+                         :line-height (px 55)
+                         :font-weight "bold"}]
+   [:.dashboard__how-it-works {:text-align "center"
+                               :padding "50px 0"
+                               :font-size (px 28)
+                               :line-height (px 34)
+                               :font-weight "bold"}]
+   [:.dashboard__how-it-works
+    [:a {:color "#000"}
+     [:&:hover {:color "#000"
+                :text-decoration "underline"}]]]
 
    ; login screen styles
    [:.login__right-column {:text-align "center"
@@ -43,11 +53,14 @@
    ; forgot password screen styles
    [:.forgot-password__subheader {:margin-bottom (px 30)
                                   :text-align "center"}]
+   [:.forgot-password__buttons {:margin "0 -0.5em!important"}]
    [:.forgot-password__back {:padding-top (px 30)
                              :text-align "center"}]
+
    ; signup screen styles
-   [:.signup__to-login {:text-align "center"
-                        :margin-top (px 30)}]
+   [:.signup__back {:text-align "center"
+                    :margin-top "30px!important"}]
+   [:.signup-thanks__wrapper {:text-align "center"}]
 
    ; form styles
    [:.input-info {:display "flex"
