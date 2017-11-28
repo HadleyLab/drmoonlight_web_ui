@@ -1,6 +1,6 @@
 (ns ui.resident.layout
   (:require
-   [ui.db :refer [>evt <sub]]
+   [ui.db.misc :refer [>evt <sub]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
 

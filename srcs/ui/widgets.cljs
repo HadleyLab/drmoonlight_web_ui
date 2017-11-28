@@ -1,7 +1,7 @@
 (ns ui.widgets
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [>event >atom dispatch-set!]]
+   [ui.db.misc :refer [>event >atom dispatch-set!]]
    [re-frame.core :as rf]
    [cljs.pprint :as pp]
    [cljs-time.core :as dt]

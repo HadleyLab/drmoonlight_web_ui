@@ -1,6 +1,6 @@
 (ns ui.widgets.message
   (:require
-   [ui.db :refer [>event >atom <sub get-url text-with-br]]
+   [ui.db.misc :refer [>event >atom <sub get-url text-with-br]]
    [ui.widgets :refer [concatv]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
@@ -17,7 +17,7 @@
                          :error (= status :failure)
                          :value @comment-cursor
                          :on-change (>atom comment-cursor)}]
-          (when-not (nil? (:message errors)) [:div.error (str (:message errors))])
+          (when-not (nil? (:message errors)) [:div.error (str (clojure.string/join "," (:message errors) ))])
           [sa/ButtonGroup
            (for [transition (conj available-transitions "message")]
              [sa/FormButton

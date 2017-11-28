@@ -12,8 +12,6 @@
    [frames.openid :as openid]
    [frames.redirect :as redirect]
    [ui.db]
-   [ui.db.account]
-   [ui.db.constants]
    [ui.dashboard.core]
    [ui.login.core]
    [ui.signup.core]
@@ -48,14 +46,12 @@
                    [[:load-constants]]
                    [(if (nil? token)
                       [:route-map/init routes/routes]
-                      [:load-account-info token {:succeed-fx
-                                                 {:dispatch [:route-map/init routes/routes]}}])])
+                      [:save-token token [:route-map/init routes/routes]])])
       :db
-      (merge
+      (merge ui.db/initial-db
        {:base-url base-url
         :constants {:status :loading}
-        :shifts {:status :not-asked}}
-       (if (nil? token) {} {:account {:token token}}))})))
+        :shifts {:status :not-asked}})})))
 
 (defn- mount-root []
   (reagent/render

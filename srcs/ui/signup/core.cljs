@@ -1,7 +1,7 @@
 (ns ui.signup.core
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [get-url >event >atom]]
+   [ui.db.misc :refer [get-url >event >atom]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [FormRadio BuildForm FormWrapper fields->schema]]

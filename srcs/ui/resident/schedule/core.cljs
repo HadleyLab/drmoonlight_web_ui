@@ -1,7 +1,7 @@
 (ns ui.resident.schedule.core
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [>event dispatch-set! get-url <sub]]
+   [ui.db.misc :refer [>event dispatch-set! get-url <sub]]
    [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]

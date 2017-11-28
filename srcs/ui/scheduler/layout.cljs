@@ -1,6 +1,6 @@
 (ns ui.scheduler.layout
   (:require
-   [ui.db :refer [<sub]]
+   [ui.db.misc :refer [<sub]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
 

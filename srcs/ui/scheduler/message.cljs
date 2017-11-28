@@ -1,7 +1,7 @@
 (ns ui.scheduler.message
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [>event >atom <sub get-url reduce-statuses text-with-br]]
+   [ui.db.misc :refer [>event >atom <sub get-url reduce-statuses text-with-br]]
    [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
    [ui.db.application :refer [application-statuses]]
    [ui.pages :as pages]
@@ -32,7 +32,7 @@
                     [:br]]))]
          [sa/GridColumn {:width 13}
           [sa/SegmentGroup
-           (for [application (:data applications)
+           (doall (for [application (:data applications)
                  :let [{{speciality :speciality
                          start :date-start
                          finish :date-end
@@ -56,7 +56,7 @@
                [sa/GridColumn {:width 3}
                 [sa/Button
                  {:on-click (>event [:goto :scheduler :messages pk :discuss (:pk application)])}
-                 "Go to Chat"]]]])]]]]])))
+                 "Go to Chat"]]]]))]]]]])))
 
 (defn ApplicationLayout [application-info content]
   (let [{status :status application :data} application-info

@@ -1,75 +1,123 @@
 (ns ui.db.account
   (:require
-   [ui.db.misc :refer [get-url]]
+   [ui.db.misc :refer [get-url <sub reduce-statuses reduce-errors]]
    [re-frame.core :as rf]))
 
-(rf/reg-sub
- :account
- (fn [db path]
-   (get-in db path)))
+(def schema
+  {::account
+   {:token nil
+    :login-form
+    {:fields
+     {:email ""
+      :password ""}
+     :response {:status :not-asked}}
+    :type-response {:status :not-asked}
+    :info-response {:status :not-asked}}})
 
-(rf/reg-sub
- :user-type
- #(deref (rf/subscribe [:account :user-type])))
+(rf/reg-event-fx
+ ::setup-login-form-and-redirect
+ (fn [{db :db} _]
+   (let [user-type (<sub [:user-type])]
+     {:db (assoc-in db [::account :login-form] (get-in schema [::account :login-form]))
+      :dispatch [:goto user-type]})))
 
-(rf/reg-sub
- :user-email
- #(deref (rf/subscribe [:account :user-info :email])))
+(rf/reg-event-fx
+ :submit-login-form
+ (fn [{db :db} _]
+   (let [body (get-in db [::account :login-form :fields])
+         final-succeed-fx [::setup-login-form-and-redirect]]
+     {:json/fetch->path {:path [::account :login-form :response]
+                         :uri (get-url db "/api/accounts/token/create/")
+                         :method "post"
+                         :body body
+                         :succeed-fx (fn [data] [:save-token (:auth-token data) final-succeed-fx])}})))
+(rf/reg-event-fx
+ :save-token
+ [(rf/inject-cofx :store)]
+ (fn [{db :db store :store} [_ token final-succeed-fx]]
+   {:db (assoc-in db [::account :token] token)
+    :store (assoc store :token token)
+    :dispatch [:load-account-type final-succeed-fx]}))
 
-(rf/reg-sub
- :user-state
- #(deref (rf/subscribe [:account :user-info :state])))
+(rf/reg-event-fx
+ :load-account-type
+ (fn [{db :db} [_ final-succeed-fx]]
+   {:json/fetch->path {:path [::account :type-response]
+                       :uri (get-url db "/api/accounts/me/")
+                       :token (<sub [:token])
+                       :succeed-fx [:load-account-info final-succeed-fx]}}))
 
-(rf/reg-sub
- :user-id
- #(deref (rf/subscribe [:account :user-info :id])))
-
-(rf/reg-sub
- :token
- #(deref (rf/subscribe [:account :token])))
+(rf/reg-event-fx
+ :load-account-info
+ (fn [{db :db} [_ final-succeed-fx]]
+   (let [user-type (<sub [:user-type])
+         user-id (<sub [:user-id])
+         token (<sub [:token])]
+     {:json/fetch->path {:path [::account :info-response]
+                         :uri (get-url db (str "/api/accounts/" (name user-type) "/" user-id "/"))
+                         :token token
+                         :succeed-fx [:dispatch-fx final-succeed-fx]}})))
 
 (rf/reg-event-fx
  :logout
  [(rf/inject-cofx :store)]
  (fn [{db :db store :store} _]
-   {:db (dissoc db :account)
+   {:db (assoc db ::account schema)
     :store (dissoc store :token)
     :dispatch [:goto "/"]}))
 
-(rf/reg-event-fx
- :login-succeed
- [(rf/inject-cofx :store)]
- (fn [{db :db store :store} [_ {data :data fxs :fxs}]]
-   {:db (assoc-in db [:account] {:token (:auth-token data)})
-    :store (assoc store :token (:auth-token data))
-    :dispatch [:load-account-info (:auth-token data) fxs]}))
+(rf/reg-sub
+ ::account
+ (fn [db path]
+   (get-in db path)))
 
-(rf/reg-event-fx
- :load-account-info
- (fn [{db :db} [_ token fxs]]
-   {:json/fetch {:uri (get-url db "/api/accounts/me/")
-                 :token token
-                 :success {:event :loaded-login-data :fxs fxs}
-                 :error {:event :login-failure :fxs fxs}}}))
+(rf/reg-sub
+ ::info-response
+ (fn [db [_ & path]]
+   (<sub (into [] (concat [::account :info-response :data] path)))))
 
-(rf/reg-event-fx
- :loaded-login-data
- (fn [{db :db} [_ {data :data fxs :fxs}]]
-   (let [user-type (cond
-                     (:is-resident data) :resident
-                     (:is-scheduler data) :scheduler
-                     (:is-account-manager data) :account-manager)
-         token (get-in db [:account :token])]
-     {:db (assoc-in db [:account :user-type] user-type)
-      :json/fetch {:uri (get-url db (str "/api/accounts/" (name user-type) "/" (:pk data) "/"))
-                   :token token
-                   :success {:event :loaded-user-data :fxs fxs}
-                   :error {:event :login-failure :fxs fxs}}})))
+(rf/reg-sub
+ :user-info
+#(<sub [::info-response]))
 
-(rf/reg-event-fx
- :loaded-user-data
- (fn [{db :db} [_ {data :data fxs :fxs}]]
-   (let [succeed-fx (:succeed-fx fxs {})
-         fxs (if (fn? succeed-fx) (succeed-fx db) succeed-fx)]
-     (merge
-      {:db (assoc-in db [:account :user-info] data)} fxs))))
+(rf/reg-sub
+ :user-type
+ (fn [db _]
+   (let
+    [type-data (<sub [::account :type-response :data])
+     user-type (cond
+                 (:is-resident type-data) :resident
+                 (:is-scheduler type-data) :scheduler
+                 (:is-account-manager type-data) :account-manager)]
+     user-type)))
+
+(rf/reg-sub
+ :user-email
+ #(<sub [::info-response :email]))
+
+(rf/reg-sub
+ :user-state
+ #(<sub [::info-response :state]))
+
+(rf/reg-sub
+ :user-id
+ #(<sub [::account :type-response :data :pk]))
+
+(rf/reg-sub
+ :token
+ #(<sub [::account :token]))
+
+(rf/reg-sub
+ :login-form-cursor
+ #(<sub [:cursor [::account :login-form :fields]]))
+
+(rf/reg-sub
+ :login-form-response
+ (fn [_ _]
+   (let [responses [(<sub [::account :login-form :response])
+                    (<sub [::account :type-response])
+                    (<sub [::account :info-response])]
+         status (apply reduce-statuses (map :status responses))
+         errors (apply reduce-errors (map :errors responses))]
+     {:status status :errors errors})))
+

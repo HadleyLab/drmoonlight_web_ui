@@ -2,7 +2,7 @@
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [>event]]
+   [ui.db.misc :refer [>event]]
    [ui.pages :as pages]
    [re-frame.core :as rf]
    [clojure.string :as str]

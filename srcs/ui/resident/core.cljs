@@ -1,7 +1,7 @@
 (ns ui.resident.core
   (:require
    [reagent.core :as reagent]
-   [ui.db :refer [>event <sub get-url]]
+   [ui.db.misc :refer [>event <sub get-url]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [BuildForm fields->schema setup-form-initial-values]]
@@ -79,8 +79,8 @@
  (fn [db _]
    (-> db
        (assoc-in [root-path] schema)
-       (update-in [root-path :profile-form :fields] (setup-form-initial-values (:user-info (<sub [:account]))))
-       (update-in [root-path :notification-form :fields] (setup-form-initial-values (:user-info (<sub [:account])))))))
+       (update-in [root-path :profile-form :fields] (setup-form-initial-values (<sub [:user-info])))
+       (update-in [root-path :notification-form :fields] (setup-form-initial-values (<sub [:user-info]))))))
 
 (rf/reg-event-fx
  :update-resident-profile

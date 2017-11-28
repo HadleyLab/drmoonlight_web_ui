@@ -1,6 +1,6 @@
 (ns ui.routes
   (:require [clojure.string :as str]
-            [ui.db :refer [<sub]]
+            [ui.db.misc :refer [<sub]]
             [route-map.core :as route-map]))
 
 ;; application routes represented as hash-map (see https://github.com/niquola/route-map)

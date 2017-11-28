@@ -55,20 +55,6 @@
                        :uri (get-url db "/api/shifts/application/" application-pk "/")
                        :token @(rf/subscribe [:token])}}))
 
-(rf/reg-event-db
- :get-application-info-succeed
- (fn [db [_ {data :data application-pk :application-pk}]]
-   (-> db
-       (assoc-in [:applications-info application-pk :status] :succeed)
-       (assoc-in [:applications-info application-pk :data] data))))
-
-(rf/reg-event-db
- :get-application-info-failure
- (fn [db [_ {data :data application-pk :application-pk}]]
-   (-> db
-       (assoc-in [:applications-info application-pk :status] :failure)
-       (assoc-in [:applications-info application-pk :errors] data))))
-
 (rf/reg-sub
  :application-info
  (fn [db [_ application-pk]]
