@@ -17,11 +17,12 @@
      [sa/Button {:basic true :color :blue :content "Log In" :on-click (>event [:goto :login])}]
      [sa/Button {:color :blue :content "Sign up" :on-click (>event [:goto :sign-up])}]]]
    [sa/GridRow {:centered true :class-name "flex _1 align-items _center"}
-    [:div {:class-name "dashboard__header"}
-     [sa/Header {:as "h1" :text-align "left"}
-      [sa/HeaderContent {}
-       [:div "Medical moonlighting made easy"]
-       [sa/HeaderSubheader {:class-name "dashboard__subheader"}
-        "Find great clinical jobs without agency recruiters"]]]]]])
+    [sa/GridColumn {:width 8}]
+    [sa/GridColumn {:width 8}
+     [:div {:class-name "dashboard__header"}
+      "Find local moonlighting, quick and easy, and supplement your income"]]]
+   [sa/GridRow {}
+    [sa/GridColumn {:width 16 :class-name "dashboard__how-it-works"}
+     [:a {:href "#"} "How it works"]]]])
 
 (pages/reg-page :core/index Index)

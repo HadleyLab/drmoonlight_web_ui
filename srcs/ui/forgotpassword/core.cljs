@@ -33,7 +33,7 @@
             :on-change (>atom email)}]]
          (when email-errors
            [:div {:class "error"} (clojure.string/join " " email-errors)])
-         [sa/FormGroup {:class-name "flex-direction _column"}
+         [sa/FormGroup {:class-name "forgot-password__buttons flex-direction _column"}
           [sa/FormButton {:color :blue
                           :loading (= status :loading)
                           :on-click (>event [:rest-password])}
