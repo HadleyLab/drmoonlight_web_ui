@@ -17,19 +17,19 @@
 (def resident-profile-form-fields
   {"Personal Information" {:first-name "First Name"
                            :last-name "Last Name"}
-   "Reidency" {:residency-program {:type :select
-                                   :label "Residency Program"
-                                   :items #(<sub [:residency-program-as-options])}
-               :specialities {:type :multy-select
-                              :label "Specialities"
-                              :items #(<sub [:speciality-as-options])}
-               :residency-years "Residency Years"
-               :state-license {:type :radio
-                               :label "State Licence"
-                               :items {true "Yes" false "No"}}
-               :board-score {:type :radio
-                             :label "Board Score"
-                             :items {true "Yes" false "No"}}}})
+   "Residency" {:residency-program {:type :select
+                                    :label "Residency Program"
+                                    :items #(<sub [:residency-program-as-options])}
+                :specialities {:type :multy-select
+                               :label "Specialities"
+                               :items #(<sub [:speciality-as-options])}
+                :residency-years "Residency Years"
+                :state-license {:type :radio
+                                :label "State Licence"
+                                :items {true "Yes" false "No"}}
+                :board-score {:type :radio
+                              :label "Board Score"
+                              :items {true "Yes" false "No"}}}})
 
 (def resident-notification-form-fields
   {"I would like to recieve emails when:"
@@ -49,11 +49,12 @@
   (let [resident-page-cursor @(rf/subscribe [:cursor [root-path]])
         resident-notification-form-cursor (reagent/cursor resident-page-cursor [:notification-form])]
     (fn []
-      [sa/Form {:class-name "moonlight-form-inner"}
-       [BuildForm resident-notification-form-cursor resident-notification-form-fields]
-       [:div.moonlight-form-group
-        [sa/FormButton {:color :blue
-                        :on-click (>event [:udpate-resident-profile])} "Save changes"]]])))
+      [:div {:class-name "profile__content-inner _notifications"}
+       [sa/Form {:class-name "moonlight-form-inner"}
+        [BuildForm resident-notification-form-cursor resident-notification-form-fields]
+        [:div.moonlight-form-group
+         [sa/FormButton {:color :blue
+                         :on-click (>event [:udpate-resident-profile])} "Save changes"]]]])))
 
 (defn ResidentProfileForm []
   (let [resident-page-cursor @(rf/subscribe [:cursor [root-path]])
@@ -61,13 +62,16 @@
         status-cursor (reagent/cursor resident-profile-form-cursor [:response :status])
         email (<sub [:user-email])]
     (fn []
-      [sa/Form {:class-name "moonlight-form-inner"}
-       [BuildForm resident-profile-form-cursor resident-profile-form-fields]
-       [:div [:label "Account settings"] [:div.field [:label "Email"] [:p email]]]
-       [:div.moonlight-form-group
-        [sa/FormButton {:color :blue
-                        :loading (= @status-cursor :loading)
-                        :on-click (>event [:update-resident-profile])} "Save changes"]]])))
+      [:div {:class-name "profile__content-inner"}
+       [sa/Form {:class-name "moonlight-form-inner"}
+        [BuildForm resident-profile-form-cursor resident-profile-form-fields]
+        [sa/Divider]
+        [:div [:label {:class-name "form__group-title"} "Account settings"]
+         [:div.field [:label "Email"] [:p email]]]
+        [:div.moonlight-form-group
+         [sa/FormButton {:color :blue
+                         :loading (= @status-cursor :loading)
+                         :on-click (>event [:update-resident-profile])} "Save changes"]]]])))
 
 (defn with-init [render]
   (fn []

@@ -33,25 +33,28 @@
 (def concatv (comp (partial into []) concat))
 
 (defn FormRadio [{items :items cursor :cursor label :label}]
-  (concatv [sa/FormGroup {} [:div.field [:label label]]]
+  (concatv [sa/FormField {:width 10} [:label {:class-name "form__label"} label]]
            (->> items
                 (mapv (fn [[key value]]
                         [sa/FormRadio {:key key
+                                       :class-name "form__radio"
                                        :label value
                                        :value key
                                        :checked (= @cursor key)
                                        :on-change #(dispatch-set! cursor key)}])))))
 
 (defn FormToggle [{cursor :cursor label :label}]
-  [sa/Checkbox
-   {:toggle true
-    :label label
-    :checked (boolean @cursor)
-    :on-change (>atom cursor)}])
+  [sa/FormField {:width 10}
+   [sa/Checkbox
+    {:toggle true
+     :label label
+     :class-name "toggler"
+     :checked (boolean @cursor)
+     :on-change (>atom cursor)}]])
 
 (defn FormDatepicker [{cursor :cursor label :label :as info_}]
   (let [info (dissoc info_ :cursor :label :type)]
-    [:div.field
+    [sa/FormField {:width 10}
      [:label label]
      [DatePicker (merge {:selected (cljs->moment @cursor) :on-change #(reset! cursor (moment->cljs %))} info)]]))
 
@@ -62,7 +65,7 @@
     :else :text))
 
 (defn FormTextarea [{cursor :cursor label :label}]
-  [:div.field
+  [sa/FormField {:width 10}
    [:label label]
    [sa/TextArea {:value @cursor :on-change (>atom cursor)}]])
 
@@ -70,7 +73,7 @@
   (let [drop-down-cursor (reagent/cursor cursor [:fields (:cursor drop-down)])
         _ (.log js/console drop-down)]
     (fn [field-cursor cursor {label :label drop-down :drop-down}]
-      [:div.field
+      [sa/FormField {:width 10}
        [:label label]
        [sa/Input {:label (reagent/as-element
                           [sa/Dropdown {:value @drop-down-cursor
@@ -81,14 +84,15 @@
                   :label-position :right}]])))
 
 (defn FormSelect [{cursor :cursor label :label items :items}]
-  [sa/FormSelect {:value @cursor
-                  :placeholder label
-                  :label label
-                  :on-change (>atom cursor)
-                  :options (items)}])
+  [sa/FormField {:width 10}
+   [sa/FormSelect {:value @cursor
+                   :placeholder label
+                   :label label
+                   :on-change (>atom cursor)
+                   :options (items)}]])
 
 (defn FormMultySelect [{cursor :cursor label :label items :items}]
-  [:div.field
+  [sa/FormField {:width 10}
    [:label label]
    [sa/Dropdown {:value @cursor
                  :placeholder label
@@ -130,7 +134,8 @@
   (concatv [:div]
            (->> field-sets
                 (mapv (fn [[title fields]]
-                        (concatv [:div {:key title :class-name "moonlight-form-group"} [:label title]]
+                        (concatv [:div {:key title :class-name "moonlight-form-group"}
+                                  [:label {:class-name "form__group-title"} title]]
                                  (->> fields
                                       (mapv (fn [[field info]]
                                               [RenderInput {:cursor cursor :field field :info info :key field}])))))))))

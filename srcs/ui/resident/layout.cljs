@@ -40,15 +40,16 @@
      [sa/Grid {}
       [sa/GridRow {}
        [sa/GridColumn {:width 4}
-        [sa/Menu {:fluid true :vertical true :tabular true}
-         [sa/MenuItem {:name "Edit Profile"
-                       :active (= (:match @route) :core/resident-profile)
-                       :on-click #(>evt [:goto :resident :profile])}]
-         [sa/MenuItem {:name "Notification Settings"
-                       :active (= (:match @route) :core/resident-profile-notification)
-                       :on-click #(>evt [:goto :resident :profile :notification])}]
-         [sa/MenuItem {:name "Log out"
-                       :on-click #(>evt [:logout])}]]]
+        [:div {:class-name "profile__menu-wrapper"}
+         [sa/Menu {:fluid true :vertical true :tabular true}
+          [sa/MenuItem {:name "Edit Profile"
+                        :active (= (:match @route) :core/resident-profile)
+                        :on-click #(>evt [:goto :resident :profile])}]
+          [sa/MenuItem {:name "Notification Settings"
+                        :active (= (:match @route) :core/resident-profile-notification)
+                        :on-click #(>evt [:goto :resident :profile :notification])}]
+          [sa/MenuItem {:name "Log out"
+                        :on-click #(>evt [:logout])}]]]]
 
-       [sa/GridColumn {:width 12 :class-name :moonlight-white}
-        content]]]]))
+       [sa/GridColumn {:width 12}
+        [:div {:class-name "profile__content moonlight-white"} content]]]]]))

@@ -52,8 +52,7 @@
       (let [status (get-in @sign-up-form-cursor [:response :status])]
         [sa/Form {:error (= status :failure) :class-name "position _relative"}
          [sa/FormGroup
-          [sa/FormField {:width 10}
-           [FormRadio {:items modes :cursor mode-cursor :label "Register as"}]]
+          [FormRadio {:items modes :cursor mode-cursor :label "Register as"}]
           [sa/FormField {:width 6 :class-name "gray-font"}
            "Scheduler is a user, who is able to create shifts for booking"]]
          [FormContent @mode-cursor sign-up-form-cursor]
