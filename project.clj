@@ -18,6 +18,7 @@
                  [com.andrewmcveigh/cljs-time "0.5.2"]
                  [soda-ash "0.76.0" :exclusions [cljsjs/react]]
                  [akiroz.re-frame/storage "0.1.2"]
+                 [haslett "0.1.0"]
                  [cljsjs/react-datepicker "0.55.0-0" :exclusions [cljsjs/react]]]
 
   :plugins [[lein-environ "1.1.0"]

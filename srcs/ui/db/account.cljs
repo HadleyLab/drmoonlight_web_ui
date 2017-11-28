@@ -1,7 +1,12 @@
 (ns ui.db.account
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
+   [cljs.core.async :as a :refer [<! >!]]
+   [haslett.client :as ws]
+   [haslett.format :as fmt]
    [ui.db.misc :refer [get-url <sub reduce-statuses reduce-errors]]
-   [re-frame.core :as rf]))
+   [re-frame.core :as rf]
+   [clojure.string :refer [replace]]))
 
 (def schema
   {::account
@@ -13,6 +18,26 @@
      :response {:status :not-asked}}
     :type-response {:status :not-asked}
     :info-response {:status :not-asked}}})
+
+(defn event->action [data]
+  (update-in data [:event] #(keyword (replace % #"_" "-"))))
+
+(def json-websocker-formater
+  "Read and write data encoded in JSON."
+  (reify fmt/Format
+    (read  [_ s] (event->action (js->clj (js/JSON.parse s) :keywordize-keys true)))
+    (write [_ v] (js/JSON.stringify (clj->js v)))))
+
+
+(rf/reg-fx
+ :account-websocket
+ (fn [url]
+   (go
+     (let [stream (<! (ws/connect url  {:format json-websocker-formater}))]
+       (while true
+         (let [message (<! (:source stream))]
+           (js/console.log message)
+           (rf/dispatch [(:event message) (:payload message)])))))))
 
 (rf/reg-event-fx
  ::setup-login-form-and-redirect
@@ -37,6 +62,7 @@
  (fn [{db :db store :store} [_ token final-succeed-fx]]
    {:db (assoc-in db [::account :token] token)
     :store (assoc store :token token)
+    :account-websocket (str "ws://localhost:8000/accounts/user/" token "/")
     :dispatch [:load-account-type final-succeed-fx]}))
 
 (rf/reg-event-fx
@@ -78,7 +104,7 @@
 
 (rf/reg-sub
  :user-info
-#(<sub [::info-response]))
+ #(<sub [::info-response]))
 
 (rf/reg-sub
  :user-type
