@@ -29,6 +29,27 @@
                         :margin-bottom (px 35)
                         :box-shadow "0 2px 1px -1px gray"}]
 
+                        ; form styles
+   [:.input-info {:display "flex"
+                  :align-items "center"
+                  :padding-top (px 23)}]
+   [:.error {:color :red}]
+   [:.moonlight-form-header {:margin-bottom "40px!important"
+                             :text-align "center"}]
+   [:.moonlight-form {:padding "70px 0"}]
+   [:.moonlight-form-inner
+    :.segment.moonlight-form-inner {:padding "40px 70px 70px"}]
+   [:.moonlight-form-group {:margin-top (px 30)}]
+   [:.form__group-title {:display "inline-block"
+                         :color "#8C97B2"
+                         :margin-bottom (px 10)}]
+   [:.form__label {:display "inline-block!important"}]
+   [:.form__radio {:display "inline-block"
+                   :margin-left "20px!important"}]
+   [:.toggler [:label:after
+               {:box-shadow
+                "0 1px 2px 0 rgba(34,36,38,.15), 0 0 0 1px rgba(34,36,38,.15) inset!important"}]]
+
    ; dashboard styles
    [:.dashboard__header {:font-size (px 46)
                          :line-height (px 55)
@@ -62,17 +83,16 @@
                     :margin-top "30px!important"}]
    [:.signup-thanks__wrapper {:text-align "center"}]
 
-   ; form styles
-   [:.input-info {:display "flex"
-                  :align-items "center"
-                  :padding-top (px 23)}]
-   [:.error {:color :red}]
-   [:.moonlight-form-header {:margin-bottom "40px!important"
-                             :text-align "center"}]
-   [:.moonlight-form {:padding "70px 0"}]
-   [:.moonlight-form-inner
-    :.segment.moonlight-form-inner {:padding "40px 70px 70px"}]
-   [:.moonlight-form-group {:margin-top (px 30)}]
-   [:.moonlight-form-group [:label {:display "inline-block"
-                                    :color "#8C97B2"
-                                    :margin-bottom (px 10)}]]))
+   ; profile screen styles
+   [:.profile__menu-wrapper {:position "relative"
+                             :margin-right "-15px"
+                             :z-index 1}]
+   [:.profile__content {:margin "0 -1em"
+                        :border "1px solid #d4d4d5"
+                        :border-radius "0 3px 3px"}
+    [:.form__label {:width "30%"}]]
+   [:.profile__content-inner {:margin-top (px -30)
+                              :min-height (px 600)}]
+   [:.profile__content-inner._notifications
+    [:label {:margin-top (px 15)}]
+    [:.form__group-title {:margin-top 0}]]))
