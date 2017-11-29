@@ -42,7 +42,7 @@
  (fn [{db :db} [k & parts]]
    (let [routes (:route-map/routes db)
          url (str "/" (str/join "/" (map (fn [x] (if (keyword? x) (name x) (str x))) parts)))]
-     (when-not  (route-map/match [:. url] routes)
+     (when-not  (route-map/match url routes)
        (.error js/console (str url " is not matches routes")))
      {:dispatch [:fragment-changed (str "#" url)]
       :push-state (str "#" url)})))

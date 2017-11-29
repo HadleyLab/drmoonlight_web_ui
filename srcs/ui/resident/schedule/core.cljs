@@ -1,6 +1,7 @@
 (ns ui.resident.schedule.core
   (:require
    [reagent.core :as reagent]
+   [ui.db.account :refer [is-approved is-profile-filled]]
    [ui.db.misc :refer [>event dispatch-set! get-url <sub]]
    [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
    [ui.pages :as pages]
@@ -18,6 +19,13 @@
 
 (defn schema []
   {:selected (dt/date-time (dt/year (dt/now)) (dt/month (dt/now)) 1)})
+
+
+(defn ActionButton [pk]
+  (cond
+    (is-approved) [sa/Button {:on-click (>event [:goto :resident :messages pk])} "Apply"]
+    (is-profile-filled) [:p "Please wait until account manager approve your account"]
+    :else [sa/Button {:on-click (>event [:goto :resident :profile])} "Fill profile to apply"]))
 
 (defn ShiftLabel [{speciality :speciality
                    start :date-start
@@ -39,7 +47,7 @@
             [:p [:strong "Required staff: "] speciality-name]
             [:p [:strong "Payment amount: "] (str "$" payment-amount " per " (if payment-per-hour "hour" "shift"))]
             ;; [:p description] TODO fix max width
-            [sa/Button {:on-click (>event [:goto :resident :messages pk])} "Apply"]]] [:br] [:br]]))
+            [ActionButton pk]]] [:br] [:br]]))
 
 (defn Index [params]
   (rf/dispatch-sync [::init-resident-shedule-page])

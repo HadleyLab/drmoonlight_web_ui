@@ -1,6 +1,6 @@
 (ns ui.routes
   (:require [clojure.string :as str]
-            [ui.db.misc :refer [<sub]]
+            [ui.db.account :refer [is-scheduler is-resident is-approved]]
             [route-map.core :as route-map]))
 
 ;; application routes represented as hash-map (see https://github.com/niquola/route-map)
@@ -10,15 +10,6 @@
 ;; while matching routes all :context events will be fired with parameter :init
 ;; We also save previos contexts and fire event with :deinit flag for disposed contexts
 ;; You could use context to init common state for some branch of routes
-
-(defn is-resident []
-  (= (<sub [:user-type]) :resident))
-
-(defn is-scheduler []
-  (= (<sub [:user-type]) :scheduler))
-
-(defn is-approved []
-  (= (<sub [:user-state])  3))
 
 (def routes {:. :core/index
              "login" :core/login
@@ -30,14 +21,12 @@
                                 "thanks" :core/forgot-password-thanks}
              "resident" {:interceptors [is-resident]
                          :. :core/resident
-                         "schedule" {:. :core/resident-schedule
-                                     :interceptors [is-approved]}
+                         "schedule" {:. :core/resident-schedule}
                          "messages" {:. :core/resident-messages
                                      [:shift-pk] {:. :core/resident-messages-apply
                                                   "discuss" {[:application-pk] :core/resident-messages-discuss}}
                                      :interceptors [is-approved]}
-                         "statistics" {:. :core/resident-statistics
-                                       :interceptors [is-approved]}
+                         "statistics" {:. :core/resident-statistics}
                          "profile" {:. :core/resident-profile
                                     "notification" :core/resident-profile-notification}}
              "scheduler" {:interceptors [is-scheduler]

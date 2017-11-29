@@ -83,6 +83,11 @@
                          :uri (get-url db (str "/api/accounts/" (name user-type) "/" user-id "/"))
                          :token token
                          :succeed-fx [:dispatch-fx final-succeed-fx]}})))
+(rf/reg-event-db
+ :update-account-info
+ (fn [db [_ data]]
+   (update-in db [::account :info-response :data] #(merge % data))))
+
 
 (rf/reg-event-fx
  :logout
@@ -147,3 +152,21 @@
          errors (apply reduce-errors (map :errors responses))]
      {:status status :errors errors})))
 
+
+(defn is-resident []
+  (= (<sub [:user-type]) :resident))
+
+(defn is-scheduler []
+  (= (<sub [:user-type]) :scheduler))
+
+(defn is-new []
+  (= (<sub [:user-state])  1))
+
+(defn is-profile-filled []
+  (= (<sub [:user-state])  2))
+
+(defn is-approved []
+  (= (<sub [:user-state])  3))
+
+(defn is-rejected []
+  (= (<sub [:user-state])  4))

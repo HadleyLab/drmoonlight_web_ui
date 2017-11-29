@@ -1,5 +1,6 @@
 (ns ui.resident.layout
   (:require
+   [ui.db.account :refer [is-approved is-new]]
    [ui.db.misc :refer [>evt <sub]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
@@ -18,6 +19,7 @@
          "Schedule"]
         [sa/Button {:active (= (:. (nth (:parents route) 2 nil))
                                :core/resident-messages)
+                    :disabled (not (is-approved))
                     :on-click #(>evt [:goto :resident :messages])}
          [sa/Icon {:name :mail}]
          "Messages"]
@@ -35,7 +37,7 @@
       [sa/GridColumn {:width 1}]]]))
 
 (defn ResidentProfileLayout [content]
-  (let [route (rf/subscribe [:route-map/current-route])]
+    (let [route (<sub [:route-map/current-route])]
     [ResidentLayout
      [sa/Grid {}
       [sa/GridRow {}
@@ -43,11 +45,11 @@
         [:div {:class-name "profile__menu-wrapper"}
          [sa/Menu {:fluid true :vertical true :tabular true}
           [sa/MenuItem {:name "Edit Profile"
-                        :active (= (:match @route) :core/resident-profile)
+                        :active (= (:match route) :core/resident-profile)
                         :on-click #(>evt [:goto :resident :profile])}]
-          [sa/MenuItem {:name "Notification Settings"
-                        :active (= (:match @route) :core/resident-profile-notification)
-                        :on-click #(>evt [:goto :resident :profile :notification])}]
+          (when-not (is-new) [sa/MenuItem {:name "Notification Settings"
+                        :active (= (:match route) :core/resident-profile-notification)
+                        :on-click #(>evt [:goto :resident :profile :notification])}])
           [sa/MenuItem {:name "Log out"
                         :on-click #(>evt [:logout])}]]]]
 

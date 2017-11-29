@@ -54,7 +54,7 @@
         [BuildForm resident-notification-form-cursor resident-notification-form-fields]
         [:div.moonlight-form-group
          [sa/FormButton {:color :blue
-                         :on-click (>event [:udpate-resident-profile])} "Save changes"]]]])))
+                         :on-click (>event [:update-resident-profile :notifications])} "Save changes"]]]])))
 
 (defn ResidentProfileForm []
   (let [resident-page-cursor @(rf/subscribe [:cursor [root-path]])
@@ -71,7 +71,7 @@
         [:div.moonlight-form-group
          [sa/FormButton {:color :blue
                          :loading (= @status-cursor :loading)
-                         :on-click (>event [:update-resident-profile])} "Save changes"]]]])))
+                         :on-click (>event [:update-resident-profile :main-fields])} "Save changes"]]]])))
 
 (defn with-init [render]
   (fn []
@@ -88,29 +88,30 @@
 
 (rf/reg-event-fx
  :update-resident-profile
- (fn [{db :db} _]
+ (fn [{db :db} [_ type]]
    (let [pk (<sub [:user-id])
          token (<sub [:token])
-         body (get-in db [root-path :profile-form :fields])
+         body (if (= type :main-fields)
+                (get-in db [root-path :profile-form :fields])
+                (get-in db [root-path :notification-form :fields]))
+         path (if (= type :main-fields)
+                [root-path :profile-form :response]
+                [root-path :notification-form :response])
          state (<sub [:user-state])
          url (if (= state 1)
                (get-url db "/api/accounts/resident/" pk "/fill_profile/")
                (get-url db "/api/accounts/resident/" pk "/"))]
-     {:json/fetch->path {:path [root-path :profile-form :response]
+     {:json/fetch->path {:path path
                          :uri url
                          :method (if (= state 1) "POST" "PATCH")
                          :token token
                          :body body
                          :succeed-fx
                          (fn [data]
-                           [:update-resident-profile-succeed
+                           [:update-account-info
                             (if (= state 1)
                               (merge body {:state 2})
                               data)])}})))
-(rf/reg-event-db
- :update-resident-profile-succeed
- (fn [db [_ data]]
-   (update-in db [:account :user-info] #(merge % data))))
 
 (pages/reg-page :core/resident (with-init (fn [] [ResidentLayout [sa/Header {} "index"]])))
 (pages/reg-page :core/resident-statistics (with-init (fn [] [ResidentLayout [sa/Header {} "statistics"]])))
