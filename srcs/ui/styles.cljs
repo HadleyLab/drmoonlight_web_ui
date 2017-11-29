@@ -24,12 +24,20 @@
    [:.position._relative {:position "relative"}]
    [:.gray-font {:color "#8C97B2"}]
    [:.moonlight-white {:background-color "#FFF"}]
-   [:.moonlight-header {:height (px 80)
-                        :background-color "#FFF"
-                        :margin-bottom (px 35)
-                        :box-shadow "0 2px 1px -1px gray"}]
 
-                        ; form styles
+   ; header styles
+   [:.header__wrapper {:height (px 80)
+                       :align-items "center!important"
+                       :padding-bottom "0!important"
+                       :background-color "#FFF"
+                       :margin-bottom (px 20)
+                       :box-shadow "0 2px 8px 0 rgba(0,0,0,0.1)"}]
+   [:.header__content {:display "flex!important"
+                       :justify-content "space-between"
+                       :align-items "center!important"}
+    [:.header {:margin-bottom "0!important"}]]
+
+   ; form styles
    [:.input-info {:display "flex"
                   :align-items "center"
                   :padding-top (px 23)}]
@@ -39,7 +47,7 @@
    [:.moonlight-form {:padding "70px 0"}]
    [:.moonlight-form-inner
     :.segment.moonlight-form-inner {:padding "40px 70px 70px"}]
-   [:.moonlight-form-group {:margin-top (px 30)}]
+   [:.form__group {:margin-top (px 30)}]
    [:.form__group-title {:display "inline-block"
                          :color "#8C97B2"
                          :margin-bottom (px 10)}]
@@ -87,12 +95,26 @@
    [:.profile__menu-wrapper {:position "relative"
                              :margin-right "-15px"
                              :z-index 1}]
-   [:.profile__content {:margin "0 -1em"
-                        :border "1px solid #d4d4d5"
-                        :border-radius "0 3px 3px"}
-    [:.form__label {:width "30%"}]]
-   [:.profile__content-inner {:margin-top (px -30)
-                              :min-height (px 600)}]
-   [:.profile__content-inner._notifications
+   [:.profile__container {:margin "0 0 0 -1em"
+                          :border "1px solid #d4d4d5"
+                          :border-radius "0 3px 3px"}
+    [:.form__label {:width "30%"}]
+    [:.form__group {:position "relative"
+                    :margin "20px 0 40px"}]]
+   [:.profile__content {:margin-top (px -20)
+                        :min-height (px 600)}]
+   [:.profile__content._notifications
     [:label {:margin-top (px 15)}]
-    [:.form__group-title {:margin-top 0}]]))
+    [:.form__group-title {:margin-top 0}]]
+   [:.profile__content._edit
+    [:.profile__button {:margin-top (px 25)}]
+    [:.form__group:after {:content "\"\""
+                          :position "absolute"
+                          :left (px -70)
+                          :right (px -70)
+                          :bottom (px -25)
+                          :height (px 1)
+                          :background-color "#DFE2E9"}]
+    [:.form__group._account-settings
+     {:margin-bottom 0}
+     [:&:after {:content "none"}]]]))

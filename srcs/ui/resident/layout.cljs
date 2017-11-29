@@ -8,10 +8,9 @@
 (defn ResidentLayout [content]
   (let [route (<sub [:route-map/current-route])]
     [sa/Grid {}
-     [sa/GridRow {:class-name "moonlight-header"}
-      [sa/GridColumn {:width 1}]
-      [sa/GridColumn {:width 7} [sa/Header {} "Dr.Moonlight"]]
-      [sa/GridColumn {:width 7}
+     [sa/GridRow {:class-name "header__wrapper"}
+      [sa/Container {:class-name "header__content"}
+       [sa/Header {} "Dr.Moonlight"]
        [sa/ButtonGroup {}
         [sa/Button {:active (= (:match route) :core/resident-schedule)
                     :on-click #(>evt [:goto :resident :schedule])}
@@ -32,9 +31,7 @@
          [sa/Icon {:name :user}]
          "Profile"]]]]
      [sa/GridRow {}
-      [sa/GridColumn {:width 1}]
-      [sa/GridColumn {:width 14} content]
-      [sa/GridColumn {:width 1}]]]))
+      [sa/Container content]]]))
 
 (defn ResidentProfileLayout [content]
     (let [route (<sub [:route-map/current-route])]
@@ -54,4 +51,4 @@
                         :on-click #(>evt [:logout])}]]]]
 
        [sa/GridColumn {:width 12}
-        [:div {:class-name "profile__content moonlight-white"} content]]]]]))
+        [:div {:class-name "profile__container moonlight-white"} content]]]]]))

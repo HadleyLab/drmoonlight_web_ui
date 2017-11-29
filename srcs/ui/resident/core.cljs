@@ -23,7 +23,9 @@
                 :specialities {:type :multy-select
                                :label "Specialities"
                                :items #(<sub [:speciality-as-options])}
-                :residency-years "Residency Years"
+                :residency-years {:type :input
+                                  :label "Residency Years"
+                                  :width 3}
                 :state-license {:type :radio
                                 :label "State Licence"
                                 :items {true "Yes" false "No"}}
@@ -49,10 +51,10 @@
   (let [resident-page-cursor @(rf/subscribe [:cursor [root-path]])
         resident-notification-form-cursor (reagent/cursor resident-page-cursor [:notification-form])]
     (fn []
-      [:div {:class-name "profile__content-inner _notifications"}
+      [:div.profile__content._notifications
        [sa/Form {:class-name "moonlight-form-inner"}
         [BuildForm resident-notification-form-cursor resident-notification-form-fields]
-        [:div.moonlight-form-group
+        [:div.form__group
          [sa/FormButton {:color :blue
                          :on-click (>event [:update-resident-profile :notifications])} "Save changes"]]]])))
 
@@ -62,15 +64,15 @@
         status-cursor (reagent/cursor resident-profile-form-cursor [:response :status])
         email (<sub [:user-email])]
     (fn []
-      [:div {:class-name "profile__content-inner"}
+      [:div.profile__content._edit
        [sa/Form {:class-name "moonlight-form-inner"}
         [BuildForm resident-profile-form-cursor resident-profile-form-fields]
-        [sa/Divider]
-        [:div [:label {:class-name "form__group-title"} "Account settings"]
-         [:div.field [:label "Email"] [:p email]]]
-        [:div.moonlight-form-group
+        [:div.form__group._account-settings
+         [:label.form__group-title "Account settings"]
+         [:div.field [:label "Email"] [:p email]]
          [sa/FormButton {:color :blue
                          :loading (= @status-cursor :loading)
+                         :class-name "profile__button"
                          :on-click (>event [:update-resident-profile :main-fields])} "Save changes"]]]])))
 
 (defn with-init [render]

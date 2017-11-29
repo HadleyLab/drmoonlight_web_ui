@@ -108,9 +108,9 @@
     (fn [{field :field info :info}]
       (let [errors @errors-cursor]
         [sa/FormGroup {}
-         (if (string? info)
-           [sa/FormField {:width 10}
-            [:label info]
+         (if (or (= :input (:type info)) (string? info))
+           [sa/FormField {:width (or (:width info) 10)}
+            [:label (or (:label info) info)]
             [sa/Input {:type (get-default-type field)
                        :value @field-cursor
                        :error (not= errors nil)
@@ -134,7 +134,7 @@
   (concatv [:div]
            (->> field-sets
                 (mapv (fn [[title fields]]
-                        (concatv [:div {:key title :class-name "moonlight-form-group"}
+                        (concatv [:div {:key title :class-name "form__group"}
                                   [:label {:class-name "form__group-title"} title]]
                                  (->> fields
                                       (mapv (fn [[field info]]
