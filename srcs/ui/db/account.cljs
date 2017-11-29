@@ -28,15 +28,28 @@
     (read  [_ s] (event->action (js->clj (js/JSON.parse s) :keywordize-keys true)))
     (write [_ v] (js/JSON.stringify (clj->js v)))))
 
+(defonce websocket (atom nil))
+
 (rf/reg-fx
  :account-websocket
  (fn [url]
    (go
      (let [stream (<! (ws/connect url  {:format json-websocker-formater}))]
-       (while true
+       (reset! websocket stream)
+       (while (not (nil? @websocket))
          (let [message (<! (:source stream))]
-           (js/console.log message)
-           (rf/dispatch [(:event message) (:payload message)])))))))
+           (if (nil? message)
+             (let [{code :code} (<! (:close-status stream))]
+               (when-not (= code 1000)
+                 ;; Reconect doesn't work now
+                 ;; See https://github.com/weavejester/haslett/issues/5 for more details
+                 (js/setTimeout #(rf/dispatch [:websocket-connect]) 1000))
+               (reset! websocket nil))
+             (rf/dispatch [(:event message) (:payload message)]))))))))
+(rf/reg-event-fx
+ :websocket-connect
+ (fn [_ _]
+   {:account-websocket (str "ws://localhost:8000/accounts/user/" (<sub [:token]) "/")}))
 
 (rf/reg-event-fx
  ::setup-login-form-and-redirect
@@ -61,8 +74,8 @@
  (fn [{db :db store :store} [_ token final-succeed-fx]]
    {:db (assoc-in db [::account :token] token)
     :store (assoc store :token token)
-    :account-websocket (str "ws://localhost:8000/accounts/user/" token "/")
-    :dispatch [:load-account-type final-succeed-fx]}))
+    :dispatch-n [[:websocket-connect]
+                 [:load-account-type final-succeed-fx]]}))
 
 (rf/reg-event-fx
  :load-account-type
@@ -93,6 +106,8 @@
  :logout
  [(rf/inject-cofx :store)]
  (fn [{db :db store :store} _]
+   (if-let [stream @websocket]
+     (ws/close stream))
    {:db (assoc db ::account schema)
     :store (dissoc store :token)
     :dispatch [:goto "/"]}))
