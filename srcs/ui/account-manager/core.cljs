@@ -21,9 +21,6 @@
       [sa/GridColumn {:width 14} content]
       [sa/GridColumn {:width 1}]]]))
 
-
-(count (:data (<sub [:get-residents-which-waiting-for-approve])))
-
 (defn Index [params]
   (rf/dispatch [:load-residents-which-waiting-for-approve])
   (fn []
