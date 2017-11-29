@@ -17,7 +17,8 @@
     [sa/GridColumn {:width 12 :text-align "right"}
      (when (nil? user-type) [sa/Button {:basic true :color :blue :content "Log In" :on-click (>event [:goto :login])}])
      (when (nil? user-type) [sa/Button {:color :blue :content "Sign up" :on-click (>event [:goto :sign-up])}])
-     (when-not (nil? user-type) [sa/Button {:color :blue :content "Go to profile" :on-click (>event [:goto user-type])}])]]
+     (when-not (nil? user-type) [sa/Button {:color :blue :content "Go to profile" :on-click (>event [:goto user-type])}])
+     (when-not (nil? user-type) [sa/Button {:basic true :color :blue :content "Log Out" :on-click (>event [:logout])}])]]
    [sa/GridRow {:centered true :class-name "flex _1 align-items _center"}
     [sa/GridColumn {:width 8}]
     [sa/GridColumn {:width 8}
