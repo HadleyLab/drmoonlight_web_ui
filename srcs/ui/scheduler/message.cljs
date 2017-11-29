@@ -70,7 +70,9 @@
        (when (not data-is-loading)
          (let [{owner :owner} application]
            [:div
-            [sa/Header (str (:first-name owner) " " (:last-name owner))]]))]]
+            [sa/Header
+             [:a {:href (href :scheduler :detail (:id owner))}
+              (str (:first-name owner) " " (:last-name owner))]]]))]]
      [sa/GridColumn {:width 13 :class-name :moonlight-white}
       content]]]]))
 

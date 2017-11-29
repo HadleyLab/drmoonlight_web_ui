@@ -18,6 +18,7 @@
    [ui.forgotpassword.core]
    [ui.resident.core]
    [ui.scheduler.core]
+   [ui.account-manager.core]
    [ui.pages :as pages]
    [ui.routes :as routes]
    [ui.layout :as layout]))

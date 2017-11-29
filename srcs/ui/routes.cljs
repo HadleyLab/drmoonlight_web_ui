@@ -1,6 +1,7 @@
 (ns ui.routes
   (:require [clojure.string :as str]
-            [ui.db.account :refer [is-scheduler is-resident is-approved]]
+            [ui.db.account :refer [is-scheduler is-resident
+                                   is-approved is-account-manager]]
             [route-map.core :as route-map]))
 
 ;; application routes represented as hash-map (see https://github.com/niquola/route-map)
@@ -19,6 +20,9 @@
                         "thanks" {:. :core/sign-up-thanks}}
              "forgot-password" {:. :core/forgot-password
                                 "thanks" :core/forgot-password-thanks}
+             "account-manager" {:interceptors [is-account-manager]
+                                :. :account-manager/index
+                                "detail" {[:resident-pk] :account-manager/resident-profile-detail}}
              "resident" {:interceptors [is-resident]
                          :. :core/resident
                          "schedule" {:. :core/resident-schedule}
@@ -31,6 +35,7 @@
                                     "notification" :core/resident-profile-notification}}
              "scheduler" {:interceptors [is-scheduler]
                           :. :core/scheduler
+                          "detail" {[:resident-pk] :scheduler/resident-profile-detail}
                           "schedule" {:. :core/scheduler-schedule}
                           "messages" {:. :core/scheduler-messages
                                       [:shift-pk] {"discuss" {[:application-pk] :core/scheduler-messages-discuss}}}

@@ -28,7 +28,6 @@
     (read  [_ s] (event->action (js->clj (js/JSON.parse s) :keywordize-keys true)))
     (write [_ v] (js/JSON.stringify (clj->js v)))))
 
-
 (rf/reg-fx
  :account-websocket
  (fn [url]
@@ -79,15 +78,16 @@
    (let [user-type (<sub [:user-type])
          user-id (<sub [:user-id])
          token (<sub [:token])]
-     {:json/fetch->path {:path [::account :info-response]
-                         :uri (get-url db (str "/api/accounts/" (name user-type) "/" user-id "/"))
-                         :token token
-                         :succeed-fx [:dispatch-fx final-succeed-fx]}})))
+     (if (= user-type :account-manager)
+       {:dispatch [:dispatch-fx final-succeed-fx]}
+       {:json/fetch->path {:path [::account :info-response]
+                           :uri (get-url db (str "/api/accounts/" (name user-type) "/" user-id "/"))
+                           :token token
+                           :succeed-fx [:dispatch-fx final-succeed-fx]}}))))
 (rf/reg-event-db
  :update-account-info
  (fn [db [_ data]]
    (update-in db [::account :info-response :data] #(merge % data))))
-
 
 (rf/reg-event-fx
  :logout
@@ -152,12 +152,14 @@
          errors (apply reduce-errors (map :errors responses))]
      {:status status :errors errors})))
 
-
 (defn is-resident []
   (= (<sub [:user-type]) :resident))
 
 (defn is-scheduler []
   (= (<sub [:user-type]) :scheduler))
+
+(defn is-account-manager []
+  (= (<sub [:user-type]) :account-manager))
 
 (defn is-new []
   (= (<sub [:user-state])  1))

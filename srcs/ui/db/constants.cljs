@@ -23,6 +23,11 @@
      (get-in db [:constants :data :residency-program id]))))
 
 (rf/reg-sub
+ :residency-program-name
+ (fn [db [_ id]]
+   (get-in db [:constants :data :residency-program id :name])))
+
+(rf/reg-sub
  :residency-program-as-options
  #(rf/subscribe [:residency-program])
  #(as-options :name %))
@@ -33,6 +38,11 @@
    (if (nil? id)
      (get-in db [:constants :data :speciality] [])
      (get-in db [:constants :data :speciality id]))))
+
+(rf/reg-sub
+ :speciality-name
+ (fn [db [_ id]]
+   (get-in db [:constants :data :speciality id :name])))
 
 (rf/reg-sub
  :speciality-as-options

@@ -8,6 +8,7 @@
             [ui.db.account]
             [ui.db.application]
             [ui.db.constants]
+            [ui.db.resident]
             [ui.db.shift]
             [clojure.string :refer [replace escape]]))
 
@@ -33,4 +34,4 @@
    {:dispatch fx}))
 
 (def initial-db
-  (merge {} ui.db.account/schema))
+  (merge {} ui.db.account/schema ui.db.resident/schema))
