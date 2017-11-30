@@ -71,9 +71,6 @@
  :shifts-data
  #(<sub [::shift :list :data]))
 
-(<sub [:shifts])
-
-
 ;; API for verbose shift information
 
 (rf/reg-event-fx
