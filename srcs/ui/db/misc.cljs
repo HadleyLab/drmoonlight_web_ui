@@ -108,3 +108,10 @@
          js->clj
          coercer
          (dispatch-set! atom))))
+
+(defn fields->schema [fields]
+  (into {} (map (fn [[key _]] [key ""]) (mapcat second fields))))
+
+(defn setup-form-initial-values [initial-values]
+  (fn [data]
+    (into {} (map (fn [[key value]] [key (initial-values key value)]) data))))

@@ -4,13 +4,40 @@
    [cljs.core.async :as a :refer [<! >!]]
    [haslett.client :as ws]
    [haslett.format :as fmt]
-   [ui.db.misc :refer [get-url <sub reduce-statuses reduce-errors]]
+   [ui.db.misc :refer [get-url <sub reduce-statuses
+                       reduce-errors fields->schema]]
    [re-frame.core :as rf]
    [clojure.string :refer [replace]]))
+
+(def scheduler-form-fields
+  {"Personal Information"
+   {:first-name "First Name"
+    :last-name "Last Name"
+    :facility-name "Hospital / Facility name"
+    :department-name "Department name"}
+   "Account settings"
+   {:email "Email"
+    :password "Password"}})
+
+(def resident-form-fields
+  {"Personal Information"
+   {:first-name "First Name"
+    :last-name "Last Name"}
+   "Account settings"
+   {:email "Email"
+    :password "Password"}})
 
 (def schema
   {::account
    {:token nil
+    :sign-up-form
+    {:fields (fields->schema scheduler-form-fields)
+     :mode :resident
+     :response {:status :not-asked}}
+    :activation-response {:status :not-asked}
+    :password-reset-form
+    {:fields {:password ""}
+     :response {:status :not-asked}}
     :forgot-password-form
     {:fields {:email ""}
      :response {:status :not-asked}}
@@ -218,3 +245,64 @@
 (rf/reg-sub
  :forgot-password-form-response
  #(<sub [::account :forgot-password-form :response]))
+
+(rf/reg-event-db
+ :init-sign-up-form
+ (fn [db [_]]
+   (assoc-in db [::account :sign-up-form] (get-in schema [::account :sign-up-form]))))
+
+(rf/reg-sub
+ :sign-up-form-cursor
+ #(<sub [:cursor [::account :sign-up-form]]))
+
+(rf/reg-sub
+ :sign-up-form-status
+ #(<sub [::account :sign-up-form :response :status]))
+
+(rf/reg-event-fx
+ :do-sigh-up
+ (fn [{db :db} [_ fx]]
+   (let [mode (<sub [::account :sign-up-form :mode])
+         data (<sub [::account :sign-up-form :fields])]
+     {:json/fetch->path {:path [::account :sign-up-form :response]
+                         :uri (get-url db (str "/api/accounts/" (name mode) "/"))
+                         :method "post"
+                         :body data
+                         :succeed-fx fx}})))
+
+(rf/reg-event-fx
+ :activate
+ (fn [{db :db} [_ data]]
+   {:json/fetch->path {:path [::account :activation-response]
+                       :uri (get-url db "/api/accounts/activate/")
+                       :method "post"
+                       :body data}}))
+
+(rf/reg-sub
+ :activation-response
+ #(<sub [::account :activation-response]))
+
+
+(rf/reg-event-db
+ :init-password-reset-form
+ (fn [db [_]]
+   (assoc-in db [::account :password-reset-form] (get-in schema [::account :password-reset-form]))))
+
+
+(rf/reg-sub
+ :password-reset-form-password-cursor
+ #(<sub [:cursor [::account :password-reset-form :fields :password]]))
+
+(rf/reg-event-fx
+ :confirm-rest-password
+ (fn [{db :db} [_ data]]
+   {:json/fetch->path {:path [::account :password-reset-form :response]
+                       :uri (get-url db "/api/accounts/password/reset/confirm/")
+                       :method "post"
+                       :body (merge data {:new-password @(<sub [:password-reset-form-password-cursor])})
+                       :succeed-fx [:goto :login]}}))
+
+(rf/reg-sub
+ :password-reset-form-response
+ #(<sub [::account :password-reset-form :response]))
+

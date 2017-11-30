@@ -1,10 +1,10 @@
 (ns ui.scheduler.schedule.core
   (:require
    [reagent.core :as reagent]
-   [ui.db.misc :refer [dispatch-set! <sub >event get-url]]
+   [ui.db.misc :refer [dispatch-set! <sub >event get-url fields->schema]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [concatv BuildForm fields->schema cljstime->drf-date-time]]
+   [ui.widgets :refer [concatv BuildForm cljstime->drf-date-time]]
    [ui.widgets.calendar :refer [Calendar]]
    [ui.scheduler.layout :refer [SchedulerLayout]]
    [re-frame.core :as rf]

@@ -1,10 +1,10 @@
 (ns ui.resident.core
   (:require
    [reagent.core :as reagent]
-   [ui.db.misc :refer [>event <sub get-url]]
+   [ui.db.misc :refer [>event <sub get-url fields->schema setup-form-initial-values]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
-   [ui.widgets :refer [BuildForm fields->schema setup-form-initial-values]]
+   [ui.widgets :refer [BuildForm]]
    [ui.resident.layout :refer [ResidentLayout ResidentProfileLayout]]
    [re-frame.core :as rf]
    [clojure.string :as str]
