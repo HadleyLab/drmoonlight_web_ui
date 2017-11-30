@@ -6,6 +6,7 @@
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [FormRadio BuildForm FormWrapper]]
+   [ui.widgets.error-message :refer [ErrorMessage]]
    [re-frame.core :as rf]
    [clojure.string :as str]
    [soda-ash.core :as sa]))
@@ -75,7 +76,7 @@
    [:div {:class-name "signup-thanks__wrapper"}
     [sa/Icon {:name "remove circle" :color "red" :size "huge"}]
     [sa/Header {:as :h1 :class-name "moonlight-form-header"} "You account is failed to activate"]
-    [:p.error (:detail errors)]
+    [ErrorMessage {:errors errors}]
     [BackButton "/" "Back to Home"]]])
 
 (defn Activate [params]
@@ -92,9 +93,7 @@
   (rf/dispatch [:init-password-reset-form])
   (let [password-cursor (<sub [:password-reset-form-password-cursor])]
     (fn [params]
-      (let [{status :status errors :errors} (<sub [:password-reset-form-response])
-            password-errors (or (:new-password errors)
-                                (:non-field-errors errors))]
+      (let [{status :status errors :errors} (<sub [:password-reset-form-response])]
         [FormWrapper
          [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Setup you new password"]
          [sa/Form {:error (= status :failure)}
@@ -102,11 +101,12 @@
            [:label "Password"]
            [sa/Input
             {:type "password"
-             :error (not= password-errors nil)
+             :error (= status :failure)
              :value @password-cursor
              :on-change (>atom password-cursor)}]]
-          (when password-errors
-            [:div {:class "error"} (clojure.string/join " " password-errors)])
+          (when (= status :failure)
+            [ErrorMessage {:errors errors
+                           :field-names-map {:non-field-errors ""}}])
           [sa/FormGroup {:class-name "flex-direction _column"}
            [sa/FormButton {:color :blue
                            :loading (= status :loading)

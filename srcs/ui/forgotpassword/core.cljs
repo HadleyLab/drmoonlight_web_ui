@@ -5,6 +5,7 @@
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [FormWrapper]]
+   [ui.widgets.error-message :refer [ErrorMessage]]
    [re-frame.core :as rf]
    [clojure.string :as str]
    [soda-ash.core :as sa]))
@@ -13,17 +14,17 @@
   (rf/dispatch [:init-forgot-password-form])
   (let [email (<sub [:forgot-password-form-email-cursor])]
     (fn []
-      (let [{status :status {email-errors :email} :errors} (<sub [:forgot-password-form-response])]
+      (let [{status :status errors :errors} (<sub [:forgot-password-form-response])]
         [sa/Form {:error (= status :failure)}
          [sa/FormField
           [:label "Email"]
           [sa/Input
            {:type "email"
-            :error (not= email-errors nil)
+            :error (= status :failure)
             :value @email
             :on-change (>atom email)}]]
-         (when email-errors
-           [:div {:class "error"} (clojure.string/join " " email-errors)])
+         (when (= status :failure)
+           [ErrorMessage {:errors errors}])
          [sa/FormGroup {:class-name "forgot-password__buttons flex-direction _column"}
           [sa/FormButton {:color :blue
                           :loading (= status :loading)
