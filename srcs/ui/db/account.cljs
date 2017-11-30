@@ -11,6 +11,9 @@
 (def schema
   {::account
    {:token nil
+    :forgot-password-form
+    {:fields {:email ""}
+     :response {:status :not-asked}}
     :login-form
     {:fields
      {:email ""
@@ -189,3 +192,29 @@
 
 (defn is-rejected []
   (= (<sub [:user-state])  4))
+
+(rf/reg-event-db
+ :init-forgot-password-form
+ (fn [db [_]]
+   (let [login-form-email (<sub [::account :login-form :fields :email])]
+     (-> db
+         (assoc-in [::account :forgot-password-form] (get-in schema [::account :forgot-password-form]))
+         (assoc-in [::account :forgot-password-form :fields :email] login-form-email)))))
+
+(rf/reg-sub
+ :forgot-password-form-email-cursor
+ #(<sub [:cursor [::account :forgot-password-form :fields :email]]))
+
+(rf/reg-event-fx
+ :rest-password
+ (fn [{db :db} [_ fx]]
+   (let [email @(<sub [:forgot-password-form-email-cursor])]
+     {:json/fetch->path {:path [::account :forgot-password-form :response]
+                         :uri (get-url db "/api/accounts/password/reset/")
+                         :method "post"
+                         :body {:email email}
+                         :succeed-fx fx}})))
+
+(rf/reg-sub
+ :forgot-password-form-response
+ #(<sub [::account :forgot-password-form :response]))
