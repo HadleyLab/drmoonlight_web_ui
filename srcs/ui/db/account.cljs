@@ -46,6 +46,7 @@
                  (js/setTimeout #(rf/dispatch [:websocket-connect]) 1000))
                (reset! websocket nil))
              (rf/dispatch [(:event message) (:payload message)]))))))))
+
 (rf/reg-event-fx
  :websocket-connect
  (fn [_ _]
@@ -97,6 +98,7 @@
                            :uri (get-url db (str "/api/accounts/" (name user-type) "/" user-id "/"))
                            :token token
                            :succeed-fx [:dispatch-fx final-succeed-fx]}}))))
+
 (rf/reg-event-db
  :update-account-info
  (fn [db [_ data]]

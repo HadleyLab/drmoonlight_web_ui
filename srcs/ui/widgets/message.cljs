@@ -14,7 +14,7 @@
   (let [comment-cursor (<sub [:comment-cursor])]
     (fn []
       (let [{status :status errors :errors} (<sub [:comment-form])
-            available-transitions (:available-transitions (:data (<sub [:application-info (str application-pk)])))]
+            available-transitions (<sub [:available-transitions (str application-pk)])]
         [sa/Segment
          [sa/Form {:error (= status :failure)}
           [sa/FormInput {:placeholder "Add comment ..."
