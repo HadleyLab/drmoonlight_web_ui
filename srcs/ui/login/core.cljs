@@ -28,7 +28,9 @@
              [sa/Input {:type "password" :value @password :on-change (>atom password)}]]
             [ErrorMessage {:errors errors
                            :visible (= status :failure)
-                           :field-names-to-display [:email :password]}]
+                           :field-name-map {:email "Email"
+                                            :password "Password"
+                                            :non-field-errors ""}}]
             [sa/FormGroup {:class-name "justify-content _space-between"}
              [sa/FormButton {:color :blue
                              :loading (= status :loading)
