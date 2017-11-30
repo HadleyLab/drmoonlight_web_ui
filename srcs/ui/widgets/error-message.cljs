@@ -11,6 +11,7 @@
       (str field-name ": " error-text))))
 
 (defn ErrorMessage [{:keys [errors field-names-map]}]
-  [sa/Message {:error true
-               :header "There was some errors with your submission"
-               :list (map #(get-message % field-names-map) errors)}])
+  (let [field-names-map (or field-names-map {})]
+    [sa/Message {:error true
+                 :header "There was some errors with your submission"
+                 :list (map #(get-message % field-names-map) errors)}]))
