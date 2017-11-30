@@ -20,7 +20,7 @@
  :load-residents-which-waiting-for-approve
  (fn [{db :db} _]
    {:json/fetch->path {:path [::resident :waiting-for-approve]
-                       :uri (get-url db "/api/accounts/resident/wating_for_approve/")
+                       :uri (get-url db "/api/accounts/resident/waiting_for_approval/")
                        :token (<sub [:token])}}))
 (rf/reg-event-fx
  :load-resident-profile-detail
@@ -60,4 +60,5 @@
    {:json/fetch->path {:path [::resident :response]
                        :uri (get-url db "/api/accounts/resident/" pk "/reject/")
                        :token (<sub [:token])
+                       :method "POST"
                        :succeed-fx fx}}))

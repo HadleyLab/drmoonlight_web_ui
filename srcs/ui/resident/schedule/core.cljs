@@ -1,7 +1,7 @@
 (ns ui.resident.schedule.core
   (:require
    [reagent.core :as reagent]
-   [ui.db.account :refer [is-approved is-profile-filled]]
+   [ui.db.account :refer [is-approved is-profile-filled is-rejected]]
    [ui.db.misc :refer [>event dispatch-set! get-url <sub]]
    [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
    [ui.pages :as pages]
@@ -25,6 +25,7 @@
   (cond
     (is-approved) [sa/Button {:on-click (>event [:goto :resident :messages pk])} "Apply"]
     (is-profile-filled) [:p "Please wait until account manager approve your account"]
+    (is-rejected) [:p "Your account was rejected, you can't apply for shifts"]
     :else [sa/Button {:on-click (>event [:goto :resident :profile])} "Fill profile to apply"]))
 
 (defn ShiftLabel [{speciality :speciality
