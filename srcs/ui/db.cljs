@@ -38,4 +38,5 @@
          ui.db.account/schema
          ui.db.application/schema
          ui.db.constants/schema
-         ui.db.resident/schema))
+         ui.db.resident/schema
+         ui.db.shift/schema))

@@ -48,10 +48,7 @@
                    [(if (nil? token)
                       [:route-map/init routes/routes]
                       [:save-token token [:route-map/init routes/routes]])])
-      :db
-      (merge ui.db/initial-db
-       {:base-url base-url
-        :shifts {:status :not-asked}})})))
+      :db (merge ui.db/initial-db {:base-url base-url})})))
 
 (defn- mount-root []
   (reagent/render

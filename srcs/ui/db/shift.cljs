@@ -1,9 +1,15 @@
 (ns ui.db.shift
   (:require
-   [ui.db.misc :refer [get-url]]
+   [ui.db.misc :refer [get-url <sub]]
    [re-frame.core :as rf]
    [cljs-time.core :as dt]
    [cljs-time.format :as format]))
+
+(def schema
+  {::shift
+   {:list {:status :not-asked}
+    :detail {}
+    :apply-requests {}}})
 
 ;; Public utils
 
@@ -43,53 +49,59 @@
 (rf/reg-event-fx
  :load-shifts
  (fn [{db :db} [_]]
-   {:json/fetch->path {:path [:shifts]
+   {:json/fetch->path {:path [::shift :list]
                        :uri (get-url db "/api/shifts/shift/")
                        :token @(rf/subscribe [:token])
                        :map-result convert-shifts}}))
 
 (rf/reg-sub
+ ::shift
+ (fn [db path]
+   (get-in db path)))
+
+(rf/reg-sub
  :shifts
- (fn [db _]
-   (get-in db [:shifts])))
+ #(<sub [::shift :list]))
 
 (rf/reg-sub
  :shifts-status
- (fn [db _]
-   (get-in db [:shifts :status])))
+ #(<sub [::shift :list :status]))
 
 (rf/reg-sub
  :shifts-data
- (fn [db _]
-   (get-in db [:shifts :data])))
+ #(<sub [::shift :list :data]))
+
+(<sub [:shifts])
+
 
 ;; API for verbose shift information
 
 (rf/reg-event-fx
  :get-shift-info
  (fn [{db :db} [_ shift-pk]]
-   {:json/fetch->path {:path [:shifts-info shift-pk]
+   {:json/fetch->path {:path [::shift :detail shift-pk]
                        :uri (get-url db "/api/shifts/shift/" shift-pk "/")
-                       :token @(rf/subscribe [:token])
+                       :token (<sub [:token])
                        :map-result parse-date-time}}))
 
 (rf/reg-sub
  :shift-info
  (fn [db [_ shift-pk]]
-   (get-in db [:shifts-info shift-pk] {:status :not-asked})))
+   (or (<sub [::shift :detail shift-pk])
+       {:status :not-asked})))
 
 (rf/reg-event-fx
  :apply-for-shift
  (fn [{db :db} [_ shift-pk]]
-   {:json/fetch->path {:path [:shift-apply-requests shift-pk]
+   {:json/fetch->path {:path [::shift :apply-requests shift-pk]
                        :uri (get-url db "/api/shifts/application/apply/")
                        :method "POST"
                        :token @(rf/subscribe [:token])
                        :body {:shift shift-pk}
-                       :succeed-fx (fn [data] (.log js/console data) [:goto :resident :messages shift-pk :discuss (:pk data)])}}))
+                       :succeed-fx (fn [data] [:goto :resident :messages shift-pk :discuss (:pk data)])}}))
 
 (rf/reg-sub
  :apply-for-shift
  (fn [db [_ shift-pk]]
-   (get-in db [:apply-for-shift shift-pk] {:status :not-asked})))
-
+   (or (<sub [::shift :apply-requests shift-pk])
+       {:status :not-asked})))
