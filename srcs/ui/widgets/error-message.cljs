@@ -6,9 +6,9 @@
 (defn get-message [[error-key error-value] names-map]
   (let [field-name (names-map error-key (str/capitalize (name error-key)))
         error-text (str/join ", " error-value)]
-    (if (and field-name (not= field-name ""))
-      (str field-name ": " error-text)
-      error-text)))
+    (if (= field-name "")
+      error-text
+      (str field-name ": " error-text))))
 
 (defn ErrorMessage [{:keys [errors field-names-map]}]
   [sa/Message {:error true
