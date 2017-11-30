@@ -7,7 +7,8 @@
    [ui.widgets :refer [FormWrapper pp]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [soda-ash.core :as sa]))
+   [soda-ash.core :as sa]
+   [ui.widgets.error-message :refer [ErrorMessage]]))
 
 (defn Form []
   (let [login-form (<sub [:login-form-cursor])
@@ -25,10 +26,9 @@
             [sa/FormField {:error (contains? errors :password)}
              [:label "Password"]
              [sa/Input {:type "password" :value @password :on-change (>atom password)}]]
-            [sa/Message {:error true
-                         :visible (= status :failure)
-                         :header "There was some errors with your submission"
-                         :list (vals errors)}]
+            [ErrorMessage {:errors errors
+                           :visible (= status :failure)
+                           :field-names-to-display [:email :password]}]
             [sa/FormGroup {:class-name "justify-content _space-between"}
              [sa/FormButton {:color :blue
                              :loading (= status :loading)
