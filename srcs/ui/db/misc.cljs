@@ -1,7 +1,9 @@
 (ns ui.db.misc
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
-            [clojure.string :refer [replace escape]]))
+            [clojure.string :refer [replace escape]]
+            [cljs-time.core :as dt]
+            [cljs-time.format :as format]))
 
 (defn reduce-statuses [& statuses]
   (cond
@@ -114,3 +116,10 @@
 (defn setup-form-initial-values [initial-values]
   (fn [data]
     (into {} (map (fn [[key value]] [key (initial-values key value)]) data))))
+
+(defn cljstime->drf-date-time [date-time]
+  (try
+    (let [date-format "yyyy-MM-dd'T'HH:mm"]
+      (format/unparse (format/formatter date-format) date-time))
+    (catch js/Object e "")))
+

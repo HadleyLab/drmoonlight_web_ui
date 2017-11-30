@@ -9,6 +9,7 @@
   {::shift
    {:list {:status :not-asked}
     :detail {}
+    :filter-value nil
     :apply-requests {}}})
 
 ;; Public utils
@@ -62,6 +63,37 @@
 (rf/reg-sub
  :shifts
  #(<sub [::shift :list]))
+
+(rf/reg-sub
+ :shifts-count-by-state
+ #(into {}
+        (map (fn [[key value]] [key (count value)])
+             (group-by identity
+                       (mapcat (fn [[key values]]
+                                 (map :state values))
+                               (<sub [::shift :list :data]))))))
+(rf/reg-sub
+ :shifts-filtered-by-state
+ (fn [db [_ filter-state]]
+   (let [shifts (<sub [:shifts])]
+     (if (nil? filter-state) shifts
+         {:status (:status shifts)
+          :data (into {}
+                      (map
+                       (fn [[key values]]
+                         [key (filter #(= filter-state (:state %)) values)])
+                       (:data shifts)))}))))
+
+(rf/reg-sub
+ :shifts-filter-state
+ #(<sub [::shift :filter-value]))
+
+(rf/reg-event-db
+ :set-shifts-filter-state
+ (fn [db [_ state]]
+   (let [new-state (if (= state (<sub [:shifts-filter-state]))
+                     nil state)]
+     (assoc-in db [::shift :filter-value] new-state))))
 
 (rf/reg-sub
  :shifts-status

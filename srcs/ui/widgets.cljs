@@ -10,12 +10,6 @@
    [cljsjs.moment]
    [soda-ash.core :as sa]))
 
-(defn cljstime->drf-date-time [date-time]
-  (try
-    (let [date-format "yyyy-MM-dd'T'HH:mm"]
-      (format/unparse (format/formatter date-format) date-time))
-    (catch js/Object e "")))
-
 (defn moment->cljs [m]
   (format/parse (.format m)))
 

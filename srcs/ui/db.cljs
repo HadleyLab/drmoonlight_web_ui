@@ -7,8 +7,10 @@
             [ui.db.misc :refer [insert-by-path]]
             [ui.db.account]
             [ui.db.application]
+            [ui.db.calendar]
             [ui.db.constants]
             [ui.db.resident]
+            [ui.db.scheduler-profile]
             [ui.db.shift]
             [clojure.string :refer [replace escape]]))
 
@@ -37,6 +39,8 @@
   (merge {}
          ui.db.account/schema
          ui.db.application/schema
+         ui.db.calendar/schema
          ui.db.constants/schema
+         ui.db.scheduler-profile/schema
          ui.db.resident/schema
          ui.db.shift/schema))
