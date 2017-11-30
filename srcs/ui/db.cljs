@@ -34,4 +34,8 @@
    {:dispatch fx}))
 
 (def initial-db
-  (merge {} ui.db.account/schema ui.db.application/schema ui.db.resident/schema))
+  (merge {}
+         ui.db.account/schema
+         ui.db.application/schema
+         ui.db.constants/schema
+         ui.db.resident/schema))

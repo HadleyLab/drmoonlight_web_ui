@@ -51,7 +51,6 @@
       :db
       (merge ui.db/initial-db
        {:base-url base-url
-        :constants {:status :loading}
         :shifts {:status :not-asked}})})))
 
 (defn- mount-root []
