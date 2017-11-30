@@ -104,7 +104,7 @@
  (fn [db _]
    (assoc-in db [::application :comment-form] (get-in schema [::application :comment-form]))))
 
-(rf/reg-sub-raw
+(rf/reg-sub
  :comment-cursor
  #(<sub [:cursor [::application :comment-form :fields :text]]))
 

@@ -15,12 +15,6 @@
    [cljs-time.core :as dt]
    [cljs-time.format :as format]))
 
-(def root-path :resident-schedule-page)
-
-(defn schema []
-  {:selected (dt/date-time (dt/year (dt/now)) (dt/month (dt/now)) 1)})
-
-
 (defn ActionButton [pk]
   (cond
     (is-approved) [sa/Button {:on-click (>event [:goto :resident :messages pk])} "Apply"]
@@ -51,8 +45,8 @@
             [ActionButton pk]]] [:br] [:br]]))
 
 (defn Index [params]
-  (rf/dispatch-sync [::init-resident-shedule-page])
-  (let [selected-cursor @(rf/subscribe [:cursor [root-path :selected]])]
+  (rf/dispatch [:load-shifts])
+  (let [calendar-month (<sub [:calendar-month])]
     (fn [params]
       [ResidentLayout
        [sa/Grid {}
@@ -60,21 +54,13 @@
          [sa/GridColumn {:width 6}]
          [sa/GridColumn {:width 4}
           [sa/Button {:icon "angle left"
-                      :on-click #(dispatch-set! selected-cursor (dt/minus @selected-cursor (dt/months 1)))}]
-          [:span (format/unparse (format/formatter "MMMM YYYY") @selected-cursor)]
+                      :on-click (>event [:set-calendar-month (dt/minus calendar-month (dt/months 1))])}]
+          [:span (format/unparse (format/formatter "MMMM YYYY") calendar-month)]
           [sa/Button {:icon "angle right"
-                      :on-click #(dispatch-set! selected-cursor (dt/plus @selected-cursor (dt/months 1)))}]
+                      :on-click (>event [:set-calendar-month (dt/plus calendar-month (dt/months 1))])}]
           [sa/GridColumn {:width 6}]]]
         [sa/GridRow {}
          [sa/GridColumn {:width 16}
-          [Calendar @selected-cursor (<sub [:shifts]) ShiftLabel]]]]])))
-
-(rf/reg-event-fx
- ::init-resident-shedule-page
- (fn [{db :db} [_]]
-   {:db (if (= (root-path db) nil)
-          (assoc-in db [root-path] (schema))
-          db)
-    :dispatch [:load-shifts]}))
+          [Calendar calendar-month (<sub [:shifts]) ShiftLabel]]]]])))
 
 (pages/reg-page :core/resident-schedule Index)

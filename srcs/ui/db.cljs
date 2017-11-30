@@ -9,6 +9,7 @@
             [ui.db.application]
             [ui.db.calendar]
             [ui.db.constants]
+            [ui.db.resident-profile]
             [ui.db.resident]
             [ui.db.scheduler-profile]
             [ui.db.shift]
@@ -41,6 +42,7 @@
          ui.db.application/schema
          ui.db.calendar/schema
          ui.db.constants/schema
-         ui.db.scheduler-profile/schema
+         ui.db.resident-profile/schema
          ui.db.resident/schema
+         ui.db.scheduler-profile/schema
          ui.db.shift/schema))
