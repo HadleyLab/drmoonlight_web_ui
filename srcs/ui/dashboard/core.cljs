@@ -1,5 +1,4 @@
 (ns ui.dashboard.core
-  (:require-macros [reagent.ratom :refer [reaction]])
   (:require
    [reagent.core :as reagent]
    [ui.db.misc :refer [>event <sub]]

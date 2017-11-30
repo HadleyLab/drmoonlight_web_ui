@@ -56,4 +56,3 @@
                                (mapv (fn [column]
                                        [sa/TableCell [draw-cell render-shift-label row column selected shifts]])
                                      (range 7)))) (range 5)))]))
-(def calendar Calendar)

@@ -1,5 +1,4 @@
 (ns ui.core
-  (:require-macros [reagent.ratom :refer [reaction]])
   (:require
    [clojure.string :as str]
    [cljsjs.react]

@@ -1,5 +1,4 @@
 (ns ui.db.application
-  (:require-macros [reagent.ratom :refer [reaction]])
   (:require
    [reagent.core :as reagent]
    [ui.db.misc :refer [get-url <sub]]
@@ -41,7 +40,6 @@
  #(<sub [::application :list]))
 
 (<sub [:applications])
-
 
 (rf/reg-sub
  :applications-filter-state
@@ -108,8 +106,7 @@
 
 (rf/reg-sub-raw
  :comment-cursor
- (fn [db _]
-   (reaction (reagent/cursor db [::application :comment-form :fields :text]))))
+ #(<sub [:cursor [::application :comment-form :fields :text]]))
 
 (rf/reg-sub
  :comment-form
