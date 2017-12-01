@@ -11,7 +11,8 @@
 (def resident-profile-form-fields
   {"Personal Information" {:first-name "First Name"
                            :last-name "Last Name"}
-   "Residency" {:residency-program {:type :select
+   "Residency" (array-map
+                :residency-program {:type :select
                                     :label "Residency Program"
                                     :items #(<sub [:residency-program-as-options])}
                 :specialities {:type :multy-select
@@ -22,10 +23,37 @@
                                   :width 3}
                 :state-license {:type :radio
                                 :label "State Licence"
-                                :items {true "Yes" false "No"}}
-                :board-score {:type :radio
-                              :label "Board Score"
-                              :items {true "Yes" false "No"}}}})
+                                :items {true "yes" false "no"}}
+                :federal-dea-active {:type :radio
+                                     :label "Federal DEA active"
+                                     :items {true "yes" false "no"}}
+                :bls-acls-pals {:type :radio
+                                :label "BLS/ACLS/PALS"
+                                :items {true "yes" false "no" nil "N/A"}}
+                :active-permanent-residence-card-or-visa {:type :radio
+                                                          :label "Active Permanent Residence Card or visa"
+                                                          :desc "if non-US citizen"
+                                                          :items {true "yes" false "no" nil "N/A"}}
+                :active-current-driver-license-or-passport {:type :radio
+                                                            :label "Active current driver license or passport"
+                                                            :items {true "yes" false "no"}}
+                :active-npi-number {:type :radio
+                                    :label "Active NPI number"
+                                    :items {true "yes" false "no"}}
+                :ecfmg {:type :radio
+                        :label "ECFMG"
+                        :desc "if applicable"
+                        :items {true "yes" false "no" nil "N/A"}}
+                :active-board-certificates {:type :radio
+                                            :label "Active Board Certificates"
+                                            :desc "if applicable"
+                                            :items {true "yes" false "no" nil "N/A"}}
+                :earliest-availability-for-shift {:type :input
+                                                  :label "Earliest availability for a shift"}
+                :preferences-for-work-location {:type :input
+                                                :label "Any preference for work location"})})
+
+(js/console.log resident-profile-form-fields)
 
 (def resident-notification-form-fields
   {"I would like to recieve emails when:"

@@ -26,8 +26,10 @@
 
 (def concatv (comp (partial into []) concat))
 
-(defn FormRadio [{items :items cursor :cursor label :label}]
-  (concatv [sa/FormField {:width 10} [:label {:class-name "form__label"} label]]
+(defn FormRadio [{items :items cursor :cursor label :label desc :desc}]
+  (concatv [sa/FormField {:width 11} [:label {:class-name "form__label"}
+                                      label (if desc
+                                              [:span {:class-name "form__label-desc"} " (" desc ")"])]]
            (->> items
                 (mapv (fn [[key value]]
                         [sa/FormRadio {:key key
@@ -38,7 +40,7 @@
                                        :on-change #(dispatch-set! cursor key)}])))))
 
 (defn FormToggle [{cursor :cursor label :label}]
-  [sa/FormField {:width 10}
+  [sa/FormField {:width 11}
    [sa/Checkbox
     {:toggle true
      :label label
@@ -48,7 +50,7 @@
 
 (defn FormDatepicker [{cursor :cursor label :label :as info_}]
   (let [info (dissoc info_ :cursor :label :type)]
-    [sa/FormField {:width 10}
+    [sa/FormField {:width 11}
      [:label label]
      [DatePicker (merge {:selected (cljs->moment @cursor) :on-change #(reset! cursor (moment->cljs %))} info)]]))
 
@@ -59,7 +61,7 @@
     :else :text))
 
 (defn FormTextarea [{cursor :cursor label :label}]
-  [sa/FormField {:width 10}
+  [sa/FormField {:width 11}
    [:label label]
    [sa/TextArea {:value @cursor :on-change (>atom cursor)}]])
 
@@ -67,7 +69,7 @@
   (let [drop-down-cursor (reagent/cursor cursor [:fields (:cursor drop-down)])
         _ (.log js/console drop-down)]
     (fn [field-cursor cursor {label :label drop-down :drop-down}]
-      [sa/FormField {:width 10}
+      [sa/FormField {:width 11}
        [:label label]
        [sa/Input {:label (reagent/as-element
                           [sa/Dropdown {:value @drop-down-cursor
@@ -78,7 +80,7 @@
                   :label-position :right}]])))
 
 (defn FormSelect [{cursor :cursor label :label items :items}]
-  [sa/FormField {:width 10}
+  [sa/FormField {:width 11}
    [sa/FormSelect {:value @cursor
                    :placeholder label
                    :label label
@@ -86,7 +88,7 @@
                    :options (items)}]])
 
 (defn FormMultySelect [{cursor :cursor label :label items :items}]
-  [sa/FormField {:width 10}
+  [sa/FormField {:width 11}
    [:label label]
    [sa/Dropdown {:value @cursor
                  :placeholder label
@@ -103,7 +105,7 @@
       (let [errors @errors-cursor]
         [sa/FormGroup {}
          (if (or (= :input (:type info)) (string? info))
-           [sa/FormField {:width (or (:width info) 10)}
+           [sa/FormField {:width (or (:width info) 11)}
             [:label (or (:label info) info)]
             [sa/Input {:type (get-default-type field)
                        :value @field-cursor
@@ -120,8 +122,8 @@
              (= :multy-select (:type info)) [FormMultySelect (merge {:cursor field-cursor} info)]
              :else [:div (str info)]))
          (if (= errors nil)
-           [sa/FormField {:width 6 :class-name "input-info gray-font"} ""]
-           [sa/FormField {:width 6 :class-name "input-info error"}
+           [sa/FormField {:width 5 :class-name "input-info gray-font"} ""]
+           [sa/FormField {:width 5 :class-name "input-info error"}
             (clojure.string/join " " errors)])]))))
 
 (defn BuildForm [cursor field-sets]
@@ -140,4 +142,3 @@
      [sa/Segment {:class-name "moonlight-form-inner"}
       (into [:div {}]
             (reagent/children this))]]))
-
