@@ -44,7 +44,11 @@
                          :margin-left "60px!important"
                          :display "inline-flex!important"
                          :align-items :center}
-    [:.icon {:color "#8C97B2!important" :opacity "1!important" :height "auto!important"}]
+    [:.icon {:color "#8C97B2!important"
+             :opacity "1!important"
+             :height "auto!important"
+             :transition "color 0.2s!important"}]
+    [:&:hover [:.icon {:color "#000!important"}]]
     [:&.active {:color "#2185d0!important"}
      [:.icon {:color "inherit!important"}]]]
 
