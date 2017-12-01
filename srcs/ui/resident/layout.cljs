@@ -2,10 +2,8 @@
   (:require
    [ui.db.account :refer [is-new is-approved]]
    [ui.db.misc :refer [>evt <sub >event]]
-   [soda-ash.core :as sa]))
-
-(defn HeaderLogo []
-  [sa/Header {:class-name "header__logo" :on-click (>event [:goto "/"])} "Dr. Moonlight"])
+   [soda-ash.core :as sa]
+   [ui.widgets.header-logo :refer [HeaderLogo]]))
 
 (defn Header []
   (let [route (<sub [:route-map/current-route])]

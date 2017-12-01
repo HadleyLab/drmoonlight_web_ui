@@ -1,10 +1,8 @@
 (ns ui.scheduler.layout
   (:require
    [ui.db.misc :refer [<sub >event]]
-   [soda-ash.core :as sa]))
-
-(defn HeaderLogo []
-  [sa/Header {:class-name "header__logo" :on-click (>event [:goto "/"])} "Dr. Moonlight"])
+   [soda-ash.core :as sa]
+   [ui.widgets.header-logo :refer [HeaderLogo]]))
 
 (defn Header []
   (let [route (<sub [:route-map/current-route])]
