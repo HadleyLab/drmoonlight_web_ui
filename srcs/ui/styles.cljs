@@ -36,6 +36,21 @@
                        :justify-content "space-between"
                        :align-items "center!important"}
     [:.header {:margin-bottom "0!important"}]]
+   [:.header__logo {:font-size "24px!important" :cursor "pointer"}]
+   [:.header__menu-item {:background "none!important"
+                         :font-size "15px!important"
+                         :padding "0!important"
+                         :color "#000!important"
+                         :margin-left "60px!important"
+                         :display "inline-flex!important"
+                         :align-items :center}
+    [:.icon {:color "#8C97B2!important"
+             :opacity "1!important"
+             :height "auto!important"
+             :transition "color 0.2s!important"}]
+    [:&:hover [:.icon {:color "#000!important"}]]
+    [:&.active {:color "#2185d0!important"}
+     [:.icon {:color "inherit!important"}]]]
 
    ; form styles
    [:.input-info {:display "flex"

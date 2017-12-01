@@ -1,40 +1,48 @@
 (ns ui.resident.layout
   (:require
-   [ui.db.account :refer [is-approved is-new]]
-   [ui.db.misc :refer [>evt <sub]]
-   [re-frame.core :as rf]
-   [soda-ash.core :as sa]))
+   [ui.db.account :refer [is-new is-approved]]
+   [ui.db.misc :refer [>evt <sub >event]]
+   [soda-ash.core :as sa]
+   [ui.widgets.header-logo :refer [HeaderLogo]]))
+
+(defn Header []
+  (let [route (<sub [:route-map/current-route])]
+    [sa/GridRow {:class-name "header__wrapper"}
+     [sa/Container {:class-name "header__content"}
+      [HeaderLogo]
+      [sa/ButtonGroup {}
+       [sa/Button {:active (= (:match route) :core/resident-schedule)
+                   :on-click (>event [:goto :resident :schedule])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name :calendar :size :large}]
+        "Schedule"]
+       [sa/Button {:active (= (:. (nth (:parents route) 2 nil))
+                              :core/resident-messages)
+                   :disabled (not (is-approved))
+                   :on-click (>event [:goto :resident :messages])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name :mail :size :large}]
+        "Messages"]
+       [sa/Button {:active (= (:match route) :core/resident-statistics)
+                   :on-click (>event [:goto :resident :statistics])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name "line graph" :size :large}]
+        "Statistics"]
+       [sa/Button {:active (= (:. (last (:parents route))) :core/resident-profile)
+                   :on-click (>event [:goto :resident :profile])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name :user :size :large}]
+        "Profile"]]]]))
 
 (defn ResidentLayout [content]
   (let [route (<sub [:route-map/current-route])]
     [sa/Grid {}
-     [sa/GridRow {:class-name "header__wrapper"}
-      [sa/Container {:class-name "header__content"}
-       [sa/Header {} "Dr.Moonlight"]
-       [sa/ButtonGroup {}
-        [sa/Button {:active (= (:match route) :core/resident-schedule)
-                    :on-click #(>evt [:goto :resident :schedule])}
-         [sa/Icon {:name :calendar}]
-         "Schedule"]
-        [sa/Button {:active (= (:. (nth (:parents route) 2 nil))
-                               :core/resident-messages)
-                    :disabled (not (is-approved))
-                    :on-click #(>evt [:goto :resident :messages])}
-         [sa/Icon {:name :mail}]
-         "Messages"]
-        [sa/Button {:active (= (:match route) :core/resident-statistics)
-                    :on-click #(>evt [:goto :resident :statistics])}
-         [sa/Icon {:name :table}]
-         "Statistics"]
-        [sa/Button {:active (= (:. (last (:parents route))) :core/resident-profile)
-                    :on-click #(>evt [:goto :resident :profile])}
-         [sa/Icon {:name :user}]
-         "Profile"]]]]
+     [Header]
      [sa/GridRow {}
       [sa/Container content]]]))
 
 (defn ResidentProfileLayout [content]
-    (let [route (<sub [:route-map/current-route])]
+  (let [route (<sub [:route-map/current-route])]
     [ResidentLayout
      [sa/Grid {}
       [sa/GridRow {}
@@ -45,10 +53,11 @@
                         :active (= (:match route) :core/resident-profile)
                         :on-click #(>evt [:goto :resident :profile])}]
           (when-not (is-new) [sa/MenuItem {:name "Notification Settings"
-                        :active (= (:match route) :core/resident-profile-notification)
-                        :on-click #(>evt [:goto :resident :profile :notification])}])
+                                           :active (= (:match route) :core/resident-profile-notification)
+                                           :on-click #(>evt [:goto :resident :profile :notification])}])
           [sa/MenuItem {:name "Log out"
                         :on-click #(>evt [:logout])}]]]]
 
        [sa/GridColumn {:width 12}
-        [:div {:class-name "profile__container moonlight-white"} content]]]]]))
+        [:div {:class-name "profile__container moonlight-white"} content]]]
+      [sa/GridRow {}]]]))

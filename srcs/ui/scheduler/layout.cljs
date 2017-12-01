@@ -1,37 +1,40 @@
 (ns ui.scheduler.layout
   (:require
-   [ui.db.misc :refer [<sub]]
-   [re-frame.core :as rf]
-   [soda-ash.core :as sa]))
+   [ui.db.misc :refer [<sub >event]]
+   [soda-ash.core :as sa]
+   [ui.widgets.header-logo :refer [HeaderLogo]]))
+
+(defn Header []
+  (let [route (<sub [:route-map/current-route])]
+    [sa/GridRow {:class-name "header__wrapper"}
+     [sa/Container {:class-name "header__content"}
+      [HeaderLogo]
+      [sa/ButtonGroup {}
+       [sa/Button {:active (= (:match route) :core/scheduler-schedule)
+                   :on-click (>event [:goto :scheduler :schedule])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name :calendar :size :large}]
+        "Schedule"]
+       [sa/Button {:active (= (:. (nth (:parents route) 2 nil))
+                              :core/scheduler-messages)
+                   :on-click (>event [:goto :scheduler :messages])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name :mail :size :large}]
+        "Messages"]
+       [sa/Button {:active (= (:match route) :core/scheduler-statistics)
+                   :on-click (>event [:goto :scheduler :statistics])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name "line graph" :size :large}]
+        "Statistics"]
+       [sa/Button {:active (= (:. (last (:parents route))) :core/scheduler-profile)
+                   :on-click (>event [:goto :scheduler :profile])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name :user :size :large}]
+        "Profile"]]]]))
 
 (defn SchedulerLayout [content]
   (let [route (<sub [:route-map/current-route])]
     [sa/Grid {}
-     [sa/GridRow {:class-name "moonlight-header"}
-      [sa/GridColumn {:width 1}]
-      [sa/GridColumn {:width 7} [sa/Header {} "Dr.Moonlight"]]
-      [sa/GridColumn {:width 7}
-       [sa/ButtonGroup {}
-        [sa/Button {:active (= (:match route) :core/scheduler-schedule)
-                    :on-click #(rf/dispatch [:goto :scheduler :schedule])}
-         [sa/Icon {:name :calendar}]
-         "Schedule"]
-
-        [sa/Button {:active (= (:. (nth (:parents route) 2 nil))
-                               :core/scheduler-messages)
-                    :on-click #(rf/dispatch [:goto :scheduler :messages])}
-         [sa/Icon {:name :mail}]
-         "Messages"]
-        [sa/Button {:active (= (:match route) :core/scheduler-statistics)
-                    :on-click #(rf/dispatch [:goto :scheduler :statistics])}
-         [sa/Icon {:name :table}]
-         "Statistics"]
-        [sa/Button {:active (= (:. (last (:parents route))) :core/scheduler-profile)
-                    :on-click #(rf/dispatch [:goto :scheduler :profile])}
-         [sa/Icon {:name :user}]
-         "Profile"]]]]
+     [Header]
      [sa/GridRow {}
-      [sa/GridColumn {:width 1}]
-      [sa/GridColumn {:width 14} content]
-      [sa/GridColumn {:width 1}]]]))
-
+      [sa/Container content]]]))
