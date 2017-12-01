@@ -52,8 +52,11 @@
                          :color "#8C97B2"
                          :margin-bottom (px 10)}]
    [:.form__label {:display "inline-block!important"}]
+   [:.form__label-desc {:font-weight "normal"
+                        :color "#8C97B2"}]
    [:.form__radio {:display "inline-block"
-                   :margin-left "20px!important"}]
+                   :margin-left "20px!important"
+                   :vertical-align "top"}]
    [:.toggler [:label:after
                {:box-shadow
                 "0 1px 2px 0 rgba(34,36,38,.15), 0 0 0 1px rgba(34,36,38,.15) inset!important"}]]
@@ -90,6 +93,8 @@
    [:.signup__back {:text-align "center"
                     :margin-top "30px!important"}]
    [:.signup-thanks__wrapper {:text-align "center"}]
+   [:.signup__user-desc {:position "absolute" :right 0 :top 0}]
+   [:.signup__container.ui.form [:.field.eleven.wide {:width "62.5%!important"}]]
 
    ; profile screen styles
    [:.profile__menu-wrapper {:position "relative"
@@ -98,7 +103,7 @@
    [:.profile__container {:margin "0 0 0 -1em"
                           :border "1px solid #d4d4d5"
                           :border-radius "0 3px 3px"}
-    [:.form__label {:width "30%"}]
+    [:.form__label {:width "52%"}]
     [:.form__group {:position "relative"
                     :margin "20px 0 40px"}]]
    [:.profile__content {:margin-top (px -20)

@@ -23,11 +23,11 @@
         modes {:resident "Resident" :scheduler "Scheduler"}]
     (fn []
       (let [status (<sub [:sign-up-form-status])]
-        [sa/Form {:error (= status :failure) :class-name "position _relative"}
+        [sa/Form {:error (= status :failure) :class-name "signup__container position _relative"}
          [sa/FormGroup
           [FormRadio {:items modes :cursor mode-cursor :label "Register as"}]
-          [sa/FormField {:width 6 :class-name "gray-font"}
-           "Scheduler is a user, who is able to create shifts for booking"]]
+          [sa/FormField {:width 6 :class-name "gray-font signup__user-desc"}
+           "A scheduler is a certified representative or employee for a hospital or facility who is seeking to hire residents for shifts"]]
          [FormContent @mode-cursor sign-up-form-cursor]
          [:div
           [sa/FormButton {:color :blue
@@ -111,9 +111,9 @@
            [sa/FormButton {:color :blue
                            :loading (= status :loading)
                            :on-click (>event [:confirm-rest-password params])}
-           "Setup new password"]]]
-          [sa/FormField {:class-name "forgot-password__back"}
-           [:a {:href (href :login)} "Back to login"]]]))))
+            "Setup new password"]]]
+         [sa/FormField {:class-name "forgot-password__back"}
+          [:a {:href (href :login)} "Back to login"]]]))))
 
 (pages/reg-page :core/sign-up Index)
 (pages/reg-page :core/sign-up-thanks Thanks)
