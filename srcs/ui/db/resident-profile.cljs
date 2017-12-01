@@ -11,7 +11,8 @@
 (def resident-profile-form-fields
   {"Personal Information" {:first-name "First Name"
                            :last-name "Last Name"}
-   "Residency" {:residency-program {:type :select
+   "Residency" (array-map
+                :residency-program {:type :select
                                     :label "Residency Program"
                                     :items #(<sub [:residency-program-as-options])}
                 :specialities {:type :multy-select
@@ -50,7 +51,9 @@
                 :earliest-availability-for-shift {:type :input
                                                   :label "Earliest availability for a shift"}
                 :preferences-for-work-location {:type :input
-                                                :label "Any preference for work location"}}})
+                                                :label "Any preference for work location"})})
+
+(js/console.log resident-profile-form-fields)
 
 (def resident-notification-form-fields
   {"I would like to recieve emails when:"
