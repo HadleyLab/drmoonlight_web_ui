@@ -36,7 +36,7 @@
                        :justify-content "space-between"
                        :align-items "center!important"}
     [:.header {:margin-bottom "0!important"}]]
-   [:.header__logo {:font-size "24px!important"}]
+   [:.header__logo {:font-size "24px!important" :cursor "pointer"}]
    [:.header__menu-item {:background "none!important"
                          :font-size "15px!important"
                          :padding "0!important"
