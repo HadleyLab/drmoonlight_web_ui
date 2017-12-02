@@ -46,8 +46,8 @@
 
 (defn Index [params]
   (rf/dispatch [:load-shifts])
-  (let [calendar-month (<sub [:calendar-month])]
     (fn [params]
+      (let [calendar-month (<sub [:calendar-month])]
       [ResidentLayout
        [sa/Grid {}
         [sa/GridRow {}
