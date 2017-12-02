@@ -30,6 +30,8 @@
      [sa/ModalContent {:image true}
       [sa/ModalDescription
        [sa/Form {}
+        ;; TODO subscribe to status of (<sub [:shift-info pk])
+        ;; to handle initial data loading
         [BuildForm new-shift-form-cursor shift-form-fields]]]]
      [sa/ModalActions [sa/Button {:color :blue :on-click (>event [:update-shift pk])} "Update"]]]))
 
