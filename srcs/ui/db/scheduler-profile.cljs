@@ -1,7 +1,8 @@
 (ns ui.db.scheduler-profile
   (:require
    [reagent.core :as reagent]
-   [ui.db.misc :refer [get-url <sub fields->schema cljstime->drf-date-time]]
+   [ui.db.misc :refer [get-url <sub fields->schema cljstime->drf-date-time
+                       setup-form-initial-values]]
    [ui.db.shift :refer [parse-date-time]]
    [re-frame.core :as rf]
    [cljs-time.core :as dt]
@@ -41,10 +42,10 @@
 
 (def schema
   {::scheduler-profile
-   {:new-shift-modal-open false
+   {:new-shift-modal false
+    :edit-shift-modal {}
     :shift-form
     {:fields (fields->schema shift-form-fields)
-     :shift-modal-open false
      :response {:status :not-asked}}}})
 
 (rf/reg-sub
@@ -53,7 +54,7 @@
    (get-in db path)))
 
 (rf/reg-sub
- :new-shift-modal-open
+ :new-shift-modal
  #(<sub [::scheduler-profile :new-shift-modal]))
 
 (rf/reg-event-db
@@ -67,6 +68,21 @@
    (assoc-in db [::scheduler-profile :new-shift-modal] false)))
 
 (rf/reg-sub
+ :edit-shift-modal
+ (fn [db [_ pk]]
+   (get-in db [::scheduler-profile :edit-shift-modal pk] false)))
+
+(rf/reg-event-db
+ :open-edit-shift-modal
+ (fn [db [_ pk]]
+   (assoc-in db [::scheduler-profile :edit-shift-modal pk] true)))
+
+(rf/reg-event-db
+ :close-edit-shift-modal
+ (fn [db [_ pk]]
+   (assoc-in db [::scheduler-profile :edit-shift-modal pk] false)))
+
+(rf/reg-sub
  :new-shift-form-cursor
  #(<sub [:cursor [::scheduler-profile :shift-form]]))
 
@@ -74,6 +90,20 @@
  :init-new-shift-form
  (fn [db [_]]
    (assoc-in db [::scheduler-profile :shift-form] (get-in schema [::scheduler-profile :shift-form]))))
+
+(rf/reg-event-fx
+ :init-edit-shift-form
+ (fn [db [_ shift-pk]]
+   {:dispatch [:get-shift-info shift-pk [:load-initial-form-data shift-pk]]}))
+
+(rf/reg-event-db
+ :load-initial-form-data
+  (fn [db [_ pk]]
+       (-> db
+           (assoc-in  [::scheduler-profile :shift-form]
+                      (get-in schema [::scheduler-profile :shift-form]))
+           (update-in [::scheduler-profile :shift-form :fields]
+                      (setup-form-initial-values (:data (<sub [:shift-info pk])))))))
 
 (rf/reg-event-fx
  :create-new-shift
@@ -92,5 +122,25 @@
  (fn [{db :db} _]
    {:dispatch-n [[:load-shifts]
                  [:close-new-shift-modal]
+                 [:init-new-shift-form]]}))
+
+
+(rf/reg-event-fx
+ :update-shift
+ (fn [{db :db} [_ pk]]
+   {:json/fetch->path {:path [::scheduler-profile :shift-form :response]
+                       :uri (get-url db "/api/shifts/shift/" pk "/")
+                       :method "PUT"
+                       :token (<sub [:token])
+                       :body (-> (<sub [::scheduler-profile :shift-form :fields])
+                                 (update-in [:date-start] cljstime->drf-date-time)
+                                 (update-in [:date-end] cljstime->drf-date-time))
+                       :succeed-fx [:update-shift-succeed pk]}}))
+
+(rf/reg-event-fx
+ :update-shift-succeed
+ (fn [{db :db} [_ pk]]
+   {:dispatch-n [[:load-shifts]
+                 [:close-edit-shift-modal pk]
                  [:init-new-shift-form]]}))
 

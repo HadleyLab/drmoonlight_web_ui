@@ -107,11 +107,12 @@
 
 (rf/reg-event-fx
  :get-shift-info
- (fn [{db :db} [_ shift-pk]]
+ (fn [{db :db} [_ shift-pk fx]]
    {:json/fetch->path {:path [::shift :detail shift-pk]
                        :uri (get-url db "/api/shifts/shift/" shift-pk "/")
                        :token (<sub [:token])
-                       :map-result parse-date-time}}))
+                       :map-result parse-date-time
+                       :succeed-fx fx}}))
 
 (rf/reg-sub
  :shift-info

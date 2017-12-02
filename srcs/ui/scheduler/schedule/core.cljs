@@ -14,9 +14,24 @@
    [cljs-time.core :as dt]
    [cljs-time.format :as format]))
 
-(defn ShiftLabel [{speciality :speciality}]
-  [:div
-   [sa/Label {:color :blue} (<sub [:speciality-name speciality])] [:br] [:br]])
+(defn ShiftLabel [{speciality :speciality pk :pk}]
+  (let [new-shift-form-cursor (<sub [:new-shift-form-cursor])]
+    [sa/Modal {:trigger (reagent/as-element
+                         [:div
+                          [sa/Label {:color :blue
+                                     :on-click (>event [:open-edit-shift-modal pk])}
+                           (<sub [:speciality-name speciality])] [:br] [:br]])
+               :dimmer :blurring
+               :open (<sub [:edit-shift-modal pk])
+               :on-open (>event [:init-edit-shift-form pk])
+               :on-close (>event [:close-edit-shift-modal pk])
+               :size :small}
+     [sa/ModalHeader "Edit the shift"]
+     [sa/ModalContent {:image true}
+      [sa/ModalDescription
+       [sa/Form {}
+        [BuildForm new-shift-form-cursor shift-form-fields]]]]
+     [sa/ModalActions [sa/Button {:color :blue :on-click (>event [:update-shift pk])} "Update"]]]))
 
 (defn CreateNewShift [new-shift-form-cursor]
   (rf/dispatch [:init-new-shift-form])
@@ -25,7 +40,7 @@
                                                         :on-click (>event [:open-new-shift-modal])}
                                              [sa/Icon {:name :plus}] "Create new shift"])
                :dimmer :blurring
-               :open (<sub [:new-shift-modal-open])
+               :open (<sub [:new-shift-modal])
                :on-close (>event [:close-new-shift-modal])
                :size :small}
      [sa/ModalHeader "Create a new shift"]
