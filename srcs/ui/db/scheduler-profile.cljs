@@ -105,6 +105,10 @@
            (update-in [::scheduler-profile :shift-form :fields]
                       (setup-form-initial-values (:data (<sub [:shift-info pk])))))))
 
+(rf/reg-sub
+ :shift-form-response
+ #(<sub [::scheduler-profile :shift-form :response]))
+
 (rf/reg-event-fx
  :create-new-shift
  (fn [{db :db} [_]]
