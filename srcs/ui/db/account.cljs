@@ -87,7 +87,9 @@
  (fn [{db :db} _]
    (let [user-type (<sub [:user-type])]
      {:db (assoc-in db [::account :login-form] (get-in schema [::account :login-form]))
-      :dispatch [:goto user-type]})))
+      :dispatch (cond
+                  (= user-type :account-manager) [:goto user-type]
+                  :else [:goto user-type :schedule])})))
 
 (rf/reg-event-fx
  :submit-login-form
