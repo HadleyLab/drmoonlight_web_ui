@@ -11,6 +11,7 @@
    [frames.openid :as openid]
    [frames.redirect :as redirect]
    [ui.db]
+   [ui.db.misc :refer [<sub]]
    [ui.dashboard.core]
    [ui.login.core]
    [ui.signup.core]
@@ -26,12 +27,15 @@
 ;; this is the root component wich switch pages
 ;; using current-route key from database
 (defn current-page []
-  (let [{page :match params :params} @(rf/subscribe [:route-map/current-route])]
+  (let [{page :match params :params} (<sub [:route-map/current-route])]
     (if page
       (if-let [cmp (get @pages/pages page)]
         [:div [cmp params]]
         [:div.not-found (str "Page not found [" (str page) "]")])
-      [:div.not-found (str "Route not found ")])))
+      (do (when (nil? (<sub [:token]))
+            ;;TODO save route and redirect to it after succeed login
+            (rf/dispatch [:goto :login]))
+          [:div.not-found (str "Route not found ")]))))
 
 ;; this is first event, which should initialize
 ;; application
