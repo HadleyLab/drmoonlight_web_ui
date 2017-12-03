@@ -13,16 +13,21 @@
    [clojure.string :as str]
    [soda-ash.core :as sa]))
 
-(defn ActionButton [pk]
+(defn ActionButton [pk state]
   (cond
+    (= state "coverage_completed") [:p "The coverage for this shift is already compleated"]
+    (= state "completed") [:p "The shift is compleated"]
     (is-approved) [sa/Button {:on-click (>event [:goto :resident :messages pk])} "Apply"]
     (is-profile-filled) [:p "Please wait until account manager approve your account"]
     (is-rejected) [:p "Your account was rejected, you can't apply for shifts"]
+    ;; TODO hide button if resident has already apply for the shifts
+    ;; https://gitlab.bro.engineering/drmoonlight/drmoonlight_api/issues/25
     :else [sa/Button {:on-click (>event [:goto :resident :profile])} "Fill profile to apply"]))
 
 (defn ShiftLabel [{speciality :speciality
                    start :date-start
                    finish :date-end
+                   state :state
                    pk :pk
                    payment-amount :payment-amount
                    payment-per-hour :payment-per-hour
@@ -40,7 +45,7 @@
             [:p [:strong "Required staff: "] speciality-name]
             [:p [:strong "Payment amount: "] (str "$" payment-amount " per " (if payment-per-hour "hour" "shift"))]
             ;; [:p description] TODO fix max width
-            [ActionButton pk]]] [:br] [:br]]))
+            [ActionButton pk state]]] [:br] [:br]]))
 
 (defn Index [params]
   (rf/dispatch [:load-shifts])
