@@ -64,7 +64,8 @@
  (fn [{db :db} [_ application-pk]]
    {:json/fetch->path {:path [::application :detail application-pk]
                        :uri (get-url db "/api/shifts/application/" application-pk "/")
-                       :token (<sub [:token])}}))
+                       :token (<sub [:token])
+                       :map-result #(update-in % [:shift] parse-date-time)}}))
 
 (rf/reg-sub
  :application-info

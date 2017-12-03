@@ -20,7 +20,8 @@
    [ui.account-manager.core]
    [ui.pages :as pages]
    [ui.routes :as routes]
-   [ui.layout :as layout]))
+   [ui.layout :as layout]
+   [cljsjs.moment]))
 
 ;; this is the root component wich switch pages
 ;; using current-route key from database

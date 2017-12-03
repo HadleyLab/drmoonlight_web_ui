@@ -4,20 +4,8 @@
    [ui.db.misc :refer [>event >atom dispatch-set!]]
    [re-frame.core :as rf]
    [cljs.pprint :as pp]
-   [cljs-time.core :as dt]
-   [cljs-time.format :as format]
    [cljsjs.react-datepicker]
-   [cljsjs.moment]
    [soda-ash.core :as sa]))
-
-(defn moment->cljs [m]
-  (format/parse (.format m)))
-
-(defn cljs->moment [c]
-  (let [date-format "yyyy-MM-dd HH:mm Z"]
-    (if (not= c "")
-      (js/moment (format/unparse (format/formatter date-format) c))
-      (js/moment))))
 
 (def DatePicker (reagent/adapt-react-class (.-default js/DatePicker)))
 
@@ -52,7 +40,8 @@
   (let [info (dissoc info_ :cursor :label :type)]
     [sa/FormField {:width 11}
      [:label label]
-     [DatePicker (merge {:selected (cljs->moment @cursor) :on-change #(reset! cursor (moment->cljs %))} info)]]))
+     [DatePicker (merge {:selected @cursor
+                         :on-change #(reset! cursor %)} info)]]))
 
 (defn get-default-type [field]
   (cond

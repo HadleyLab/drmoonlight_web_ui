@@ -2,11 +2,8 @@
   (:require
    [reagent.core :as reagent]
    [ui.db.misc :refer [get-url <sub fields->schema
-                       cljstime->drf-date-time setup-form-initial-values]]
-   [ui.db.shift :refer [parse-date-time]]
-   [re-frame.core :as rf]
-   [cljs-time.core :as dt]
-   [cljs-time.format :as format]))
+                       setup-form-initial-values]]
+   [re-frame.core :as rf]))
 
 (def resident-profile-form-fields
   {"Personal Information" {:first-name "First Name"

@@ -1,9 +1,7 @@
 (ns ui.db.shift
   (:require
    [ui.db.misc :refer [get-url <sub]]
-   [re-frame.core :as rf]
-   [cljs-time.core :as dt]
-   [cljs-time.format :as format]))
+   [re-frame.core :as rf]))
 
 (def schema
   {::shift
@@ -15,32 +13,21 @@
 ;; Public utils
 
 (defn as-apply-date-time [date-time]
-  (try
-    (let [date-format "dd/MM/yyyy' at 'hh:mm a"]
-      (format/unparse (format/formatter date-format) date-time))
-    (catch js/Object e "")))
+  (.format date-time))
 
 (defn as-hours-interval [start finish]
-  (/
-   (dt/in-minutes
-    (dt/interval
-     start
-     finish))
-   60))
+  (/ (.diff finish start "minutes") 60))
 
 (defn parse-date-time [shift]
   (let [date-keys #{:date-start :date-end :date-created :date-modified}]
     (into {} (map (fn [[key value]]
-                    (if (date-keys key) [key (format/parse value)]
+                    (if (date-keys key) [key (js/moment value)]
                         [key value])) shift))))
 
 ;; Private utils
 
 (defn- get-date [date-time]
-  (try
-    (let [date-format "yyyy-MM-dd"]
-      (format/unparse (format/formatter date-format) date-time))
-    (catch js/Object e "")))
+  (.format date-time "YYYY-MM-DD"))
 
 (defn- convert-shifts [data]
   (group-by (comp get-date :date-start) (map parse-date-time data)))

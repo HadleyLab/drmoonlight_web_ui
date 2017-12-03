@@ -7,13 +7,11 @@
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [concatv]]
-   [ui.widgets.calendar :refer [Calendar]]
+   [ui.widgets.calendar :refer [Calendar CalendarMonthControl]]
    [ui.resident.layout :refer [ResidentLayout]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [soda-ash.core :as sa]
-   [cljs-time.core :as dt]
-   [cljs-time.format :as format]))
+   [soda-ash.core :as sa]))
 
 (defn ActionButton [pk]
   (cond
@@ -46,19 +44,14 @@
 
 (defn Index [params]
   (rf/dispatch [:load-shifts])
-    (fn [params]
-      (let [calendar-month (<sub [:calendar-month])]
+  (fn [params]
+    (let [calendar-month (<sub [:calendar-month])]
       [ResidentLayout
        [sa/Grid {}
         [sa/GridRow {}
          [sa/GridColumn {:width 6}]
-         [sa/GridColumn {:width 4}
-          [sa/Button {:icon "angle left"
-                      :on-click (>event [:set-calendar-month (dt/minus calendar-month (dt/months 1))])}]
-          [:span (format/unparse (format/formatter "MMMM YYYY") calendar-month)]
-          [sa/Button {:icon "angle right"
-                      :on-click (>event [:set-calendar-month (dt/plus calendar-month (dt/months 1))])}]
-          [sa/GridColumn {:width 6}]]]
+         [CalendarMonthControl [sa/GridColumn {:width 4}]]
+         [sa/GridColumn {:width 6}]]
         [sa/GridRow {}
          [sa/GridColumn {:width 16}
           [Calendar calendar-month (<sub [:shifts]) ShiftLabel]]]]])))

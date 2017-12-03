@@ -1,42 +1,42 @@
 (ns ui.widgets.calendar
   (:require
    [reagent.core :as reagent]
+   [ui.db.misc :refer (>event <sub)]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [concatv]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [soda-ash.core :as sa]
-   [cljs-time.core :as dt]
-   [cljs-time.format :as format]))
+   [soda-ash.core :as sa]))
 
 (defn- as-key [date]
-  (format/unparse (format/formatter "yyyy-MM-dd") date))
+  (.format date "YYYY-MM-DD"))
 
 (defn- get-shifts-for-day [shifts day]
   (get-in shifts [:data (as-key day)] []))
 
 (defn- draw-cell [render-shift-label row column selected shifts]
-  (let [month-start (dt/day-of-week selected)
+  (let [month-start (.weekday selected)
         index (+ (* row 7) column)
         day (+ (- index month-start) 1)
-        prev-month (dt/minus selected (dt/months 1))
-        next-month (dt/plus selected (dt/months 1))
-        selected-month-max-day (dt/day (dt/last-day-of-the-month selected))
-        prev-month-max-day (dt/day (dt/last-day-of-the-month prev-month))
+        prev-month (.subtract (js/moment selected) 1 "month")
+        next-month (.add (js/moment selected) 1 "month")
+        selected-month-max-day (-> selected
+                                   (js/moment)
+                                   (.endOf "month")
+                                   (.date))
+        prev-month-max-day        (-> prev-month
+                                      (js/moment)
+                                      (.endOf "month")
+                                      (.date))
         cell-date (cond
-                    (<= day 0) (dt/date-time
-                                (dt/year prev-month)
-                                (dt/month prev-month)
-                                (+ prev-month-max-day day))
-                    (> day selected-month-max-day) (dt/date-time
-                                                    (dt/year next-month)
-                                                    (dt/month next-month)
-                                                    (- day selected-month-max-day))
-                    :else (dt/date-time (dt/year selected)
-                                        (dt/month selected)
-                                        day))]
-    (concatv [:div [:p (dt/day cell-date)]] (mapv render-shift-label (get-shifts-for-day shifts cell-date)))))
+                    (<= day 0) (js/moment (str (.format prev-month "YYYY-MM-")
+                                               (+ prev-month-max-day day)))
+                    (> day selected-month-max-day) (js/moment (str (.format next-month "YYYY-MM-")
+                                                                   (- day selected-month-max-day)))
+                    :else (js/moment (str (.format selected "YYYY-MM-") day)))]
+    (concatv [:div [:p (.date cell-date)]]
+             (mapv render-shift-label (get-shifts-for-day shifts cell-date)))))
 
 (defn Calendar [selected shifts render-shift-label]
   (fn [selected shifts]
@@ -56,3 +56,12 @@
                                (mapv (fn [column]
                                        [sa/TableCell [draw-cell render-shift-label row column selected shifts]])
                                      (range 7)))) (range 5)))]))
+
+(defn CalendarMonthControl [parent]
+  (into parent
+        [[sa/Button {:icon "angle left"
+                     :on-click (>event [:dec-calendar-month])}]
+         [:span (<sub [:calendar-month-formated])]
+         [sa/Button {:icon "angle right"
+                     :on-click (>event [:inc-calendar-month])}]
+         [sa/GridColumn {:width 6}]]))

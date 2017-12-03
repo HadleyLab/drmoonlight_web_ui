@@ -19,6 +19,7 @@
                  [soda-ash "0.76.0" :exclusions [cljsjs/react]]
                  [akiroz.re-frame/storage "0.1.2"]
                  [haslett "0.1.0"]
+                 [cljsjs/moment "2.17.1-1"]
                  [cljsjs/react-datepicker "0.55.0-0" :exclusions [cljsjs/react]]]
 
   :plugins [[lein-environ "1.1.0"]

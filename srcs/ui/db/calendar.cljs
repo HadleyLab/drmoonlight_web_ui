@@ -1,13 +1,11 @@
 (ns ui.db.calendar
   (:require
    [re-frame.core :as rf]
-   [ui.db.misc :refer [<sub]]
-   [cljs-time.core :as dt]
-   [cljs-time.format :as format]))
+   [ui.db.misc :refer [<sub]]))
 
 (def schema
   {::calendar
-   {:month (dt/date-time (dt/year (dt/now)) (dt/month (dt/now)) 1)}})
+   {:month (.date (js/moment) 1)}})
 
 (rf/reg-sub
  ::calendar
@@ -18,7 +16,19 @@
  :calendar-month
  #(<sub [::calendar :month]))
 
+(rf/reg-sub
+ :calendar-month-formated
+ #(.format (<sub [::calendar :month]) "MMMM YYYY"))
+
+
+
 (rf/reg-event-db
- :set-calendar-month
+ :inc-calendar-month
  (fn [db [_ month]]
-   (assoc-in db [::calendar :month] month)))
+   (update-in db [::calendar :month] #(.add (js/moment %) 1 "month"))))
+
+(rf/reg-event-db
+ :dec-calendar-month
+ (fn [db [_ month]]
+   (update-in db [::calendar :month] #(.subtract (js/moment %) 1 "month"))))
+

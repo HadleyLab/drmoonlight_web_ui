@@ -7,13 +7,11 @@
    [ui.routes :refer [href]]
    [ui.widgets :refer [concatv BuildForm]]
    [ui.widgets.error-message :refer [ErrorMessage]]
-   [ui.widgets.calendar :refer [Calendar]]
+   [ui.widgets.calendar :refer [Calendar CalendarMonthControl]]
    [ui.scheduler.layout :refer [SchedulerLayout]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [soda-ash.core :as sa]
-   [cljs-time.core :as dt]
-   [cljs-time.format :as format]))
+   [soda-ash.core :as sa]))
 
 (defn ShiftLabel [{speciality :speciality pk :pk}]
   (let [new-shift-form-cursor (<sub [:new-shift-form-cursor])
@@ -72,13 +70,7 @@
           [sa/GridRow {}
            [sa/GridColumn {:width 3} [CreateNewShift new-shift-form-cursor]]
            [sa/GridColumn {:width 3}]
-           [sa/GridColumn {:width 4}
-            [sa/Button {:icon "angle left"
-                        :on-click (>event [:set-calendar-month (dt/minus calendar-month (dt/months 1))])}]
-            [:span (format/unparse (format/formatter "MMMM YYYY") calendar-month)]
-            [sa/Button {:icon "angle right"
-                        :on-click (>event [:set-calendar-month (dt/plus calendar-month (dt/months 1))])}]
-            [sa/GridColumn {:width 6}]]]
+           [CalendarMonthControl [sa/GridColumn {:width 4}]]]
           [sa/GridRow {}
            [sa/GridColumn {:width 3}
             (for [state ["completed" "active" "without_applies" "coverage_completed" "require_approval"]]

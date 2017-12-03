@@ -1,7 +1,7 @@
 (ns ui.db.scheduler-profile
   (:require
    [reagent.core :as reagent]
-   [ui.db.misc :refer [get-url <sub fields->schema cljstime->drf-date-time
+   [ui.db.misc :refer [get-url <sub fields->schema
                        setup-form-initial-values]]
    [ui.db.shift :refer [parse-date-time]]
    [re-frame.core :as rf]
@@ -116,9 +116,7 @@
                        :uri (get-url db "/api/shifts/shift/")
                        :method "POST"
                        :token (<sub [:token])
-                       :body (-> (<sub [::scheduler-profile :shift-form :fields])
-                                 (update-in [:date-start] cljstime->drf-date-time)
-                                 (update-in [:date-end] cljstime->drf-date-time))
+                       :body (<sub [::scheduler-profile :shift-form :fields])
                        :succeed-fx [:create-new-shift-succeed]}}))
 
 (rf/reg-event-fx
@@ -136,9 +134,7 @@
                        :uri (get-url db "/api/shifts/shift/" pk "/")
                        :method "PUT"
                        :token (<sub [:token])
-                       :body (-> (<sub [::scheduler-profile :shift-form :fields])
-                                 (update-in [:date-start] cljstime->drf-date-time)
-                                 (update-in [:date-end] cljstime->drf-date-time))
+                       :body (<sub [::scheduler-profile :shift-form :fields])
                        :succeed-fx [:update-shift-succeed pk]}}))
 
 (rf/reg-event-fx
