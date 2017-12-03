@@ -109,6 +109,11 @@
  :shift-form-response
  #(<sub [::scheduler-profile :shift-form :response]))
 
+
+(defn shift->api-data [shift]
+  (-> shift
+      (update-in [:residency-years-required] #(if (= "") 0 %))))
+
 (rf/reg-event-fx
  :create-new-shift
  (fn [{db :db} [_]]
@@ -116,7 +121,7 @@
                        :uri (get-url db "/api/shifts/shift/")
                        :method "POST"
                        :token (<sub [:token])
-                       :body (<sub [::scheduler-profile :shift-form :fields])
+                       :body (shift->api-data (<sub [::scheduler-profile :shift-form :fields]))
                        :succeed-fx [:create-new-shift-succeed]}}))
 
 (rf/reg-event-fx
@@ -134,7 +139,7 @@
                        :uri (get-url db "/api/shifts/shift/" pk "/")
                        :method "PUT"
                        :token (<sub [:token])
-                       :body (<sub [::scheduler-profile :shift-form :fields])
+                       :body (shift->api-data (<sub [::scheduler-profile :shift-form :fields]))
                        :succeed-fx [:update-shift-succeed pk]}}))
 
 (rf/reg-event-fx
