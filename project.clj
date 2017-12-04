@@ -27,7 +27,6 @@
             [lein-ancient "0.6.14"]
             [cider/cider-nrepl "0.15.1"]]
 
-  :jvm-opts ["--add-modules" "java.xml.bind"]
   :min-lein-version "2.5.0"
 
   :clean-targets ^{:protect false}
