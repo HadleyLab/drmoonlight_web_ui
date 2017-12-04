@@ -5,6 +5,6 @@ RUN rm ./conf.d/*
 RUN mkdir ./available
 ADD ./conf.d/* ./available/
 ADD dockerentrypoint.sh ./dockerentrypoint.sh
-ADD build ./
+ADD build ./html
 VOLUME ["/etc/letsencrypt", "/data/acme"]
 ENTRYPOINT ["./dockerentrypoint.sh"]
