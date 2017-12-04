@@ -35,7 +35,7 @@
    [:cljsbuild :builds :app :compiler :output-dir]
    [:cljsbuild :builds :app :compiler :output-to]]
 
-  :source-paths ["srcc"]
+  :source-paths ["srcs"]
   :resource-paths ["resources"]
 
   :figwheel
@@ -59,14 +59,14 @@
                                   [com.cemerick/piggieback "0.2.2-SNAPSHOT"]
                                   [pjstadig/humane-test-output "0.8.3"]]
 
-                   :source-paths ["srcs" "srcc" "env/dev/clj"]
+                   :source-paths ["env/dev/clj"]
                    :plugins [[lein-figwheel "0.5.14"]]
 
                    :env {:dev true}
 
                    :cljsbuild
                    {:builds
-                    {:ui {:source-paths ["srcs" "srcc" "env/dev/cljs"]
+                    {:ui {:source-paths ["srcs" "env/dev/cljs"]
                           :compiler
                           {:main "ui.dev"
                            :asset-path "/js/out"
@@ -83,18 +83,15 @@
                            ;; :externs []
 
                            }}}}}
-
              :prod {:cljsbuild
-
                     {:builds
-                     {:ui {:source-paths ["srcs" "env/prod/cljs"]
+                     {:ui {:source-paths ["env/prod/cljs"]
                            :verbose true
                            :compiler
                            {:main "ui.prod"
                             :verbose true
-                            ;; :foreign-libs []
-                            ;; :externs []
                             :output-to "build/js/ui.js"
-                            ;; :output-dir "build/js/out"
-                            :optimizations :advanced
+                            :optimizations :simple
+                            ;; :optimizations :advanced
+                            :infer-externs true
                             :pretty-print  false}}}}}})
