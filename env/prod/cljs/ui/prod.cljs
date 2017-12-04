@@ -3,4 +3,4 @@
 
 (enable-console-print!)
 
-(core/init!)
+(core/init! "https://mdmoonlight.com")

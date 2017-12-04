@@ -79,8 +79,9 @@
 
 (rf/reg-event-fx
  :websocket-connect
- (fn [_ _]
-   {:account-websocket (str "ws://localhost:8000/accounts/user/" (<sub [:token]) "/")}))
+ (fn [{db :db} _]
+   (let [base-url (replace (:base-url db) #"^http" "ws")]
+   {:account-websocket (str base-url "/accounts/user/" (<sub [:token]) "/")})))
 
 (rf/reg-event-fx
  ::setup-login-form-and-redirect

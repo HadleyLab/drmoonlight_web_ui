@@ -44,9 +44,8 @@
 (rf/reg-event-fx
  ::initialize
  [(rf/inject-cofx :store)]
- (fn [{store :store}]
-   (let [base-url "http://localhost:8000"
-         token (:token store)]
+ (fn [{store :store} [_ base-url]]
+   (let [token (:token store)]
      {:dispatch-n (concat
                    [[:load-constants]]
                    [(if (nil? token)
@@ -59,6 +58,6 @@
    [layout/layout [current-page]]
    (.getElementById js/document "app")))
 
-(defn init! []
-  (rf/dispatch [::initialize])
+(defn init! [base-url]
+  (rf/dispatch [::initialize base-url])
   (mount-root))
