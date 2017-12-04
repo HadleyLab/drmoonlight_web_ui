@@ -47,8 +47,8 @@
        [sa/TableHeaderCell "Monday"]
        [sa/TableHeaderCell "Tuesday"]
        [sa/TableHeaderCell "Wednesday"]
-       [sa/TableHeaderCell "Trusday"]
-       [sa/TableHeaderCell "Frayday"]
+       [sa/TableHeaderCell "Thursday"]
+       [sa/TableHeaderCell "Friday"]
        [sa/TableHeaderCell "Saturday"]]]
      (concatv [sa/TableBody]
               (mapv (fn [row]
@@ -59,9 +59,10 @@
 
 (defn CalendarMonthControl [parent]
   (into parent
-        [[sa/Button {:icon "angle left"
-                     :on-click (>event [:dec-calendar-month])}]
-         [:span (<sub [:calendar-month-formated])]
-         [sa/Button {:icon "angle right"
-                     :on-click (>event [:inc-calendar-month])}]
+        [[:div.calendar__controls
+          [:div.calendar__button {:on-click (>event [:dec-calendar-month])}
+           [sa/Icon {:name "angle left" :size "big"}]]
+          [:span.calendar__month-name (<sub [:calendar-month-formated])]
+          [:div.calendar__button {:on-click (>event [:inc-calendar-month])}
+           [sa/Icon {:name "angle right" :size "big"}]]]
          [sa/GridColumn {:width 6}]]))

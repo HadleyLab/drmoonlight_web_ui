@@ -57,6 +57,12 @@
         [BuildForm new-shift-form-cursor shift-form-fields]]]]
      [sa/ModalActions [sa/Button {:color :blue :on-click (>event [:create-new-shift])} "Done"]]]))
 
+(def shift-types [{:type "completed" :label "Completed shifts"}
+                  {:type "active" :label "Active shifts"}
+                  {:type "without_applies" :label "Shifts without applies"}
+                  {:type "coverage_completed" :label "Coverage completed"}
+                  {:type "require_approval" :label "Require approval"}])
+
 (defn Index [params]
   (rf/dispatch [:load-shifts])
   (let [new-shift-form-cursor (<sub [:new-shift-form-cursor])]
@@ -69,18 +75,20 @@
          [sa/Grid {}
           [sa/GridRow {}
            [sa/GridColumn {:width 3} [CreateNewShift new-shift-form-cursor]]
-           [sa/GridColumn {:width 3}]
-           [CalendarMonthControl [sa/GridColumn {:width 4}]]]
+           [CalendarMonthControl [sa/GridColumn {:width 12}]]]
           [sa/GridRow {}
            [sa/GridColumn {:width 3}
-            (for [state ["completed" "active" "without_applies" "coverage_completed" "require_approval"]]
-              [:div {:key state}
-               [sa/Label {:active (= state filter-state)
-                          :on-click (>event [:set-shifts-filter-state state])}
-                state
-                [sa/LabelDetail (get shifts-count-by-state state 0)]]
-               [:br]
-               [:br]])]
+            (for [state shift-types]
+              (let [type (:type state)
+                    label (:label state)]
+                [:div {:key type :class-name "schedule__shifts-menu-item"}
+                 [:label {:class-name "schedule__shifts-menu-item-label"
+                          :on-click (>event [:set-shifts-filter-state type])}
+                  [:span {:class-name (str "schedule__shifts-menu-item-color _" type)}]
+                  label " (" (get shifts-count-by-state type 0) ")"]
+                 [sa/Checkbox {:checked (= type filter-state)
+                               :class-name "schedule__shifts-menu-item-checkbox"
+                               :on-click (>event [:set-shifts-filter-state type])}]]))]
            [sa/GridColumn {:width 13}
             [Calendar calendar-month filtered-shifts ShiftLabel]]]]]))))
 

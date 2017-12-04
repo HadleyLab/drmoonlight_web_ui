@@ -111,6 +111,46 @@
    [:.signup__user-desc {:position "absolute" :right 0 :top 0}]
    [:.signup__container.ui.form [:.field.eleven.wide {:width "62.5%!important"}]]
 
+   ; schedule screen styles
+   [:.schedule__shifts-menu-item {:display "flex"
+                                  :color "#8C97B2"
+                                  :font-size (px 14)
+                                  :line-height (px 15)
+                                  :margin-bottom (px 12)
+                                  :justify-content "space-between"}]
+   [:.schedule__shifts-menu-item-label {:cursor "pointer"
+                                        :position "relative"
+                                        :padding-left (px 17)
+                                        :transition "color 0.2s"}
+    [:&:hover {:color "#000"}]]
+   [:.schedule__shifts-menu-item-checkbox {:margin-left (px 7)}]
+   [:.schedule__shifts-menu-item-color {:display "inline-block"
+                                        :position "absolute"
+                                        :left 0
+                                        :top (px 5)
+                                        :width (px 7)
+                                        :height (px 7)
+                                        :border-radius "50%"}
+    [:&._completed {:background-color "#00BFDD"}]
+    [:&._active {:background-color "#FFAB00"}]
+    [:&._without_applies {:background-color "#E64C66"}]
+    [:&._coverage_completed {:background-color "#44BE8D"}]
+    [:&._require_approval {:background-color "#7874CF"}]]
+
+   ; calendar styles
+   [:.calendar__controls {:display "flex"
+                          :align-items "center"
+                          :justify-content "center"}]
+   [:.calendar__button {:display "inline-block"
+                        :color "#8C97B2"
+                        :cursor "pointer"
+                        :transition "color 0.2s"}
+    [:&:hover {:color "#000"}]]
+   [:.calendar__month-name {:font-size (px 18)
+                            :font-weight "bold"
+                            :letter-spacing (px -0.12)
+                            :margin "0 10px"}]
+
    ; profile screen styles
    [:.profile__menu-wrapper {:position "relative"
                              :margin-right "-15px"
