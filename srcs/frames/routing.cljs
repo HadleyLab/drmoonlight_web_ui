@@ -16,6 +16,10 @@
 (rf/reg-sub-raw
  :route-map/current-route
  (fn [db _] (reaction (:route-map/current-route @db))))
+(rf/reg-sub
+ :route-map/initialized
+ (fn [db _] (let [routes (get-in db [:route-map/routes])]
+              (not (nil? routes)))))
 
 (defn contexts-diff [old-contexts new-contexts params old-params]
   (let [n-idx (into #{} new-contexts)
