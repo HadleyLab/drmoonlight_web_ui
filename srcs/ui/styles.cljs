@@ -150,6 +150,37 @@
                             :font-weight "bold"
                             :letter-spacing (px -0.12)
                             :margin "0 10px"}]
+   [:.calendar__cell {:position "relative"
+                      :width "14.28%"
+                      :max-width "14.28%"
+                      :padding "0!important"}]
+   [:.calendar__cell-inner {:height "inherit"
+                            :width "100%"
+                            :padding "24px 7px 5px"
+                            :min-height (px 105)}]
+   [:.calendar__date {:position "absolute"
+                      :right (px 7)
+                      :top (px 6)
+                      :color "rgba(140,151,178,0.3)"
+                      :font-size (px 12)}]
+
+   [:.calendar__cell-inner._current-month [:.calendar__date {:color "#888A8C"}]]
+   [:.calendar__cell-inner._today {:background-color "rgba(140,151,178,0.17)"}
+    [:.calendar__date {:font-weight "bold"
+                       :color "#000"}]]
+   ; shifts styles
+   [:.shift__popup {:padding "0!important"}
+    [:.ui.button {:border-top-left-radius "0"
+                  :border-top-right-radius "0"}]]
+   [:.shift__popup-content {:padding (px 20)}]
+   [:.shift__popup-footer [:p {:margin 0
+                               :padding "0 20px 20px"
+                               :font-weight "bold"}]]
+   [:.shift__row {:margin "10px 0"
+                  :font-size (px 14)
+                  :line-height (px 17)}
+    [:i {:color "#8C97B2"
+         :font-style "normal"}]]
 
    ; profile screen styles
    [:.profile__menu-wrapper {:position "relative"

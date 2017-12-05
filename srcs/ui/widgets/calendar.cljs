@@ -29,13 +29,22 @@
                                       (js/moment)
                                       (.endOf "month")
                                       (.date))
+
+        current-date (.format (js/moment selected) "YYYY-MM-D")
         cell-date (cond
                     (<= day 0) (js/moment (str (.format prev-month "YYYY-MM-")
                                                (+ prev-month-max-day day)))
                     (> day selected-month-max-day) (js/moment (str (.format next-month "YYYY-MM-")
                                                                    (- day selected-month-max-day)))
-                    :else (js/moment (str (.format selected "YYYY-MM-") day)))]
-    (concatv [:div [:p (.date cell-date)]]
+                    :else (js/moment (str (.format selected "YYYY-MM-") day)))
+        is-today (= (.format (js/moment) "YYYY-MM-D") (.format cell-date "YYYY-MM-D"))
+        is-current-month (= (.month (js/moment selected)) (.month cell-date))]
+    (concatv [:div {:class-name (str "calendar__cell-inner"
+                                     " "
+                                     (if is-current-month "_current-month")
+                                     " "
+                                     (if is-today "_today"))}
+              [:div.calendar__date (.date cell-date)]]
              (mapv render-shift-label (get-shifts-for-day shifts cell-date)))))
 
 (defn Calendar [selected shifts render-shift-label]
@@ -43,18 +52,19 @@
     [sa/Table {:celled true}
      [sa/TableHeader
       [sa/TableRow
-       [sa/TableHeaderCell "Sunday"]
-       [sa/TableHeaderCell "Monday"]
-       [sa/TableHeaderCell "Tuesday"]
-       [sa/TableHeaderCell "Wednesday"]
-       [sa/TableHeaderCell "Thursday"]
-       [sa/TableHeaderCell "Friday"]
-       [sa/TableHeaderCell "Saturday"]]]
+       [sa/TableHeaderCell "Sun"]
+       [sa/TableHeaderCell "Mon"]
+       [sa/TableHeaderCell "Tue"]
+       [sa/TableHeaderCell "Wed"]
+       [sa/TableHeaderCell "Thu"]
+       [sa/TableHeaderCell "Fri"]
+       [sa/TableHeaderCell "Sat"]]]
      (concatv [sa/TableBody]
               (mapv (fn [row]
                       (concatv [sa/TableRow]
                                (mapv (fn [column]
-                                       [sa/TableCell [draw-cell render-shift-label row column selected shifts]])
+                                       [sa/TableCell {:class-name "calendar__cell"}
+                                        [draw-cell render-shift-label row column selected shifts]])
                                      (range 7)))) (range 5)))]))
 
 (defn CalendarMonthControl [parent]

@@ -14,15 +14,23 @@
    [soda-ash.core :as sa]))
 
 (defn ActionButton [pk state]
-  (cond
-    (= state "coverage_completed") [:p "The coverage for this shift is already compleated"]
-    (= state "completed") [:p "The shift is compleated"]
-    (is-approved) [sa/Button {:on-click (>event [:goto :resident :messages pk])} "Apply"]
-    (is-profile-filled) [:p "Please wait until account manager approve your account"]
-    (is-rejected) [:p "Your account was rejected, you can't apply for shifts"]
+  [:div.shift__popup-footer
+   (cond
+     (= state "coverage_completed") [:p "The coverage for this shift is already completed"]
+     (= state "completed") [:p "The shift is completed"]
+     (is-approved) [sa/Button {:on-click (>event [:goto :resident :messages pk]) :fluid true :color "blue"} "Apply for the shift"]
+     (is-profile-filled) [:p "Please wait until account manager approve your account"]
+     (is-rejected) [:p "Your account was rejected, you can't apply for shifts"]
     ;; TODO hide button if resident has already apply for the shifts
     ;; https://gitlab.bro.engineering/drmoonlight/drmoonlight_api/issues/25
-    :else [sa/Button {:on-click (>event [:goto :resident :profile])} "Fill profile to apply"]))
+     :else [sa/Button {:on-click (>event [:goto :resident :profile]) :fluid true :color "blue"} "Fill profile to apply"])])
+
+(defn get-date [date]
+  (let [formatted-date (.format date "DD/MM/YYYY")
+        hour (.format date "h")
+        minute (.format date "mm")
+        am-pm (.format date "a")]
+    (str formatted-date " at " hour ":" minute " " am-pm)))
 
 (defn ShiftLabel [{speciality :speciality
                    start :date-start
@@ -35,17 +43,18 @@
   (let [speciality-name (:name (<sub [:speciality speciality]))]
     [:div [sa/Popup
            {:trigger (reagent/as-element [sa/Label {:color :blue} speciality-name])
-            :flowing true
             :position "left center"
-            :hoverable true}
-           [:div
-            [:p [:strong "Starts: "] (as-apply-date-time start)]
-            [:p [:strong "Ends: "] (as-apply-date-time finish)]
-            [:p [:strong "Total: "] (as-hours-interval start finish) " hours"]
-            [:p [:strong "Required staff: "] speciality-name]
-            [:p [:strong "Payment amount: "] (str "$" payment-amount " per " (if payment-per-hour "hour" "shift"))]
-            ;; [:p description] TODO fix max width
-            [ActionButton pk state]]] [:br] [:br]]))
+            :offset 2
+            :hoverable true
+            :class-name "shift__popup"}
+           [:div.shift__popup-content
+            [:p.shift__row [:i "Starts: "] (get-date start)]
+            [:p.shift__row [:i "Ends: "] (get-date finish)]
+            [:p.shift__row [:i "Total: "] (as-hours-interval start finish) " hours"]
+            [:p.shift__row [:i "Required staff: "] speciality-name]
+            [:p.shift__row [:i "Payment amount: "] [:b "$" payment-amount] (str " per " (if payment-per-hour "hour" "shift"))]
+            [:p.shift__row description]]
+           [ActionButton pk state]]]))
 
 (defn Index [params]
   (rf/dispatch [:load-shifts])
