@@ -27,12 +27,13 @@
 ;; this is the root component wich switch pages
 ;; using current-route key from database
 (defn current-page []
-  (let [{page :match params :params} (<sub [:route-map/current-route])]
+  (let [{page :match params :params} (<sub [:route-map/current-route])
+        routes-initialized (<sub [:route-map/initialized])]
     (if page
       (if-let [cmp (get @pages/pages page)]
         [:div [cmp params]]
         [:div.not-found (str "Page not found [" (str page) "]")])
-      (do (when (nil? (<sub [:token]))
+      (do (when (and routes-initialized (nil? (<sub [:token])))
             ;;TODO save route and redirect to it after succeed login
             (rf/dispatch [:goto :login]))
           [:div.not-found (str "Route not found ")]))))
