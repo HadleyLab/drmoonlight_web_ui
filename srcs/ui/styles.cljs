@@ -111,6 +111,106 @@
    [:.signup__user-desc {:position "absolute" :right 0 :top 0}]
    [:.signup__container.ui.form [:.field.eleven.wide {:width "62.5%!important"}]]
 
+   ; schedule screen styles
+   [:.schedule__shifts-menu-item {:display "flex"
+                                  :color "#8C97B2"
+                                  :font-size (px 14)
+                                  :line-height (px 15)
+                                  :margin-bottom (px 12)
+                                  :justify-content "space-between"}]
+   [:.schedule__shifts-menu-item-label {:cursor "pointer"
+                                        :position "relative"
+                                        :padding-left (px 17)
+                                        :transition "color 0.2s"}
+    [:&:hover {:color "#000"}]]
+   [:.schedule__shifts-menu-item-checkbox {:margin-left (px 7)}]
+   [:.schedule__shifts-menu-item-color {:display "inline-block"
+                                        :position "absolute"
+                                        :left 0
+                                        :top (px 5)
+                                        :width (px 7)
+                                        :height (px 7)
+                                        :border-radius "50%"}
+    [:&._completed {:background-color "#00BFDD"}]
+    [:&._active {:background-color "#FFAB00"}]
+    [:&._without_applies {:background-color "#E64C66"}]
+    [:&._coverage_completed {:background-color "#44BE8D"}]
+    [:&._require_approval {:background-color "#7874CF"}]]
+
+   ; calendar styles
+   [:.calendar__table {:table-layout :fixed}]
+   [:.calendar__table-header [:th {:padding "7px!important"
+                                   :text-align "center!important"}]]
+   [:.calendar__controls {:display "flex"
+                          :align-items "center"
+                          :justify-content "center"}]
+   [:.calendar__button {:display "inline-block"
+                        :color "#8C97B2"
+                        :cursor "pointer"
+                        :transition "color 0.2s"}
+    [:&:hover {:color "#000"}]]
+   [:.calendar__month-name {:font-size (px 18)
+                            :font-weight "bold"
+                            :letter-spacing (px -0.12)
+                            :margin "0 10px"}]
+   [:.calendar__cell {:position "relative"
+                      :width "14.28%"
+                      :max-width "14.28%"
+                      :padding "0!important"
+                      :vertical-align "top"}]
+   [:.calendar__cell-inner {:height "inherit"
+                            :width "100%"
+                            :padding "22px 7px 5px"
+                            :min-height (px 105)}]
+   [:.calendar__date {:position "absolute"
+                      :right (px 7)
+                      :top (px 6)
+                      :color "rgba(140,151,178,0.3)"
+                      :font-size (px 12)}]
+   [:.calendar__cell-inner._current-month [:.calendar__date {:color "#888A8C"}]]
+   [:.calendar__cell-inner._today
+    [:.calendar__cell-bg {:position "absolute"
+                          :left 0
+                          :top 0
+                          :right 0
+                          :bottom 0
+                          :background-color "rgba(140,151,178,0.17)"}]
+    [:.calendar__date {:font-weight "bold"
+                       :color "#000"}]]
+   ; shifts styles
+   [:.shift__label {:position "relative"
+                    :padding "3px 8px"
+                    :color "#fff"
+                    :font-size (px 12)
+                    :line-height (px 14)
+                    :border-radius (px 4)
+                    :margin-top (px 2)
+                    :cursor "default"
+                    :word-wrap "break-word"}
+    [:&._completed {:background-color "#00BFDD"}]
+    [:&._active {:background-color "#FFAB00"}]
+    [:&._without_applies {:background-color "#E64C66"}]
+    [:&._coverage_completed {:background-color "#44BE8D"}]
+    [:&._require_approval {:background-color "#7874CF"}]]
+   [:.shift__popup {:padding "0!important"}]
+   [:.shift__popup-content {:padding "20px 20px 10px"}]
+   [:.shift__popup-footer._scheduler {:display :flex
+                                      :justify-content "space-between"
+                                      :align-items "center"
+                                      :padding "0 20px 20px"}]
+   [:.shift__popup-footer._resident
+    [:p {:margin 0
+         :padding "0 20px 20px"
+         :font-weight "bold"}]
+    [:.ui.button {:border-top-left-radius "0"
+                  :border-top-right-radius "0"}]]
+   [:.shift__row {:margin "10px 0"
+                  :font-size (px 14)
+                  :line-height (px 17)}
+    [:i {:color "#8C97B2"
+         :font-style "normal"}]]
+   [:.shift__remove-shift {:color "#E64C66" :cursor "pointer"}]
+
    ; profile screen styles
    [:.profile__menu-wrapper {:position "relative"
                              :margin-right "-15px"

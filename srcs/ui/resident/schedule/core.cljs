@@ -2,50 +2,40 @@
   (:require
    [reagent.core :as reagent]
    [ui.db.account :refer [is-approved is-profile-filled is-rejected]]
-   [ui.db.misc :refer [>event dispatch-set! get-url <sub]]
-   [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
+   [ui.db.misc :refer [>event <sub]]
    [ui.pages :as pages]
-   [ui.routes :refer [href]]
-   [ui.widgets :refer [concatv]]
    [ui.widgets.calendar :refer [Calendar CalendarMonthControl]]
+   [ui.widgets.shift-info :refer [ShiftInfo]]
    [ui.resident.layout :refer [ResidentLayout]]
    [re-frame.core :as rf]
-   [clojure.string :as str]
    [soda-ash.core :as sa]))
 
 (defn ActionButton [pk state]
-  (cond
-    (= state "coverage_completed") [:p "The coverage for this shift is already compleated"]
-    (= state "completed") [:p "The shift is compleated"]
-    (is-approved) [sa/Button {:on-click (>event [:goto :resident :messages pk])} "Apply"]
-    (is-profile-filled) [:p "Please wait until account manager approve your account"]
-    (is-rejected) [:p "Your account was rejected, you can't apply for shifts"]
+  [:div.shift__popup-footer._resident
+   (cond
+     (= state "coverage_completed") [:p "The coverage for this shift is already completed"]
+     (= state "completed") [:p "The shift is completed"]
+     (is-approved) [sa/Button {:on-click (>event [:goto :resident :messages pk]) :fluid true :color "blue"} "Apply for the shift"]
+     (is-profile-filled) [:p "Please wait until account manager approve your account"]
+     (is-rejected) [:p "Your account was rejected, you can't apply for shifts"]
     ;; TODO hide button if resident has already apply for the shifts
     ;; https://gitlab.bro.engineering/drmoonlight/drmoonlight_api/issues/25
-    :else [sa/Button {:on-click (>event [:goto :resident :profile])} "Fill profile to apply"]))
+     :else [sa/Button {:on-click (>event [:goto :resident :profile]) :fluid true :color "blue"} "Fill profile to apply"])])
 
-(defn ShiftLabel [{speciality :speciality
-                   start :date-start
-                   finish :date-end
-                   state :state
-                   pk :pk
-                   payment-amount :payment-amount
-                   payment-per-hour :payment-per-hour
-                   description :description}]
-  (let [speciality-name (:name (<sub [:speciality speciality]))]
+(defn ShiftLabel [params]
+  (let [pk (:pk params)
+        state (:state params)
+        speciality (:speciality params)
+        speciality-name (:name (<sub [:speciality speciality]))]
     [:div [sa/Popup
-           {:trigger (reagent/as-element [sa/Label {:color :blue} speciality-name])
-            :flowing true
+           {:trigger (reagent/as-element [:div {:class-name (str "shift__label _" state)}
+                                          speciality-name])
             :position "left center"
-            :hoverable true}
-           [:div
-            [:p [:strong "Starts: "] (as-apply-date-time start)]
-            [:p [:strong "Ends: "] (as-apply-date-time finish)]
-            [:p [:strong "Total: "] (as-hours-interval start finish) " hours"]
-            [:p [:strong "Required staff: "] speciality-name]
-            [:p [:strong "Payment amount: "] (str "$" payment-amount " per " (if payment-per-hour "hour" "shift"))]
-            ;; [:p description] TODO fix max width
-            [ActionButton pk state]]] [:br] [:br]]))
+            :offset 2
+            :hoverable true
+            :class-name "shift__popup"}
+           [ShiftInfo params]
+           [ActionButton pk state]]]))
 
 (defn Index [params]
   (rf/dispatch [:load-shifts])
