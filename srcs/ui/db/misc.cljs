@@ -114,3 +114,10 @@
 (defn setup-form-initial-values [initial-values]
   (fn [data]
     (into {} (map (fn [[key value]] [key (initial-values key value)]) data))))
+
+(defn format-date-time [date]
+  (let [formatted-date (.format date "DD/MM/YYYY")
+        hour (.format date "h")
+        minute (.format date "mm")
+        am-pm (.format date "a")]
+    (str formatted-date " at " hour ":" minute " " am-pm)))

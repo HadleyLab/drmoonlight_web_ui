@@ -1,17 +1,15 @@
 (ns ui.scheduler.schedule.core
   (:require
    [reagent.core :as reagent]
-   [ui.db.misc :refer [dispatch-set! <sub >event >events get-url]]
-   [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
+   [ui.db.misc :refer [<sub >event >events]]
    [ui.db.scheduler-profile :refer [shift-form-fields]]
    [ui.pages :as pages]
-   [ui.routes :refer [href]]
-   [ui.widgets :refer [concatv BuildForm]]
+   [ui.widgets :refer [BuildForm]]
    [ui.widgets.error-message :refer [ErrorMessage]]
    [ui.widgets.calendar :refer [Calendar CalendarMonthControl]]
+   [ui.widgets.shift-info :refer [ShiftInfo]]
    [ui.scheduler.layout :refer [SchedulerLayout]]
    [re-frame.core :as rf]
-   [clojure.string :as str]
    [soda-ash.core :as sa]))
 
 (defn EditModal [pk]
@@ -35,22 +33,11 @@
       (when-not (= status :failure)
         [sa/Button {:color :blue :on-click (>event [:update-shift pk])} "Update"])]]))
 
-(defn get-date [date]
-  (let [formatted-date (.format date "DD/MM/YYYY")
-        hour (.format date "h")
-        minute (.format date "mm")
-        am-pm (.format date "a")]
-    (str formatted-date " at " hour ":" minute " " am-pm)))
-
-(defn ShiftLabel [{speciality :speciality
-                   start :date-start
-                   finish :date-end
-                   state :state
-                   pk :pk
-                   payment-amount :payment-amount
-                   payment-per-hour :payment-per-hour
-                   description :description}]
-  (let [speciality-name (:name (<sub [:speciality speciality]))]
+(defn ShiftLabel [params]
+  (let [pk (:pk params)
+        state (:state params)
+        speciality (:speciality params)
+        speciality-name (:name (<sub [:speciality speciality]))]
     [:div [sa/Popup
            {:trigger (reagent/as-element
                       [:div {:class-name (str "shift__label _" state)}
@@ -62,13 +49,7 @@
             :offset 2
             :hoverable true
             :class-name "shift__popup"}
-           [:div.shift__popup-content
-            [:p.shift__row [:i "Starts: "] (get-date start)]
-            [:p.shift__row [:i "Ends: "] (get-date finish)]
-            [:p.shift__row [:i "Total: "] (as-hours-interval start finish) " hours"]
-            [:p.shift__row [:i "Required staff: "] speciality-name]
-            [:p.shift__row [:i "Payment amount: "] [:b "$" payment-amount] (str " per " (if payment-per-hour "hour" "shift"))]
-            [:p.shift__row description]]
+           [ShiftInfo params]
            [sa/Divider]
            [:div.shift__popup-footer._scheduler
             [sa/Button {:basic true

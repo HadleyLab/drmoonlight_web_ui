@@ -2,15 +2,12 @@
   (:require
    [reagent.core :as reagent]
    [ui.db.account :refer [is-approved is-profile-filled is-rejected]]
-   [ui.db.misc :refer [>event dispatch-set! get-url <sub]]
-   [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
+   [ui.db.misc :refer [>event <sub]]
    [ui.pages :as pages]
-   [ui.routes :refer [href]]
-   [ui.widgets :refer [concatv]]
    [ui.widgets.calendar :refer [Calendar CalendarMonthControl]]
+   [ui.widgets.shift-info :refer [ShiftInfo]]
    [ui.resident.layout :refer [ResidentLayout]]
    [re-frame.core :as rf]
-   [clojure.string :as str]
    [soda-ash.core :as sa]))
 
 (defn ActionButton [pk state]
@@ -25,22 +22,11 @@
     ;; https://gitlab.bro.engineering/drmoonlight/drmoonlight_api/issues/25
      :else [sa/Button {:on-click (>event [:goto :resident :profile]) :fluid true :color "blue"} "Fill profile to apply"])])
 
-(defn get-date [date]
-  (let [formatted-date (.format date "DD/MM/YYYY")
-        hour (.format date "h")
-        minute (.format date "mm")
-        am-pm (.format date "a")]
-    (str formatted-date " at " hour ":" minute " " am-pm)))
-
-(defn ShiftLabel [{speciality :speciality
-                   start :date-start
-                   finish :date-end
-                   state :state
-                   pk :pk
-                   payment-amount :payment-amount
-                   payment-per-hour :payment-per-hour
-                   description :description}]
-  (let [speciality-name (:name (<sub [:speciality speciality]))]
+(defn ShiftLabel [params]
+  (let [pk (:pk params)
+        state (:state params)
+        speciality (:speciality params)
+        speciality-name (:name (<sub [:speciality speciality]))]
     [:div [sa/Popup
            {:trigger (reagent/as-element [:div {:class-name (str "shift__label _" state)}
                                           speciality-name])
@@ -48,13 +34,7 @@
             :offset 2
             :hoverable true
             :class-name "shift__popup"}
-           [:div.shift__popup-content
-            [:p.shift__row [:i "Starts: "] (get-date start)]
-            [:p.shift__row [:i "Ends: "] (get-date finish)]
-            [:p.shift__row [:i "Total: "] (as-hours-interval start finish) " hours"]
-            [:p.shift__row [:i "Required staff: "] speciality-name]
-            [:p.shift__row [:i "Payment amount: "] [:b "$" payment-amount] (str " per " (if payment-per-hour "hour" "shift"))]
-            [:p.shift__row description]]
+           [ShiftInfo params]
            [ActionButton pk state]]]))
 
 (defn Index [params]
