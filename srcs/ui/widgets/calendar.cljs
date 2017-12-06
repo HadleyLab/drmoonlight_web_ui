@@ -15,6 +15,9 @@
 (defn- get-shifts-for-day [shifts day]
   (get-in shifts [:data (as-key day)] []))
 
+(defn- format-day [day]
+  (if (> (count (str day)) 1) day (str 0 day)))
+
 (defn- draw-cell [render-shift-label row column selected shifts]
   (let [month-start (.weekday selected)
         index (+ (* row 7) column)
@@ -29,15 +32,14 @@
                                       (js/moment)
                                       (.endOf "month")
                                       (.date))
-
-        current-date (.format (js/moment selected) "YYYY-MM-D")
         cell-date (cond
                     (<= day 0) (js/moment (str (.format prev-month "YYYY-MM-")
-                                               (+ prev-month-max-day day)))
-                    (> day selected-month-max-day) (js/moment (str (.format next-month "YYYY-MM-")
-                                                                   (- day selected-month-max-day)))
-                    :else (js/moment (str (.format selected "YYYY-MM-") day)))
-        is-today (= (.format (js/moment) "YYYY-MM-D") (.format cell-date "YYYY-MM-D"))
+                                               (format-day (+ prev-month-max-day day))))
+                    (> day selected-month-max-day) (js/moment
+                                                    (str (.format next-month "YYYY-MM-")
+                                                         (format-day (- day selected-month-max-day))))
+                    :else (js/moment (str (.format selected "YYYY-MM-") (format-day day))))
+        is-today (= (.format (js/moment) "YYYY-MM-DD") (.format cell-date "YYYY-MM-DD"))
         is-current-month (= (.month (js/moment selected)) (.month cell-date))]
     (concatv [:div {:class-name (str "calendar__cell-inner"
                                      " "
