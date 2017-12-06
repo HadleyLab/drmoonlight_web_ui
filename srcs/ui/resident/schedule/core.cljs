@@ -42,7 +42,8 @@
                    description :description}]
   (let [speciality-name (:name (<sub [:speciality speciality]))]
     [:div [sa/Popup
-           {:trigger (reagent/as-element [sa/Label {:color :blue} speciality-name])
+           {:trigger (reagent/as-element [:div {:class-name (str "shift__label _" state)}
+                                          speciality-name])
             :position "left center"
             :offset 2
             :hoverable true

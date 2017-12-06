@@ -53,7 +53,8 @@
   (let [speciality-name (:name (<sub [:speciality speciality]))]
     [:div [sa/Popup
            {:trigger (reagent/as-element
-                      [sa/Label {:color :blue} (<sub [:speciality-name speciality])])
+                      [:div {:class-name (str "shift__label _" state)}
+                       (<sub [:speciality-name speciality])])
             :open (<sub [:edit-shift-popup pk])
             :on-open (>event [:open-edit-shift-popup pk])
             :on-close (>event [:close-edit-shift-popup pk])
@@ -113,7 +114,7 @@
          [sa/Grid {}
           [sa/GridRow {}
            [sa/GridColumn {:width 3} [CreateNewShift new-shift-form-cursor]]
-           [CalendarMonthControl [sa/GridColumn {:width 12}]]]
+           [CalendarMonthControl [sa/GridColumn {:width 13}]]]
           [sa/GridRow {}
            [sa/GridColumn {:width 3}
             (for [state shift-types]

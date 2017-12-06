@@ -44,13 +44,14 @@
                                      (if is-current-month "_current-month")
                                      " "
                                      (if is-today "_today"))}
+              [:div.calendar__cell-bg]
               [:div.calendar__date (.date cell-date)]]
              (mapv render-shift-label (get-shifts-for-day shifts cell-date)))))
 
 (defn Calendar [selected shifts render-shift-label]
   (fn [selected shifts]
-    [sa/Table {:celled true}
-     [sa/TableHeader
+    [sa/Table {:class-name "calendar__table" :celled true}
+     [sa/TableHeader {:class-name "calendar__table-header"}
       [sa/TableRow
        [sa/TableHeaderCell "Sun"]
        [sa/TableHeaderCell "Mon"]

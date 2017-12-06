@@ -138,6 +138,9 @@
     [:&._require_approval {:background-color "#7874CF"}]]
 
    ; calendar styles
+   [:.calendar__table {:table-layout :fixed}]
+   [:.calendar__table-header [:th {:padding "7px!important"
+                                   :text-align "center!important"}]]
    [:.calendar__controls {:display "flex"
                           :align-items "center"
                           :justify-content "center"}]
@@ -153,10 +156,11 @@
    [:.calendar__cell {:position "relative"
                       :width "14.28%"
                       :max-width "14.28%"
-                      :padding "0!important"}]
+                      :padding "0!important"
+                      :vertical-align "top"}]
    [:.calendar__cell-inner {:height "inherit"
                             :width "100%"
-                            :padding "24px 7px 5px"
+                            :padding "22px 7px 5px"
                             :min-height (px 105)}]
    [:.calendar__date {:position "absolute"
                       :right (px 7)
@@ -164,10 +168,30 @@
                       :color "rgba(140,151,178,0.3)"
                       :font-size (px 12)}]
    [:.calendar__cell-inner._current-month [:.calendar__date {:color "#888A8C"}]]
-   [:.calendar__cell-inner._today {:background-color "rgba(140,151,178,0.17)"}
+   [:.calendar__cell-inner._today
+    [:.calendar__cell-bg {:position "absolute"
+                          :left 0
+                          :top 0
+                          :right 0
+                          :bottom 0
+                          :background-color "rgba(140,151,178,0.17)"}]
     [:.calendar__date {:font-weight "bold"
                        :color "#000"}]]
    ; shifts styles
+   [:.shift__label {:position "relative"
+                    :padding "3px 8px"
+                    :color "#fff"
+                    :font-size (px 12)
+                    :line-height (px 14)
+                    :border-radius (px 4)
+                    :margin-top (px 2)
+                    :cursor "default"
+                    :word-wrap "break-word"}
+    [:&._completed {:background-color "#00BFDD"}]
+    [:&._active {:background-color "#FFAB00"}]
+    [:&._without_applies {:background-color "#E64C66"}]
+    [:&._coverage_completed {:background-color "#44BE8D"}]
+    [:&._require_approval {:background-color "#7874CF"}]]
    [:.shift__popup {:padding "0!important"}]
    [:.shift__popup-content {:padding "20px 20px 10px"}]
    [:.shift__popup-footer._scheduler {:display :flex
