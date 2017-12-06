@@ -22,21 +22,34 @@
    [ui.pages :as pages]
    [ui.routes :as routes]
    [ui.layout :as layout]
-   [cljsjs.moment]))
+   [cljsjs.moment]
+   [soda-ash.core :as sa]))
+
+(defn- NotFound []
+  [sa/Header
+    [:div.not-found (str "Page not found")]])
+
+(defn- Preloader []
+  [sa/Header
+    [:div.preloader (str "Loading")]])
 
 ;; this is the root component wich switch pages
 ;; using current-route key from database
-(defn current-page []
+(defn CurrentPage []
   (let [{page :match params :params} (<sub [:route-map/current-route])
         routes-initialized (<sub [:route-map/initialized])]
-    (if page
-      (if-let [cmp (get @pages/pages page)]
-        [:div [cmp params]]
-        [:div.not-found (str "Page not found [" (str page) "]")])
-      (do (when (and routes-initialized (nil? (<sub [:token])))
-            ;;TODO save route and redirect to it after succeed login
+    (if routes-initialized
+      (if page
+        (if-let [cmp (get @pages/pages page)]
+          [:div [cmp params]]
+          [:div (str "Page " (str page) "is not registered")])
+        (do
+          (when (nil? (<sub [:token]))
+            ;; TODO: save route and redirect to it after succeed login
+            ;; TODO: move logic out from render
             (rf/dispatch [:goto :login]))
-          [:div.not-found (str "Route not found ")]))))
+          [NotFound]))
+      [Preloader])))
 
 ;; this is first event, which should initialize
 ;; application
@@ -56,7 +69,7 @@
 
 (defn- mount-root []
   (reagent/render
-   [layout/layout [current-page]]
+   [layout/layout [CurrentPage]]
    (.getElementById js/document "app")))
 
 (defn init! [base-url]
