@@ -14,7 +14,7 @@
    [soda-ash.core :as sa]))
 
 (defn ActionButton [pk state]
-  [:div.shift__popup-footer
+  [:div.shift__popup-footer._resident
    (cond
      (= state "coverage_completed") [:p "The coverage for this shift is already completed"]
      (= state "completed") [:p "The shift is completed"]

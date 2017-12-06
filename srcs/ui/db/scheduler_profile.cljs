@@ -44,6 +44,7 @@
   {::scheduler-profile
    {:new-shift-modal false
     :edit-shift-modal {}
+    :edit-shift-popup {}
     :shift-form
     {:fields (fields->schema shift-form-fields)
      :response {:status :not-asked}}}})
@@ -83,6 +84,21 @@
    (assoc-in db [::scheduler-profile :edit-shift-modal pk] false)))
 
 (rf/reg-sub
+ :edit-shift-popup
+ (fn [db [_ pk]]
+   (get-in db [::scheduler-profile :edit-shift-popup pk] false)))
+
+(rf/reg-event-db
+ :open-edit-shift-popup
+ (fn [db [_ pk]]
+   (assoc-in db [::scheduler-profile :edit-shift-popup pk] true)))
+
+(rf/reg-event-db
+ :close-edit-shift-popup
+ (fn [db [_ pk]]
+   (assoc-in db [::scheduler-profile :edit-shift-popup pk] false)))
+
+(rf/reg-sub
  :new-shift-form-cursor
  #(<sub [:cursor [::scheduler-profile :shift-form]]))
 
@@ -98,17 +114,16 @@
 
 (rf/reg-event-db
  :load-initial-form-data
-  (fn [db [_ pk]]
-       (-> db
-           (assoc-in  [::scheduler-profile :shift-form]
-                      (get-in schema [::scheduler-profile :shift-form]))
-           (update-in [::scheduler-profile :shift-form :fields]
-                      (setup-form-initial-values (:data (<sub [:shift-info pk])))))))
+ (fn [db [_ pk]]
+   (-> db
+       (assoc-in  [::scheduler-profile :shift-form]
+                  (get-in schema [::scheduler-profile :shift-form]))
+       (update-in [::scheduler-profile :shift-form :fields]
+                  (setup-form-initial-values (:data (<sub [:shift-info pk])))))))
 
 (rf/reg-sub
  :shift-form-response
  #(<sub [::scheduler-profile :shift-form :response]))
-
 
 (defn shift->api-data [shift]
   (-> shift
@@ -131,7 +146,6 @@
                  [:close-new-shift-modal]
                  [:init-new-shift-form]]}))
 
-
 (rf/reg-event-fx
  :update-shift
  (fn [{db :db} [_ pk]]
@@ -148,4 +162,3 @@
    {:dispatch-n [[:load-shifts]
                  [:close-edit-shift-modal pk]
                  [:init-new-shift-form]]}))
-

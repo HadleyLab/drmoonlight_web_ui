@@ -1,7 +1,8 @@
 (ns ui.scheduler.schedule.core
   (:require
    [reagent.core :as reagent]
-   [ui.db.misc :refer [dispatch-set! <sub >event get-url]]
+   [ui.db.misc :refer [dispatch-set! <sub >event >events get-url]]
+   [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
    [ui.db.scheduler-profile :refer [shift-form-fields]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
@@ -13,20 +14,14 @@
    [clojure.string :as str]
    [soda-ash.core :as sa]))
 
-(defn ShiftLabel [{speciality :speciality pk :pk}]
+(defn EditModal [pk]
   (let [new-shift-form-cursor (<sub [:new-shift-form-cursor])
         {status :status errors :errors} (<sub [:shift-info pk])
         {{detail-error :detail} :errors} (<sub [:shift-form-response])]
-    [sa/Modal {:trigger (reagent/as-element
-                         [:div
-                          [sa/Label {:color :blue
-                                     :on-click (>event [:open-edit-shift-modal pk])}
-                           (<sub [:speciality-name speciality])] [:br] [:br]])
-               :dimmer :blurring
-               :open (<sub [:edit-shift-modal pk])
-               :on-open (>event [:init-edit-shift-form pk])
+    [sa/Modal {:open (<sub [:edit-shift-modal pk])
                :on-close (>event [:close-edit-shift-modal pk])
-               :size :small}
+               :size :small
+               :class-name "shift__modal"}
      [sa/ModalHeader "Edit the shift"]
      [sa/ModalContent {:image true}
       [sa/ModalDescription
@@ -40,13 +35,56 @@
       (when-not (= status :failure)
         [sa/Button {:color :blue :on-click (>event [:update-shift pk])} "Update"])]]))
 
+(defn get-date [date]
+  (let [formatted-date (.format date "DD/MM/YYYY")
+        hour (.format date "h")
+        minute (.format date "mm")
+        am-pm (.format date "a")]
+    (str formatted-date " at " hour ":" minute " " am-pm)))
+
+(defn ShiftLabel [{speciality :speciality
+                   start :date-start
+                   finish :date-end
+                   state :state
+                   pk :pk
+                   payment-amount :payment-amount
+                   payment-per-hour :payment-per-hour
+                   description :description}]
+  (let [speciality-name (:name (<sub [:speciality speciality]))]
+    [:div [sa/Popup
+           {:trigger (reagent/as-element
+                      [sa/Label {:color :blue} (<sub [:speciality-name speciality])])
+            :open (<sub [:edit-shift-popup pk])
+            :on-open (>event [:open-edit-shift-popup pk])
+            :on-close (>event [:close-edit-shift-popup pk])
+            :position "left center"
+            :offset 2
+            :hoverable true
+            :class-name "shift__popup"}
+           [:div.shift__popup-content
+            [:p.shift__row [:i "Starts: "] (get-date start)]
+            [:p.shift__row [:i "Ends: "] (get-date finish)]
+            [:p.shift__row [:i "Total: "] (as-hours-interval start finish) " hours"]
+            [:p.shift__row [:i "Required staff: "] speciality-name]
+            [:p.shift__row [:i "Payment amount: "] [:b "$" payment-amount] (str " per " (if payment-per-hour "hour" "shift"))]
+            [:p.shift__row description]]
+           [sa/Divider]
+           [:div.shift__popup-footer._scheduler
+            [sa/Button {:basic true
+                        :color :blue
+                        :on-click (>events [[[:close-edit-shift-popup] pk]
+                                            [[:init-edit-shift-form] pk]
+                                            [[:open-edit-shift-modal] pk]])} "Edit shift"]
+            [:div.shift__remove-shift "Remove shift"]]]
+     [EditModal pk]]))
+
 (defn CreateNewShift [new-shift-form-cursor]
   (rf/dispatch [:init-new-shift-form])
   (fn [new-shift-form-cursor]
     [sa/Modal {:trigger (reagent/as-element [sa/Button {:color :blue
+                                                        :fluid true
                                                         :on-click (>event [:open-new-shift-modal])}
                                              [sa/Icon {:name :plus}] "Create new shift"])
-               :dimmer :blurring
                :open (<sub [:new-shift-modal])
                :on-close (>event [:close-new-shift-modal])
                :size :small}
