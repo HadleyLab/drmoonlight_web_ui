@@ -62,7 +62,8 @@
    [:.moonlight-form {:padding "70px 0"}]
    [:.moonlight-form-inner
     :.segment.moonlight-form-inner {:padding "40px 70px 70px"}]
-   [:.form__group {:margin-top (px 30)}]
+   [:.form__group {:margin-top (px 30)}
+    [:&._without-title {:margin-top (px 5)}]]
    [:.form__group-title {:display "inline-block"
                          :color "#8C97B2"
                          :margin-bottom (px 10)}]
@@ -210,6 +211,7 @@
     [:i {:color "#8C97B2"
          :font-style "normal"}]]
    [:.shift__remove-shift {:color "#E64C66" :cursor "pointer"}]
+   [:.shift__modal [:.form__label {:white-space :nowrap}]]
 
    ; profile screen styles
    [:.profile__menu-wrapper {:position "relative"

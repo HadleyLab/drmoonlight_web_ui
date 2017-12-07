@@ -23,22 +23,27 @@
         :time-format "HH:mm"
         :date-format "LLL"
         :time-intervals 15}}
-   "Requid staff" {:speciality
-                   {:type :select
-                    :label "Speciality name"
-                    :items #(<sub [:speciality-as-options])}
+   "Required staff" {:speciality
+                     {:type :select
+                      :label "Speciality name"
+                      :items #(<sub [:speciality-as-options])}
 
-                   :payment-amount {:type :input-with-drop-down
-                                    :label "Payment amount, $"
-                                    :drop-down {:cursor :payment-per-hour
-                                                :options [{:key "true" :value "true" :text "hourly"}
-                                                          {:key "false" :value "false" :text "per shift"}]}}
-                   :payment-per-hour {:type :mock}
-                   :description {:type :textarea :label "Description"}
-                   :residency-program {:type :select
-                                       :label "Residency Program"
-                                       :items #(<sub [:residency-program-as-options])}
-                   :residency-years-required "Residency years required"}})
+                     :payment-amount {:type :input-with-drop-down
+                                      :label "Payment amount, $"
+                                      :drop-down {:cursor :payment-per-hour
+                                                  :options [{:key "true" :value "true" :text "hourly"}
+                                                            {:key "false" :value "false" :text "per shift"}]}
+                                      :width 5}
+                     :payment-per-hour {:type :mock}
+                     :description {:type :textarea :label "Description" :desc "optional"}
+                     :residency-program {:type :select
+                                         :label "Residency program"
+                                         :items #(<sub [:residency-program-as-options])
+                                         :desc "optional"}
+                     :residency-years-required {:type :input
+                                                :label "Residency years required"
+                                                :width 3
+                                                :desc "optional"}}})
 
 (def schema
   {::scheduler-profile

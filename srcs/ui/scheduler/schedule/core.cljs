@@ -12,23 +12,30 @@
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
 
+(def field-names-map {:date-end "Ends"
+                      :date-start "Starts"
+                      :payment-amount "Payment amount"
+                      :payment-per-hour "Payment hourly/pre shift missed value"
+                      :detail-error ""})
+
 (defn EditModal [pk]
   (let [new-shift-form-cursor (<sub [:new-shift-form-cursor])
+        hide-field-errors true
         {status :status errors :errors} (<sub [:shift-info pk])
-        {{detail-error :detail} :errors} (<sub [:shift-form-response])]
+        {submit-errors :errors} (<sub [:shift-form-response])]
     [sa/Modal {:open (<sub [:edit-shift-modal pk])
                :on-close (>event [:close-edit-shift-modal pk])
                :size :small
                :class-name "shift__modal"}
      [sa/ModalHeader "Edit the shift"]
-     [sa/ModalContent {:image true}
+     [sa/ModalContent
       [sa/ModalDescription
        (if (= status :failure)
          [ErrorMessage {:errors errors}]
          [sa/Form {}
-          [BuildForm new-shift-form-cursor shift-form-fields]
-          (when-not (nil? detail-error)
-            [ErrorMessage {:errors {"" [detail-error]}}])])]]
+          [BuildForm new-shift-form-cursor shift-form-fields hide-field-errors]
+          (when-not (nil? submit-errors)
+            [ErrorMessage {:errors submit-errors :field-names-map field-names-map}])])]]
      [sa/ModalActions
       (when-not (= status :failure)
         [sa/Button {:color :blue :on-click (>event [:update-shift pk])} "Update"])]]))
@@ -64,19 +71,25 @@
 (defn CreateNewShift [new-shift-form-cursor]
   (rf/dispatch [:init-new-shift-form])
   (fn [new-shift-form-cursor]
-    [sa/Modal {:trigger (reagent/as-element [sa/Button {:color :blue
-                                                        :fluid true
-                                                        :on-click (>event [:open-new-shift-modal])}
-                                             [sa/Icon {:name :plus}] "Create new shift"])
-               :open (<sub [:new-shift-modal])
-               :on-close (>event [:close-new-shift-modal])
-               :size :small}
-     [sa/ModalHeader "Create a new shift"]
-     [sa/ModalContent {:image true}
-      [sa/ModalDescription
-       [sa/Form {}
-        [BuildForm new-shift-form-cursor shift-form-fields]]]]
-     [sa/ModalActions [sa/Button {:color :blue :on-click (>event [:create-new-shift])} "Done"]]]))
+    (let [hide-field-errors true
+          {status :status errors :errors} (<sub [:shift-form-response])]
+      (.log js/console "status" status)
+      (.log js/console "errors" errors)
+      [sa/Modal {:trigger (reagent/as-element [sa/Button {:color :blue
+                                                          :fluid true
+                                                          :on-click (>event [:open-new-shift-modal])}
+                                               [sa/Icon {:name :plus}] "Create new shift"])
+                 :open (<sub [:new-shift-modal])
+                 :on-close (>event [:close-new-shift-modal])
+                 :size :small
+                 :class-name "shift__modal"}
+       [sa/ModalHeader "Create a new shift"]
+       [sa/ModalContent
+        [sa/Form {}
+         [BuildForm new-shift-form-cursor shift-form-fields hide-field-errors]
+         (when (= status :failure)
+           [ErrorMessage {:errors errors :field-names-map field-names-map}])]]
+       [sa/ModalActions [sa/Button {:color :blue :on-click (>event [:create-new-shift])} "Done"]]])))
 
 (def shift-types [{:type "completed" :label "Completed shifts"}
                   {:type "active" :label "Active shifts"}
