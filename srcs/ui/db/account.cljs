@@ -121,13 +121,18 @@
                        :failure-fx [:process-invalid-token]}}))
 
 (rf/reg-event-fx
+  :force-reload
+  (fn [world [_]]
+    (.reload js/location)
+    {}))
+
+(rf/reg-event-fx
   :process-invalid-token
   [(rf/inject-cofx :store)]
   (fn [{db :db store :store} [_]]
-    (.reload js/location)
     {:db (assoc-in db [::account :token] nil)
      :store (assoc store :token nil)
-     :dispatch []}))
+     :dispatch [:force-reload]}))
 
 (rf/reg-event-fx
  :load-account-info
