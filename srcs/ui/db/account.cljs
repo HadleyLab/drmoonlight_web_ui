@@ -117,7 +117,21 @@
    {:json/fetch->path {:path [::account :type-response]
                        :uri (get-url db "/api/accounts/me/")
                        :token (<sub [:token])
-                       :succeed-fx [:load-account-info final-succeed-fx]}}))
+                       :succeed-fx [:load-account-info final-succeed-fx]
+                       :failure-fx [:process-invalid-token]}}))
+
+(rf/reg-event-fx
+  :force-reload
+  (fn [world [_]]
+    (.reload js/location)
+    {}))
+
+(rf/reg-event-fx
+  :process-invalid-token
+  [(rf/inject-cofx :store)]
+  (fn [{store :store} [_]]
+    {:store (dissoc store :token)
+     :dispatch [:force-reload]}))
 
 (rf/reg-event-fx
  :load-account-info
