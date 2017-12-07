@@ -129,9 +129,8 @@
 (rf/reg-event-fx
   :process-invalid-token
   [(rf/inject-cofx :store)]
-  (fn [{db :db store :store} [_]]
-    {:db (assoc-in db [::account :token] nil)
-     :store (assoc store :token nil)
+  (fn [{store :store} [_]]
+    {:store (dissoc store :token)
      :dispatch [:force-reload]}))
 
 (rf/reg-event-fx
