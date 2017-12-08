@@ -2,7 +2,7 @@
   (:require
    [reagent.core :as reagent]
    [ui.db.misc :refer [<sub >event >events]]
-   [ui.db.scheduler-profile :refer [shift-form-fields]]
+   [ui.db.shift :refer [shift-form-fields]]
    [ui.pages :as pages]
    [ui.widgets :refer [BuildForm]]
    [ui.widgets.error-message :refer [ErrorMessage]]
