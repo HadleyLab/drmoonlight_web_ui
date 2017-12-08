@@ -10,11 +10,13 @@
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
 
-(defn ActionButton [pk state]
+(defn ActionButton [pk state has-already-applied]
   [:div.shift__popup-footer._resident
    (cond
      (= state "coverage_completed") [:p "The coverage for this shift is already completed"]
      (= state "completed") [:p "The shift is completed"]
+     (= state "active") [:p "The shift is active"]
+     (true? has-already-applied) [:p "You have already applied for this shift"]
      (is-approved) [sa/Button {:on-click (>event [:goto :resident :messages pk]) :fluid true :color "blue"} "Apply for the shift"]
      (is-profile-filled) [:p "Please wait until account manager approve your account"]
      (is-rejected) [:p "Your account was rejected, you can't apply for shifts"]
@@ -25,6 +27,7 @@
 (defn ShiftLabel [params]
   (let [pk (:pk params)
         state (:state params)
+        has-already-applied (:has-already-applied params)
         speciality (:speciality params)
         speciality-name (:name (<sub [:speciality speciality]))]
     [:div [sa/Popup
@@ -35,7 +38,7 @@
             :hoverable true
             :class-name "shift__popup"}
            [ShiftInfo params]
-           [ActionButton pk state]]]))
+           [ActionButton pk state has-already-applied]]]))
 
 (defn Index [params]
   (rf/dispatch [:load-shifts])
