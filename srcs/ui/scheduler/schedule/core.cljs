@@ -16,7 +16,7 @@
                       :date-start "Starts"
                       :payment-amount "Payment amount"
                       :payment-per-hour "Payment hourly/pre shift missed value"
-                      :detail-error ""})
+                      :detail ""})
 
 (defn EditModal [pk]
   (let [new-shift-form-cursor (<sub [:new-shift-form-cursor])
@@ -73,8 +73,6 @@
   (fn [new-shift-form-cursor]
     (let [hide-field-errors true
           {status :status errors :errors} (<sub [:shift-form-response])]
-      (.log js/console "status" status)
-      (.log js/console "errors" errors)
       [sa/Modal {:trigger (reagent/as-element [sa/Button {:color :blue
                                                           :fluid true
                                                           :on-click (>event [:open-new-shift-modal])}

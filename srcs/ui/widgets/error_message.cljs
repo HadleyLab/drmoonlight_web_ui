@@ -5,7 +5,7 @@
 
 (defn get-message [[error-key error-value] names-map]
   (let [field-name (names-map error-key (str/capitalize (name error-key)))
-        error-text (str/join ", " error-value)]
+        error-text (if (vector? error-value) (str/join ", " error-value) error-value)]
     (if (= field-name "")
       error-text
       (str field-name ": " error-text))))

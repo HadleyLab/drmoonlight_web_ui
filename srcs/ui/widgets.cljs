@@ -104,15 +104,15 @@
                          :value @field-cursor
                          :error (not= errors nil)
                          :on-change (>atom field-cursor)}]]
-             (cond
-               (= :radio (:type info)) [FormRadio (merge {:cursor field-cursor} info)]
-               (= :toggle (:type info)) [FormToggle (merge {:cursor field-cursor} info)]
-               (= :textarea (:type info)) [FormTextarea (merge {:cursor field-cursor} info)]
-               (= :date-picker (:type info)) [FormDatepicker (merge {:cursor field-cursor} info)]
-               (= :input-with-drop-down (:type info)) [FormInputWithDropDown field-cursor cursor info]
-               (= :select (:type info)) [FormSelect (merge {:cursor field-cursor} info)]
-               (= :multy-select (:type info)) [FormMultySelect (merge {:cursor field-cursor} info)]
-               :else [:div (str info)]))
+             (case (:type info)
+               :radio [FormRadio (merge {:cursor field-cursor} info)]
+               :toggle [FormToggle (merge {:cursor field-cursor} info)]
+               :textarea [FormTextarea (merge {:cursor field-cursor} info)]
+               :date-picker [FormDatepicker (merge {:cursor field-cursor} info)]
+               :input-with-drop-down [FormInputWithDropDown field-cursor cursor info]
+               :select [FormSelect (merge {:cursor field-cursor} info)]
+               :multy-select [FormMultySelect (merge {:cursor field-cursor} info)]
+               [:div (str info)]))
            (if-not (or (true? hide-error) (nil? errors))
              [sa/FormField {:width 5 :class-name "input-info error"}
               (clojure.string/join " " errors)])])))))
