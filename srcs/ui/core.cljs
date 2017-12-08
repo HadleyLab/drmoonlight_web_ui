@@ -42,7 +42,7 @@
       (if page
         (if-let [cmp (get @pages/pages page)]
           [:div [cmp params]]
-          [:div (str "Page " (str page) "is not registered")])
+          [:div (str "Page " (str page) " is not registered")])
         (do
           (when (nil? (<sub [:token]))
             ;; TODO: save route and redirect to it after succeed login

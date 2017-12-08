@@ -108,8 +108,8 @@
          coercer
          (dispatch-set! atom))))
 
-(defn fields->schema [fields]
-  (into {} (map (fn [[key _]] [key ""]) (mapcat second fields))))
+(defn fields->schema [fields & [defaults]]
+  (into {} (map (fn [[key _]] [key (get (or defaults {}) key "")]) (mapcat second fields))))
 
 (defn setup-form-initial-values [initial-values]
   (fn [data]

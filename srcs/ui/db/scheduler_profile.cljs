@@ -46,7 +46,7 @@
     :edit-shift-modal {}
     :edit-shift-popup {}
     :shift-form
-    {:fields (fields->schema shift-form-fields)
+    {:fields (fields->schema shift-form-fields {:payment-per-hour "false"})
      :response {:status :not-asked}}}})
 
 (rf/reg-sub
