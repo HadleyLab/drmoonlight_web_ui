@@ -53,4 +53,9 @@
                          :uri url
                          :method (if (= state 1) "POST" "PATCH")
                          :token (<sub [:token])
-                         :body body}})))
+                         :body body
+                         :succeed-fx (fn [data]
+                                       [:update-account-info
+                                        (if (= state 1)
+                                          (merge body {:state 2})
+                                          data)])}})))
