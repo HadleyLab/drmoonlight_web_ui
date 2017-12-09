@@ -18,9 +18,9 @@
   (if desc
     [:span {:class-name "form__label-desc"} " (" desc ")"]))
 
-(defn FormRadio [{items :items cursor :cursor label :label desc :desc}]
-  (concatv [sa/FormField {:width 11} [:label {:class-name "form__label"}
-                                      label [Description desc]]]
+(defn FormRadio [{items :items cursor :cursor label :label desc :desc error :error}]
+  (concatv [sa/FormField {:width 11 :error error} [:label {:class-name "form__label"}
+                                                   label [Description desc]]]
            (->> items
                 (mapv (fn [[key value]]
                         [sa/FormRadio {:key key
@@ -30,8 +30,8 @@
                                        :checked (= @cursor key)
                                        :on-change #(dispatch-set! cursor key)}])))))
 
-(defn FormToggle [{cursor :cursor label :label}]
-  [sa/FormField {:width 11}
+(defn FormToggle [{cursor :cursor label :label error :error}]
+  [sa/FormField {:width 11 :error error}
    [sa/Checkbox
     {:toggle true
      :label label
@@ -39,9 +39,9 @@
      :checked (boolean @cursor)
      :on-change (>atom cursor)}]])
 
-(defn FormDatepicker [{cursor :cursor label :label :as info_}]
-  (let [info (dissoc info_ :cursor :label :type)]
-    [sa/FormField {:width 11}
+(defn FormDatepicker [{cursor :cursor label :label error :error :as info_}]
+  (let [info (dissoc info_ :cursor :label :type :error)]
+    [sa/FormField {:width 11 :error error}
      [:label label]
      [DatePicker (merge {:selected @cursor
                          :on-change #(reset! cursor %)} info)]]))
@@ -52,16 +52,15 @@
     (= field :email) :email
     :else :text))
 
-(defn FormTextarea [{cursor :cursor label :label desc :desc}]
-  [sa/FormField {:width 11}
+(defn FormTextarea [{cursor :cursor label :label desc :desc error :error}]
+  [sa/FormField {:width 11 :error error}
    [:label.form__label label [Description desc]]
    [sa/TextArea {:value @cursor :on-change (>atom cursor)}]])
 
-(defn FormInputWithDropDown [field-cursor cursor {label :label drop-down :drop-down width :width}]
-  (let [drop-down-cursor (reagent/cursor cursor [:fields (:cursor drop-down)])
-        _ (.log js/console drop-down)]
-    (fn [field-cursor cursor {label :label drop-down :drop-down}]
-      [sa/FormField {:width (or width 11)}
+(defn FormInputWithDropDown [field-cursor cursor {drop-down :drop-down}]
+  (let [drop-down-cursor (reagent/cursor cursor [:fields (:cursor drop-down)])]
+    (fn [field-cursor cursor {label :label drop-down :drop-down width :width error :error}]
+      [sa/FormField {:width (or width 11) :error error}
        [:label label]
        [sa/Input {:label (reagent/as-element
                           [sa/Dropdown {:value @drop-down-cursor
@@ -71,16 +70,16 @@
                   :on-change (>atom field-cursor)
                   :label-position :right}]])))
 
-(defn FormSelect [{cursor :cursor label :label items :items desc :desc}]
-  [sa/FormField {:width 11}
+(defn FormSelect [{cursor :cursor label :label items :items desc :desc error :error}]
+  [sa/FormField {:width 11 :error error}
    [:label.form__label label [Description desc]]
    [sa/FormSelect {:value @cursor
                    :placeholder label
                    :on-change (>atom cursor)
                    :options (items)}]])
 
-(defn FormMultySelect [{cursor :cursor label :label items :items}]
-  [sa/FormField {:width 11}
+(defn FormMultySelect [{cursor :cursor label :label items :items error :error}]
+  [sa/FormField {:width 11 :error error}
    [:label label]
    [sa/Dropdown {:value @cursor
                  :placeholder label
@@ -98,7 +97,7 @@
         (if (not= :mock (:type info))
           [sa/FormGroup {}
            (if (or (= :input (:type info)) (string? info))
-             [sa/FormField {:width (or (:width info) 11)}
+             [sa/FormField {:width (or (:width info) 11) :error (:error info)}
               [:label.form__label (or (:label info) info) [Description (:desc info)]]
               [sa/Input {:type (get-default-type field)
                          :value @field-cursor
@@ -117,6 +116,17 @@
              [sa/FormField {:width 5 :class-name "input-info error"}
               (clojure.string/join " " errors)])])))))
 
+(defn check-if-dropdown-error [data errors]
+  (if (= (:type data) :input-with-drop-down)
+    (some? ((:cursor (:drop-down data)) errors))))
+
+(defn prepare-data [cursor data field]
+  (let [errors-cursor (reagent/cursor cursor [:response :errors])]
+    (if (or (some? (field @errors-cursor))
+            (check-if-dropdown-error data @errors-cursor))
+      (merge data {:error true})
+      data)))
+
 (defn BuildForm [cursor field-sets hide-field-errors]
   (concatv [:div]
            (->> field-sets
@@ -128,7 +138,8 @@
                                       (mapv (fn [[field info]]
                                               [RenderInput {:cursor cursor
                                                             :field field
-                                                            :info info :key field
+                                                            :info (prepare-data cursor info field)
+                                                            :key field
                                                             :hide-error hide-field-errors}])))))))))
 
 (defn FormWrapper []

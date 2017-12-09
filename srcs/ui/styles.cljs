@@ -77,6 +77,8 @@
                {:box-shadow
                 "0 1px 2px 0 rgba(34,36,38,.15), 0 0 0 1px rgba(34,36,38,.15) inset!important"}]]
 
+   [:.field [:.ui.dropdown {:border-width (px 1)}]]
+
    ; dashboard styles
    [:.dashboard__header {:font-size (px 46)
                          :line-height (px 55)
