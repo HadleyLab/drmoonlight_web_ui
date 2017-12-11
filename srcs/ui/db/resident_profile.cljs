@@ -50,8 +50,6 @@
                 :preferences-for-work-location {:type :input
                                                 :label "Any preference for work location"})})
 
-(js/console.log resident-profile-form-fields)
-
 (def resident-notification-form-fields
   {"I would like to recieve emails when:"
    {:notification-new-shifts {:type :toggle :label "New shift is created"}

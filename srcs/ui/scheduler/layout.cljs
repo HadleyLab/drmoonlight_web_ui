@@ -1,6 +1,6 @@
 (ns ui.scheduler.layout
   (:require
-   [ui.db.misc :refer [<sub >event]]
+   [ui.db.misc :refer [>evt <sub >event]]
    [soda-ash.core :as sa]
    [ui.widgets.header-logo :refer [HeaderLogo]]))
 
@@ -38,3 +38,20 @@
      [Header]
      [sa/GridRow {}
       [sa/Container content]]]))
+
+(defn SchedulerProfileLayout [content]
+  (let [route (<sub [:route-map/current-route])]
+    [SchedulerLayout
+     [sa/Grid {}
+      [sa/GridRow {}
+       [sa/GridColumn {:width 4}
+        [:div {:class-name "profile__menu-wrapper"}
+         [sa/Menu {:fluid true :vertical true :tabular true}
+          [sa/MenuItem {:name "Edit Profile"
+                        :active (= (:match route) :core/scheduler-profile)
+                        :on-click #(>evt [:goto :scheduler :profile])}]
+          [sa/MenuItem {:name "Log out"
+                        :on-click #(>evt [:logout])}]]]]
+       [sa/GridColumn {:width 12}
+        [:div {:class-name "profile__container moonlight-white"} content]]]
+      [sa/GridRow {}]]]))
