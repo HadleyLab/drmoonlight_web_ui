@@ -11,21 +11,31 @@
 
 (def scheduler-form-fields
   {"Personal Information"
-   {:first-name "First Name"
-    :last-name "Last Name"
-    :facility-name "Hospital / Facility name"
-    :department-name "Department name"}
+   {:first-name {:type :input
+                 :label "First Name"}
+    :last-name {:type :input
+                :label "Last Name"}
+    :facility-name {:type :input
+                    :label "Hospital / Facility name"}
+    :department-name {:type :input
+                      :label "Department name"}}
    "Account settings"
-   {:email "Email"
-    :password "Password"}})
+   {:email {:type :input
+            :label "Email"}
+    :password {:type :input
+               :label "Password"}}})
 
 (def resident-form-fields
   {"Personal Information"
-   {:first-name "First Name"
-    :last-name "Last Name"}
+   {:first-name {:type :input
+                 :label "First Name"}
+    :last-name {:type :input
+                :label "Last Name"}}
    "Account settings"
-   {:email "Email"
-    :password "Password"}})
+   {:email {:type :input
+            :label "Email"}
+    :password {:type :input
+               :label "Password"}}})
 
 (def schema
   {::account
@@ -81,7 +91,7 @@
  :websocket-connect
  (fn [{db :db} _]
    (let [base-url (replace (:base-url db) #"^http" "ws")]
-   {:account-websocket (str base-url "/accounts/user/" (<sub [:token]) "/")})))
+     {:account-websocket (str base-url "/accounts/user/" (<sub [:token]) "/")})))
 
 (rf/reg-event-fx
  ::setup-login-form-and-redirect
@@ -121,17 +131,17 @@
                        :failure-fx [:process-invalid-token]}}))
 
 (rf/reg-event-fx
-  :force-reload
-  (fn [world [_]]
-    (.reload js/location)
-    {}))
+ :force-reload
+ (fn [world [_]]
+   (.reload js/location)
+   {}))
 
 (rf/reg-event-fx
-  :process-invalid-token
-  [(rf/inject-cofx :store)]
-  (fn [{store :store} [_]]
-    {:store (dissoc store :token)
-     :dispatch [:force-reload]}))
+ :process-invalid-token
+ [(rf/inject-cofx :store)]
+ (fn [{store :store} [_]]
+   {:store (dissoc store :token)
+    :dispatch [:force-reload]}))
 
 (rf/reg-event-fx
  :load-account-info
@@ -299,12 +309,10 @@
  :activation-response
  #(<sub [::account :activation-response]))
 
-
 (rf/reg-event-db
  :init-password-reset-form
  (fn [db [_]]
    (assoc-in db [::account :password-reset-form] (get-in schema [::account :password-reset-form]))))
-
 
 (rf/reg-sub
  :password-reset-form-password-cursor
@@ -322,4 +330,3 @@
 (rf/reg-sub
  :password-reset-form-response
  #(<sub [::account :password-reset-form :response]))
-

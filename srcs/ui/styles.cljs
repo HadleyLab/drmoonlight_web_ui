@@ -222,7 +222,7 @@
    [:.profile__container {:margin "0 0 0 -1em"
                           :border "1px solid #d4d4d5"
                           :border-radius "0 3px 3px"}
-    [:.form__label {:width "52%"}]
+    [:.field._radio [:.form__label {:width "52%"}]]
     [:.form__group {:position "relative"
                     :margin "20px 0 40px"}]]
    [:.profile__content {:margin-top (px -20)

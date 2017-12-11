@@ -16,7 +16,7 @@
     (fn []
       (let [{status :status errors :errors} (<sub [:forgot-password-form-response])]
         [sa/Form {:error (= status :failure)}
-         [sa/FormField
+         [sa/FormField {:error (contains? errors :email)}
           [:label "Email"]
           [sa/Input
            {:type "email"

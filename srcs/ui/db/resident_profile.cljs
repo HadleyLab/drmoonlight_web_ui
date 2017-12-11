@@ -6,8 +6,10 @@
    [re-frame.core :as rf]))
 
 (def resident-profile-form-fields
-  {"Personal Information" {:first-name "First Name"
-                           :last-name "Last Name"}
+  {"Personal Information" {:first-name {:type :input
+                                        :label "First Name"}
+                           :last-name {:type :input
+                                       :label "Last Name"}}
    "Residency" (array-map
                 :residency-program {:type :select
                                     :label "Residency Program"

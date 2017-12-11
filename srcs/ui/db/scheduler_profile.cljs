@@ -5,8 +5,10 @@
                        setup-form-initial-values]]))
 
 (def scheduler-profile-form-fields
-  {"Personal Information" {:first-name "First Name"
-                           :last-name "Last Name"}
+  {"Personal Information" {:first-name {:type :input
+                                        :label "First Name"}
+                           :last-name {:type :input
+                                       :label "Last Name"}}
    "Residency" (array-map
                 :facility-name {:type :input
                                 :label "Hospital / Facility name"}
