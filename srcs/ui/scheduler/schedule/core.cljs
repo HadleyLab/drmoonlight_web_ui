@@ -60,6 +60,7 @@
             [:div.shift__remove-shift "Remove shift"]]]
      [EditModal pk]]))
 
+;; TODO: rename to CreateModal to be consistent with EditModal
 (defn CreateNewShift [new-shift-form-cursor]
   (rf/dispatch [:init-new-shift-form])
   (fn [new-shift-form-cursor]
