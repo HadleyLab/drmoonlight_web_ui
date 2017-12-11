@@ -97,7 +97,7 @@
         [FormWrapper
          [sa/Header {:as :h1 :class-name "moonlight-form-header"} "Setup you new password"]
          [sa/Form {:error (= status :failure)}
-          [sa/FormField
+          [sa/FormField {:error (contains? errors :new-password)}
            [:label "Password"]
            [sa/Input
             {:type "password"

@@ -19,8 +19,9 @@
     [:span {:class-name "form__label-desc"} " (" desc ")"]))
 
 (defn FormRadio [{items :items cursor :cursor label :label desc :desc error :error}]
-  (concatv [sa/FormField {:width 11 :error error} [:label {:class-name "form__label"}
-                                                   label [Description desc]]]
+  (concatv [sa/FormField {:width 11 :error error :class-name "_radio"}
+            [:label {:class-name "form__label"}
+             label [Description desc]]]
            (->> items
                 (mapv (fn [[key value]]
                         [sa/FormRadio {:key key
