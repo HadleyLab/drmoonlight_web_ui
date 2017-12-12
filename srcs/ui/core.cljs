@@ -23,6 +23,7 @@
    [ui.routes :as routes]
    [ui.layout :as layout]
    [cljsjs.moment]
+   [cljsjs.moment-timezone]
    [soda-ash.core :as sa]))
 
 (defn- NotFound []

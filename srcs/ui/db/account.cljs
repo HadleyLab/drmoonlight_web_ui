@@ -5,7 +5,7 @@
    [haslett.client :as ws]
    [haslett.format :as fmt]
    [ui.db.misc :refer [get-url <sub reduce-statuses
-                       reduce-errors fields->schema]]
+                       reduce-errors fields->schema get-timezone-str]]
    [re-frame.core :as rf]
    [clojure.string :refer [replace]]))
 
@@ -294,7 +294,7 @@
      {:json/fetch->path {:path [::account :sign-up-form :response]
                          :uri (get-url db (str "/api/accounts/" (name mode) "/"))
                          :method "post"
-                         :body data
+                         :body (merge data {:timezone (get-timezone-str)})
                          :succeed-fx fx}})))
 
 (rf/reg-event-fx

@@ -121,3 +121,6 @@
         minute (.format date "mm")
         am-pm (.format date "a")]
     (str formatted-date " at " hour ":" minute " " am-pm)))
+
+(defn get-timezone-str []
+  (.guess (.-tz js/moment)))

@@ -2,7 +2,7 @@
   (:require
    [reagent.core :as reagent]
    [ui.db.misc :refer [get-url <sub fields->schema
-                       setup-form-initial-values]]
+                       setup-form-initial-values get-timezone-str]]
    [re-frame.core :as rf]))
 
 (def resident-profile-form-fields
@@ -102,7 +102,7 @@
                          :uri url
                          :method (if (= state 1) "POST" "PATCH")
                          :token (<sub [:token])
-                         :body body
+                         :body (merge body {:timezone (get-timezone-str)})
                          :succeed-fx (fn [data]
                                        [:update-account-info
                                         (if (= state 1)
