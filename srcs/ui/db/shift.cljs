@@ -5,19 +5,13 @@
 
 (def shift-form-fields
   {"" {:date-start
-       {:type :date-picker
+       {:type :date-time-picker
         :label "Starts"
-        :show-time-select true
-        :time-format "HH:mm"
-        :date-format "LLL"
-        :time-intervals 15}
+        :date-format "YYYY-MM-DD"}
        :date-end
-       {:type :date-picker
+       {:type :date-time-picker
         :label "Ends"
-        :show-time-select true
-        :time-format "HH:mm"
-        :date-format "LLL"
-        :time-intervals 15}}
+        :date-format "YYYY-MM-DD"}}
    "Required staff" {:speciality
                      {:type :select
                       :label "Speciality name"
