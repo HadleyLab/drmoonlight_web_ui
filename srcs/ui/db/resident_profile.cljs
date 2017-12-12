@@ -58,6 +58,12 @@
     :notification-application-status-changing  {:type :toggle :label "My application is approved/rejected"}
     :notification-new-messages {:type :toggle :label "New message from a scheduler is received"}}})
 
+(def resident-change-password-form-fields
+  {""
+   {:current-password {:type :input :label "Old password"}
+    :new-password {:type :input :label "New password"}
+    :confirm-new-password {:type :input :label "Confirm new password"}}})
+
 (def schema
   {::resident-profile
    {:profile-form
@@ -65,6 +71,9 @@
      :response {:status :not-asked}}
     :notification-form
     {:fields (fields->schema resident-notification-form-fields)
+     :response {:status :not-asked}}
+    :change-password-form
+    {:fields (fields->schema resident-change-password-form-fields)
      :response {:status :not-asked}}}})
 
 (rf/reg-sub
@@ -120,13 +129,28 @@
        (update-in [::resident-profile :notification-form :fields]
                   (setup-form-initial-values (<sub [:user-info]))))))
 
+(rf/reg-event-db
+ :init-resident-change-password-form
+ (fn [db _]
+   (-> db
+       (assoc-in  [::resident-profile :change-password-form]
+                  (get-in schema [::resident-profile :change-password-form]))
+       (update-in [::resident-profile :change-password-form :fields]
+                  (setup-form-initial-values (<sub [:user-info]))))))
+
 (rf/reg-sub
  :resident-notification-form-cursor
  #(<sub [:cursor [::resident-profile :notification-form]]))
 
 (rf/reg-sub
+ :resident-change-password-form-cursor
+ #(<sub [:cursor [::resident-profile :change-password-form]]))
+
+(rf/reg-sub
  :resident-notification-form-response
- #(<sub [::resident-profile :notification-form :response]))
+ #(<sub [::resident-profile :notification-form :response])) (rf/reg-sub
+                                                             :resident-change-password-form-response
+                                                             #(<sub [::resident-profile :change-password-form :response]))
 
 (rf/reg-event-fx
  :update-resident-notifications
