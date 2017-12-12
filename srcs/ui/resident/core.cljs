@@ -2,9 +2,9 @@
   (:require
    [reagent.core :as reagent]
    [ui.db.misc :refer [>event <sub get-url]]
+   [ui.db.account :refer [change-password-form-fields]]
    [ui.db.resident-profile :refer [resident-profile-form-fields
-                                   resident-notification-form-fields
-                                   resident-change-password-form-fields]]
+                                   resident-notification-form-fields]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [BuildForm]]
@@ -49,18 +49,24 @@
                            :on-click (>event [:update-resident-profile])} "Save changes"]]]]))))
 
 (defn ResidentChangePasswordForm []
-  (rf/dispatch [:init-resident-change-password-form])
-  (let [resident-change-password-form-cursor (<sub [:resident-change-password-form-cursor])]
+  (let [cursor (<sub [:change-password-form-cursor])]
     (fn []
-      (let [{status :status errors :errors} (<sub [:resident-change-password-form-response])]
+      (let [fields (:fields @cursor)
+            new-password (:new-password fields)
+            new-password-confirm (:new-password-confirm fields)
+            {status :status errors :errors} (<sub [:change-password-form-response])]
         [:div.profile__content
          [sa/Form {:class-name "moonlight-form-inner"}
-          [BuildForm resident-change-password-form-cursor resident-change-password-form-fields]
+          [BuildForm cursor change-password-form-fields]
           [:div.form__group
            [sa/FormButton {:color :blue
+                           :disabled (or
+                                      (= new-password "")
+                                      (nil? new-password)
+                                      (not= new-password new-password-confirm))
                            :loading (= status :loading)
                            :class-name "profile__button"
-                           :on-click (.log js/console "Change password")} "Save changes"]]]]))))
+                           :on-click (>event [:update-user-password])} "Save changes"]]]]))))
 
 (pages/reg-page :core/resident (fn [] [ResidentLayout [sa/Header {} "index"]]))
 (pages/reg-page :core/resident-statistics (fn [] [ResidentLayout [sa/Header {} "statistics"]]))

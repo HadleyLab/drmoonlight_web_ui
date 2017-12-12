@@ -37,6 +37,12 @@
     :password {:type :input
                :label "Password"}}})
 
+(def change-password-form-fields
+  {""
+   {:current-password {:type :input :label "Current password"}
+    :new-password {:type :input :label "New password"}
+    :new-password-confirm {:type :input :label "Confirm new password"}}})
+
 (def schema
   {::account
    {:token nil
@@ -57,7 +63,10 @@
       :password ""}
      :response {:status :not-asked}}
     :type-response {:status :not-asked}
-    :info-response {:status :not-asked}}})
+    :info-response {:status :not-asked}
+    :change-password-form
+    {:fields (fields->schema change-password-form-fields)
+     :response {:status :not-asked}}}})
 
 (defn event->action [data]
   (update-in data [:event] #(keyword (replace % #"_" "-"))))
@@ -330,3 +339,29 @@
 (rf/reg-sub
  :password-reset-form-response
  #(<sub [::account :password-reset-form :response]))
+
+ ; Change password form
+
+(rf/reg-event-db
+ :init-change-password-form
+ (fn [db [_]]
+   (assoc-in db [::account :change-password-form] (get-in schema [::account :change-password-form]))))
+
+(rf/reg-sub
+ :change-password-form-cursor
+ #(<sub [:cursor [::account :change-password-form]]))
+
+(rf/reg-sub
+ :change-password-form-response
+ #(<sub [::account :change-password-form :response]))
+
+(rf/reg-event-fx
+ :update-user-password
+ (fn [{db :db} [_ data]]
+   (let [body (<sub [::account :change-password-form :fields])]
+     {:json/fetch->path {:path [::account :change-password-form :response]
+                         :uri (get-url db "/api/accounts/password/")
+                         :token (<sub [:token])
+                         :method "post"
+                         :body (dissoc body :new-password-confirm)
+                         :succeed-fx [:init-change-password-form]}})))
