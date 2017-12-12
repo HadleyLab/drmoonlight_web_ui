@@ -95,17 +95,19 @@
    (let [pk (<sub [:user-id])
          state (<sub [:user-state])
          body (<sub [::resident-profile :profile-form :fields])
-         url (if (= state 1)
+         ; TODO: use keyword constants instead of numbers
+         is-new-or-rejected (or (= state 1) (= state 4))
+         url (if is-new-or-rejected
                (get-url db "/api/accounts/resident/" pk "/fill_profile/")
                (get-url db "/api/accounts/resident/" pk "/"))]
      {:json/fetch->path {:path [::resident-profile :profile-form :response]
                          :uri url
-                         :method (if (= state 1) "POST" "PATCH")
+                         :method (if is-new-or-rejected "POST" "PATCH")
                          :token (<sub [:token])
                          :body body
                          :succeed-fx (fn [data]
                                        [:update-account-info
-                                        (if (= state 1)
+                                        (if is-new-or-rejected
                                           (merge body {:state 2})
                                           data)])}})))
 
