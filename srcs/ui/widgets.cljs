@@ -47,34 +47,37 @@
               hours  (quot total-minutes 60)
               minutes (* 15 (mod x 4))
               minutes (if (= minutes 0) "00" minutes)
-              value (str hours ":" minutes)]]
-    {:key value :value value :text value}))
+              value (str hours ":" minutes)
+              text (if (> hours 12)
+                     (str (- hours 12) ":" minutes " pm")
+                     (str value " am"))]]
+    {:key value :value value :text text}))
 
-(defn FormDateTimepicker [{cursor :cursor label :label error :error :as info_}]
+(defn FormDateTimePicker [{cursor :cursor label :label error :error :as info_}]
   (let [info (dissoc info_ :cursor :label :type :error)
         value @cursor
-        value (if (= value "") (.set (js/moment) "minute" 0) value)]
-    [sa/FormGroup
-     [sa/FormField {:width 11 :error error}
-      [:label label]
-      [DatePicker (merge {:selected value
-                          :on-change #(reset! cursor %)} info)]
-      [sa/Icon {:name "calendar"}]]
-
-     [sa/FormField {:width 11 :error error}
-      [sa/FormSelect {:value (.format value "H:mm")
-                      :icon "clock"
-                      :placeholder "Select time"
-                      :on-change
-                      (fn [e v]
-                        (let [time (or (.-value v) (.-checked v))
-                              [hour minute] (str/split time #":")]
-                          (reset!
-                           cursor
-                           (-> (js/moment value)
-                               (.set "hour" hour)
-                               (.set "minute" minute)))))
-                      :options (get-time-options)}]]]))
+        value (if (or (= value "") (nil? value)) (.set (js/moment) "minute" 0) value)]
+    [sa/FormField {:width 11 :error error}
+     [:label label]
+     [sa/FormGroup
+      [sa/FormField {:width 6 :class-name "date-time-picker__field"}
+       [DatePicker (merge {:selected value
+                           :on-change #(reset! cursor %)} info)]
+       [sa/Icon {:name "calendar outline" :class-name "date-time-picker__icon"}]]
+      [sa/FormField {:width 5 :class-name "date-time-picker__field"}
+       [sa/FormSelect {:value (.format value "H:mm")
+                       :placeholder "Select time"
+                       :on-change
+                       (fn [e v]
+                         (let [time (or (.-value v) (.-checked v))
+                               [hour minute] (str/split time #":")]
+                           (reset!
+                            cursor
+                            (-> (js/moment value)
+                                (.set "hour" hour)
+                                (.set "minute" minute)))))
+                       :options (get-time-options)}]
+       [sa/Icon {:name "clock" :class-name "date-time-picker__icon"}]]]]))
 
 (defn get-default-type [field]
   (cond
@@ -137,7 +140,7 @@
                :radio [FormRadio (merge {:cursor field-cursor} info)]
                :toggle [FormToggle (merge {:cursor field-cursor} info)]
                :textarea [FormTextarea (merge {:cursor field-cursor} info)]
-               :date-time-picker [FormDateTimepicker (merge {:cursor field-cursor} info)]
+               :date-time-picker [FormDateTimePicker (merge {:cursor field-cursor} info)]
                :input-with-drop-down [FormInputWithDropDown field-cursor cursor info]
                :select [FormSelect (merge {:cursor field-cursor} info)]
                :multy-select [FormMultySelect (merge {:cursor field-cursor} info)]

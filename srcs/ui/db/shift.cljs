@@ -7,11 +7,11 @@
   {"" {:date-start
        {:type :date-time-picker
         :label "Starts"
-        :date-format "YYYY-MM-DD"}
+        :date-format "DD/MM/YYYY"}
        :date-end
        {:type :date-time-picker
         :label "Ends"
-        :date-format "YYYY-MM-DD"}}
+        :date-format "DD/MM/YYYY"}}
    "Required staff" {:speciality
                      {:type :select
                       :label "Speciality name"
@@ -34,6 +34,11 @@
                                                 :width 3
                                                 :desc "optional"}}})
 
+(def shift-form-default-values
+  {:date-start (.set (js/moment) "minute" 0)
+   :date-end (.set (js/moment) "minute" 0)
+   :payment-per-hour "false"})
+
 (def schema
   {::shift
    {:list {:status :not-asked}
@@ -44,7 +49,7 @@
     :edit-shift-modal {}
     :edit-shift-popup {}
     :shift-form
-    {:fields (fields->schema shift-form-fields)
+    {:fields (fields->schema shift-form-fields shift-form-default-values)
      :response {:status :not-asked}}}})
 
 ;; Public utils
