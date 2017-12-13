@@ -50,6 +50,9 @@
           [sa/MenuItem {:name "Edit Profile"
                         :active (= (:match route) :core/scheduler-profile)
                         :on-click #(>evt [:goto :scheduler :profile])}]
+          [sa/MenuItem {:name "Change Password"
+                        :active (= (:match route) :core/scheduler-profile-change-password)
+                        :on-click #(>evt [:goto :scheduler :profile :change-password])}]
           [sa/MenuItem {:name "Log out"
                         :on-click #(>evt [:logout])}]]]]
        [sa/GridColumn {:width 12}

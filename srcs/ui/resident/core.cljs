@@ -2,11 +2,11 @@
   (:require
    [reagent.core :as reagent]
    [ui.db.misc :refer [>event <sub get-url]]
-   [ui.db.account :refer [change-password-form-fields]]
    [ui.db.resident-profile :refer [resident-profile-form-fields
                                    resident-notification-form-fields]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
+   [ui.change-password.core :refer [ChangePasswordForm]]
    [ui.widgets :refer [BuildForm]]
    [ui.widgets.error-message :refer [ErrorMessage]]
    [ui.resident.layout :refer [ResidentLayout ResidentProfileLayout]]
@@ -48,28 +48,8 @@
                            :class-name "profile__button"
                            :on-click (>event [:update-resident-profile])} "Save changes"]]]]))))
 
-(defn ResidentChangePasswordForm []
-  (let [cursor (<sub [:change-password-form-cursor])]
-    (fn []
-      (let [fields (:fields @cursor)
-            new-password (:new-password fields)
-            new-password-confirm (:new-password-confirm fields)
-            {status :status errors :errors} (<sub [:change-password-form-response])]
-        [:div.profile__content
-         [sa/Form {:class-name "moonlight-form-inner"}
-          [BuildForm cursor change-password-form-fields]
-          [:div.form__group
-           [sa/FormButton {:color :blue
-                           :disabled (or
-                                      (= new-password "")
-                                      (nil? new-password)
-                                      (not= new-password new-password-confirm))
-                           :loading (= status :loading)
-                           :class-name "profile__button"
-                           :on-click (>event [:update-user-password])} "Save changes"]]]]))))
-
 (pages/reg-page :core/resident (fn [] [ResidentLayout [sa/Header {} "index"]]))
 (pages/reg-page :core/resident-statistics (fn [] [ResidentLayout [sa/Header {} "statistics"]]))
 (pages/reg-page :core/resident-profile (fn [] [ResidentProfileLayout [ResidentProfileForm]]))
 (pages/reg-page :core/resident-profile-notification (fn [] [ResidentProfileLayout [ResidentNotificationForm]]))
-(pages/reg-page :core/resident-profile-change-password (fn [] [ResidentProfileLayout [ResidentChangePasswordForm]]))
+(pages/reg-page :core/resident-profile-change-password (fn [] [ResidentProfileLayout [ChangePasswordForm]]))

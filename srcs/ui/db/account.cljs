@@ -39,9 +39,9 @@
 
 (def change-password-form-fields
   {""
-   {:current-password {:type :input :label "Current password"}
-    :new-password {:type :input :label "New password"}
-    :new-password-confirm {:type :input :label "Confirm new password"}}})
+   {:current-password {:type :input :label "Current password" :width 8}
+    :new-password {:type :input :label "New password" :width 8}
+    :new-password-confirm {:type :input :label "Confirm new password" :width 8}}})
 
 (def schema
   {::account
@@ -347,6 +347,14 @@
  (fn [db [_]]
    (assoc-in db [::account :change-password-form] (get-in schema [::account :change-password-form]))))
 
+(rf/reg-event-db
+ :change-password-succeed
+ (fn [db _]
+   (-> db
+       (assoc-in [::account :change-password-form :fields]
+                 (get-in schema [::account :change-password-form :fields]))
+       (update-in [::account :change-password-form :response] #(merge % {:errors {}})))))
+
 (rf/reg-sub
  :change-password-form-cursor
  #(<sub [:cursor [::account :change-password-form]]))
@@ -364,4 +372,4 @@
                          :token (<sub [:token])
                          :method "post"
                          :body (dissoc body :new-password-confirm)
-                         :succeed-fx [:init-change-password-form]}})))
+                         :succeed-fx [:change-password-succeed]}})))
