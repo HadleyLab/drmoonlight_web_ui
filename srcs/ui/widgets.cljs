@@ -42,16 +42,20 @@
      :on-change (>atom cursor)}]])
 
 (defn get-time-options []
-  (for [x (range 96)
-        :let [total-minutes (* x 15)
-              hours  (quot total-minutes 60)
-              minutes (* 15 (mod x 4))
-              minutes (if (= minutes 0) "00" minutes)
-              value (str hours ":" minutes)
-              text (if (> hours 12)
-                     (str (- hours 12) ":" minutes " pm")
-                     (str value " am"))]]
-    {:key value :value value :text text}))
+  (let [interval-in-minutes 15
+        number-of-intervals-in-hour (quot 60 interval-in-minutes)
+        number-of-intervals-in-day (* 24 number-of-intervals-in-hour)]
+    (for [x (range number-of-intervals-in-day)
+          :let [total-minutes (* x interval-in-minutes)
+                hours  (quot total-minutes 60)
+                minutes (* interval-in-minutes (mod x number-of-intervals-in-hour))
+                minutes (if (= minutes 0) "00" minutes)
+                value (str hours ":" minutes)
+                text (cond
+                       (> hours 12) (str (- hours 12) ":" minutes " pm")
+                       (= hours 12) (str value " pm")
+                       :else (str value " am"))]]
+      {:key value :value value :text text})))
 
 (defn FormDateTimePicker [{cursor :cursor label :label error :error :as info_}]
   (let [info (dissoc info_ :cursor :label :type :error)
