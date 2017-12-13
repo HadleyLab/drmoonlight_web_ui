@@ -76,8 +76,26 @@
    [:.toggler [:label:after
                {:box-shadow
                 "0 1px 2px 0 rgba(34,36,38,.15), 0 0 0 1px rgba(34,36,38,.15) inset!important"}]]
-
    [:.field [:.ui.dropdown {:border-width (px 1)}]]
+   [:.date-time-picker__field {:position "relative"}
+    [:.selection {:min-width "auto!important"}]]
+   [:.date-time-picker__icon {:display "flex!important"
+                              :height "auto!important"
+                              :width "42px!important"
+                              :position "absolute"
+                              :right ".5em"
+                              :top 0
+                              :bottom 0
+                              :align-items "center"
+                              :justify-content "center"
+                              :margin-right "0!important"
+                              :border-radius "0 .28571429rem .28571429rem 0"
+                              :color "#8C97B2"
+                              :background-color "#DFE2E9"}
+    [:&:before {:font-size "18px!important"}]]
+   [:.field.error [:.date-time-picker__icon {:color "#9f3a38"
+                                             :border "1px solid rgb(224, 180, 180)"
+                                             :background-color "rgb(255, 246, 246)"}]]
 
    ; dashboard styles
    [:.dashboard__header {:font-size (px 46)

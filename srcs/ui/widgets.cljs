@@ -5,6 +5,7 @@
    [re-frame.core :as rf]
    [cljs.pprint :as pp]
    [cljsjs.react-datepicker]
+   [clojure.string :as str]
    [soda-ash.core :as sa]))
 
 (def DatePicker (reagent/adapt-react-class (.-default js/DatePicker)))
@@ -40,12 +41,47 @@
      :checked (boolean @cursor)
      :on-change (>atom cursor)}]])
 
-(defn FormDatepicker [{cursor :cursor label :label error :error :as info_}]
-  (let [info (dissoc info_ :cursor :label :type :error)]
+(defn get-time-options []
+  (let [interval-in-minutes 15
+        number-of-intervals-in-hour (quot 60 interval-in-minutes)
+        number-of-intervals-in-day (* 24 number-of-intervals-in-hour)]
+    (for [x (range number-of-intervals-in-day)
+          :let [total-minutes (* x interval-in-minutes)
+                hours  (quot total-minutes 60)
+                minutes (* interval-in-minutes (mod x number-of-intervals-in-hour))
+                minutes (if (= minutes 0) "00" minutes)
+                value (str hours ":" minutes)
+                text (cond
+                       (> hours 12) (str (- hours 12) ":" minutes " pm")
+                       (= hours 12) (str value " pm")
+                       :else (str value " am"))]]
+      {:key value :value value :text text})))
+
+(defn FormDateTimePicker [{cursor :cursor label :label error :error :as info_}]
+  (let [info (dissoc info_ :cursor :label :type :error)
+        value @cursor
+        value (if (or (= value "") (nil? value)) (.set (js/moment) "minute" 0) value)]
     [sa/FormField {:width 11 :error error}
      [:label label]
-     [DatePicker (merge {:selected @cursor
-                         :on-change #(reset! cursor %)} info)]]))
+     [sa/FormGroup
+      [sa/FormField {:width 6 :class-name "date-time-picker__field"}
+       [DatePicker (merge {:selected value
+                           :on-change #(reset! cursor %)} info)]
+       [sa/Icon {:name "calendar outline" :class-name "date-time-picker__icon"}]]
+      [sa/FormField {:width 5 :class-name "date-time-picker__field"}
+       [sa/FormSelect {:value (.format value "H:mm")
+                       :placeholder "Select time"
+                       :on-change
+                       (fn [e v]
+                         (let [time (or (.-value v) (.-checked v))
+                               [hour minute] (str/split time #":")]
+                           (reset!
+                            cursor
+                            (-> (js/moment value)
+                                (.set "hour" hour)
+                                (.set "minute" minute)))))
+                       :options (get-time-options)}]
+       [sa/Icon {:name "clock" :class-name "date-time-picker__icon"}]]]]))
 
 (defn get-default-type [field]
   (cond
@@ -108,7 +144,7 @@
                :radio [FormRadio (merge {:cursor field-cursor} info)]
                :toggle [FormToggle (merge {:cursor field-cursor} info)]
                :textarea [FormTextarea (merge {:cursor field-cursor} info)]
-               :date-picker [FormDatepicker (merge {:cursor field-cursor} info)]
+               :date-time-picker [FormDateTimePicker (merge {:cursor field-cursor} info)]
                :input-with-drop-down [FormInputWithDropDown field-cursor cursor info]
                :select [FormSelect (merge {:cursor field-cursor} info)]
                :multy-select [FormMultySelect (merge {:cursor field-cursor} info)]
