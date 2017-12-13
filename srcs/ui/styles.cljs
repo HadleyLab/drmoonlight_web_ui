@@ -135,6 +135,7 @@
                                         :height (px 7)
                                         :border-radius "50%"}
     [:&._completed {:background-color "#00BFDD"}]
+    [:&._failed {:background-color "#000000"}]
     [:&._active {:background-color "#FFAB00"}]
     [:&._without_applies {:background-color "#E64C66"}]
     [:&._coverage_completed {:background-color "#44BE8D"}]
@@ -191,6 +192,7 @@
                     :cursor "default"
                     :word-wrap "break-word"}
     [:&._completed {:background-color "#00BFDD"}]
+    [:&._failed {:background-color "#000000"}]
     [:&._active {:background-color "#FFAB00"}]
     [:&._without_applies {:background-color "#E64C66"}]
     [:&._coverage_completed {:background-color "#44BE8D"}]

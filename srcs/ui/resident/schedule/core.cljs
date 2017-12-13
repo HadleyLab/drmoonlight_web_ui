@@ -16,12 +16,11 @@
      (= state "coverage_completed") [:p "The coverage for this shift is already completed"]
      (= state "completed") [:p "The shift is completed"]
      (= state "active") [:p "The shift is active"]
+     (= state "failed") [:p "The shift is failed"]
      (true? has-already-applied) [:p "You have already applied for this shift"]
      (is-approved) [sa/Button {:on-click (>event [:goto :resident :messages pk]) :fluid true :color "blue"} "Apply for the shift"]
      (is-profile-filled) [:p "Please wait until account manager approve your account"]
      (is-rejected) [:p "Your account was rejected, you can't apply for shifts"]
-    ;; TODO hide button if resident has already apply for the shifts
-    ;; https://gitlab.bro.engineering/drmoonlight/drmoonlight_api/issues/25
      :else [sa/Button {:on-click (>event [:goto :resident :profile]) :fluid true :color "blue"} "Fill profile to apply"])])
 
 (defn ShiftLabel [params]

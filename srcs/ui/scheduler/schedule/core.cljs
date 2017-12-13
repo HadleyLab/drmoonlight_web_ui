@@ -93,7 +93,8 @@
                   {:type "active" :label "Active shifts"}
                   {:type "without_applies" :label "Shifts without applies"}
                   {:type "coverage_completed" :label "Coverage completed"}
-                  {:type "require_approval" :label "Require approval"}])
+                  {:type "require_approval" :label "Require approval"}
+                  {:type "failed" :label "Failed shifts"}])
 
 (defn Index [params]
   (rf/dispatch [:load-shifts])
