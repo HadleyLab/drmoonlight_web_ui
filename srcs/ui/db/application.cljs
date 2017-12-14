@@ -14,7 +14,7 @@
     :comment-form {:fields {:text ""} :response {:status :not-asked}}}})
 
 (def application-statuses
-  {1 "New"
+  {1 "New application"
    2 "Approved"
    3 "Rejected"
    4 "Postponed"

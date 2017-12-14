@@ -82,56 +82,92 @@
       (str " at " start-date " from " start-time " to " finish-time)
       (str " from " start-date " at " start-time " to " finish-date " at " finish-time))))
 
+(defn get-status-name [state]
+  (if (nil? state)
+    "All messages"
+    (map
+     (fn [[key value]] (if (= key state) value))
+     application-statuses)))
+
+(defn Application [params]
+  (fn [params]
+    (let [user-id (<sub [:user-id])
+          {date-created :date-created
+           state :state
+           application-pk :pk
+           {speciality :speciality
+            start :date-start
+            finish :date-end
+            shift-pk :pk
+            payment-amount :payment-amount
+            payment-per-hour :payment-per-hour
+            description :description
+            :as shift} :shift
+           {owner-id :id
+            :as owner} :owner
+           {last-message-text :text
+            :as last-message} :last-message} params]
+      [sa/Segment {:key application-pk
+                   :class-name "messages__message-wrapper"
+                   :on-click (>event [:goto :resident :messages shift-pk :discuss application-pk])}
+       [sa/Grid {:class-name "messages__message-grid"}
+        [sa/GridColumn {:width 3}
+         [:div.gray-font (.fromNow (js/moment date-created))]]
+        [sa/GridColumn {:width 10}
+         [:b (:name (<sub [:speciality speciality])) (format-date-time start finish)]
+         (if last-message-text [:div.messages__message-text
+                                (if (= user-id owner-id) [:b "You: "])
+                                last-message-text])]
+        [sa/GridColumn {:width 3}
+         [:div {:class-name (str "messages__message-label" " label-" state)}
+          (get-status-name state)]]]])))
+
+(defn ApplicationsDropdown [params]
+  (fn [params]
+    (let [applications (<sub [:applications])
+          filter-state (<sub [:applications-filter-state])]
+      [sa/Dropdown {:button true
+                    :fluid true
+                    :floating true
+                    :text (get-status-name filter-state)
+                    :class-name (str "messages__dropdown"
+                                     (if-not (nil? filter-state) (str " _" filter-state)))}
+       [sa/DropdownMenu
+        [:div {:class-name (str "messages__dropdown-item"
+                                (if (nil? filter-state) " _active"))
+               :on-click (>event [:set-applications-filter-state nil])}
+         "All messages" [:span.gray-font " (" (count (:data applications)) ")"]]
+        (doall (for [[state-key state] application-statuses]
+                 [:div {:key state
+                        :class-name (str "messages__dropdown-item"
+                                         " _" state-key
+                                         (if (= state-key filter-state) " _active"))
+                        :on-click (>event [:set-applications-filter-state state-key])}
+                  state
+                  [:span.gray-font
+                   (str " (" (<sub [:count-applications-by-state state-key]) ")")]]))]])))
+
 (defn ShowAllApplications [params]
   (rf/dispatch [:get-applications])
   (fn [params]
     (let [applications (<sub [:applications])
-          filter-state (<sub [:applications-filter-state])]
+          filter-state (<sub [:applications-filter-state])
+          applications-count (<sub [:count-applications-by-state filter-state])]
       [ResidentLayout
-       [sa/Grid {}
+       [sa/Grid {:class-name "messages__container"}
         [sa/GridRow {}
          [sa/GridColumn {:width 3}
-          (doall (for [[state-key state] application-statuses]
-                   [:div {:key state}
-                    [sa/Label {:active (= state-key filter-state)
-                               :on-click (>event [:set-applications-filter-state state-key])}
-                     state
-                     [sa/LabelDetail (<sub [:count-applications-by-state state-key])]]
-                    [:br]
-                    [:br]]))]
+          [ApplicationsDropdown]]
          [sa/GridColumn {:width 13}
-          [sa/SegmentGroup
-           (doall (for [application (:data applications)
-                        :let [{{speciality :speciality
-                                start :date-start
-                                finish :date-end
-                                pk :pk
-                                payment-amount :payment-amount
-                                payment-per-hour :payment-per-hour
-                                description :description
-                                :as shift} :shift
-                               date-created :date-created
-                               state :state
-                               {message-text :text
-                                :as last-message} :last-message} application]
-                        :when (if (nil? filter-state)
-                                true
-                                (= filter-state (:state application)))]
-
-                    [sa/Segment {:key (:pk application)
-                                 :class-name "messages__message-container"
-                                 :on-click (>event [:goto :resident :messages pk :discuss (:pk application)])}
-                     (.log js/console "application" application)
-                     [sa/Grid {:class-name "messages__message-grid"}
-                      [sa/GridColumn {:width 3}
-                       [:div.gray-font (.fromNow (js/moment date-created))]]
-                      [sa/GridColumn {:width 10}
-                       [:b (:name (<sub [:speciality speciality])) (format-date-time start finish)]
-                       (if message-text [:div.messages__message-text message-text])]
-                      [sa/GridColumn {:width 3}
-                       (map
-                        (fn [[key value]] (if (= key state) value))
-                        application-statuses)]]]))]]]]])))
+          (if (and (some? filter-state) (= applications-count 0))
+            [sa/SegmentGroup
+             [sa/Segment "No result found"]]
+            [sa/SegmentGroup
+             (doall (for [application (:data applications)
+                          :when (if (nil? filter-state)
+                                  true
+                                  (= filter-state (:state application)))]
+                      [Application application]))])]]]])))
 
 (pages/reg-page :core/resident-messages ShowAllApplications)
 (pages/reg-page :core/resident-messages-apply ApplyToShift)
