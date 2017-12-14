@@ -3,7 +3,8 @@
    [reagent.core :as reagent]
    [ui.db.misc :refer [>event >atom <sub get-url reduce-statuses text-with-br]]
    [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
-   [ui.db.application :refer [application-statuses]]
+   [ui.db.application :refer [get-application-status-name format-application-shift-date]]
+   [ui.widgets.applications-dropdown :refer [ApplicationsDropdown]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.widgets :refer [concatv]]
@@ -73,22 +74,6 @@
           status (reduce-statuses shift-status application-status messages-status)]
       [ShiftLayout shift-pk [Discussion shift application messages status]])))
 
-(defn format-date-time [start finish]
-  (let [start-date (.format start "DD/MM")
-        finish-date (.format finish "DD/MM")
-        start-time (.format start "h:mm a")
-        finish-time (.format finish "h:mm a")]
-    (if (= start-date finish-date)
-      (str " at " start-date " from " start-time " to " finish-time)
-      (str " from " start-date " at " start-time " to " finish-date " at " finish-time))))
-
-(defn get-status-name [state]
-  (if (nil? state)
-    "All messages"
-    (map
-     (fn [[key value]] (if (= key state) value))
-     application-statuses)))
-
 (defn Application [params]
   (fn [params]
     (let [user-id (<sub [:user-id])
@@ -103,9 +88,8 @@
             payment-per-hour :payment-per-hour
             description :description
             :as shift} :shift
-           {owner-id :id
-            :as owner} :owner
            {last-message-text :text
+            last-message-owner :owner
             :as last-message} :last-message} params]
       [sa/Segment {:key application-pk
                    :class-name "messages__message-wrapper"
@@ -114,38 +98,13 @@
         [sa/GridColumn {:width 3}
          [:div.gray-font (.fromNow (js/moment date-created))]]
         [sa/GridColumn {:width 10}
-         [:b (:name (<sub [:speciality speciality])) (format-date-time start finish)]
+         [:b (:name (<sub [:speciality speciality])) (format-application-shift-date start finish)]
          (if last-message-text [:div.messages__message-text
-                                (if (= user-id owner-id) [:b "You: "])
+                                (if (= user-id last-message-owner) [:b "You: "])
                                 last-message-text])]
         [sa/GridColumn {:width 3}
          [:div {:class-name (str "messages__message-label" " label-" state)}
-          (get-status-name state)]]]])))
-
-(defn ApplicationsDropdown [params]
-  (fn [params]
-    (let [applications (<sub [:applications])
-          filter-state (<sub [:applications-filter-state])]
-      [sa/Dropdown {:button true
-                    :fluid true
-                    :floating true
-                    :text (get-status-name filter-state)
-                    :class-name (str "messages__dropdown"
-                                     (if-not (nil? filter-state) (str " _" filter-state)))}
-       [sa/DropdownMenu
-        [:div {:class-name (str "messages__dropdown-item"
-                                (if (nil? filter-state) " _active"))
-               :on-click (>event [:set-applications-filter-state nil])}
-         "All messages" [:span.gray-font " (" (count (:data applications)) ")"]]
-        (doall (for [[state-key state] application-statuses]
-                 [:div {:key state
-                        :class-name (str "messages__dropdown-item"
-                                         " _" state-key
-                                         (if (= state-key filter-state) " _active"))
-                        :on-click (>event [:set-applications-filter-state state-key])}
-                  state
-                  [:span.gray-font
-                   (str " (" (<sub [:count-applications-by-state state-key]) ")")]]))]])))
+          (get-application-status-name state)]]]])))
 
 (defn ShowAllApplications [params]
   (rf/dispatch [:get-applications])
@@ -159,15 +118,14 @@
          [sa/GridColumn {:width 3}
           [ApplicationsDropdown]]
          [sa/GridColumn {:width 13}
-          (if (and (some? filter-state) (= applications-count 0))
-            [sa/SegmentGroup
-             [sa/Segment "No result found"]]
-            [sa/SegmentGroup
+          [sa/SegmentGroup {:class-name "messages__applications-list"}
+           (if (and (some? filter-state) (= applications-count 0))
+             [sa/Segment "No result found"]
              (doall (for [application (:data applications)
                           :when (if (nil? filter-state)
                                   true
                                   (= filter-state (:state application)))]
-                      [Application application]))])]]]])))
+                      ^{:key (:pk application)} [Application application])))]]]]])))
 
 (pages/reg-page :core/resident-messages ShowAllApplications)
 (pages/reg-page :core/resident-messages-apply ApplyToShift)

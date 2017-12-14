@@ -290,11 +290,15 @@
     [:.label-8
      :.messages__dropdown-item._8:before
      (s/> :.messages__dropdown._8 :.text:before) {:background-color "#15A4FA"}]]
+   [:.messages__applications-list {:background-color "#fff"}]
    [:.messages__message-wrapper {:cursor "pointer"
                                  :transition "background-color .2s"}
+    [:&._new {:background-color "rgba(21,164,250,0.1)"}]
     [:&:hover {:background-color "#f3f3f3"}]]
    [:.messages__message-grid {:padding "0 25px!important"}]
    [:.messages__message-text {:margin-top (px 10)}]
+   [:.messages__message-desc {:margin-top (px 10)
+                              :color "#8C97B2"}]
    [:.messages__message-label {:display "inline-block"
                                :vertical-align "top"
                                :float "right"
