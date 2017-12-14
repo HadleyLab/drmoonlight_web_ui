@@ -85,10 +85,7 @@
 
 (defn get-default-type [field]
   (cond
-    (= field :password) :password
-    (= field :current-password) :password
-    (= field :new-password) :password
-    (= field :new-password-confirm) :password
+    (str/includes? (name field) "password") :password
     (= field :email) :email
     :else :text))
 
