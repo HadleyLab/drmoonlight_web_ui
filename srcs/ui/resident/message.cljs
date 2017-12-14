@@ -73,6 +73,15 @@
           status (reduce-statuses shift-status application-status messages-status)]
       [ShiftLayout shift-pk [Discussion shift application messages status]])))
 
+(defn format-date-time [start finish]
+  (let [start-date (.format start "DD/MM")
+        finish-date (.format finish "DD/MM")
+        start-time (.format start "h:mm a")
+        finish-time (.format finish "h:mm a")]
+    (if (= start-date finish-date)
+      (str " at " start-date " from " start-time " to " finish-time)
+      (str " from " start-date " at " start-time " to " finish-date " at " finish-time))))
+
 (defn ShowAllApplications [params]
   (rf/dispatch [:get-applications])
   (fn [params]
@@ -93,30 +102,36 @@
          [sa/GridColumn {:width 13}
           [sa/SegmentGroup
            (doall (for [application (:data applications)
-                 :let [{{speciality :speciality
-                         start :date-start
-                         finish :date-end
-                         pk :pk
-                         payment-amount :payment-amount
-                         payment-per-hour :payment-per-hour
-                         description :description
-                         :as shift} :shift} application]
-                 :when (if (nil? filter-state)
-                         true
-                         (= filter-state (:state application)))]
-             [sa/Segment {:key (:pk application)}
-              [sa/Grid
-               [sa/GridColumn {:width 4}
-                [sa/Header (:name (<sub [:speciality speciality]))]
-                [:p [:strong "Starts: "] (as-apply-date-time start)]
-                [:p [:strong "Ends: "] (as-apply-date-time finish)]
-                [:p [:strong "Total: "] (as-hours-interval start finish) " hours"]
-                [:p [:strong "Payment amount: "] (str "$" payment-amount " per " (if payment-per-hour "hour" "shift"))]]
-               [sa/GridColumn {:width 9} description]
-               [sa/GridColumn {:width 3}
-                [sa/Button
-                 {:on-click (>event [:goto :resident :messages pk :discuss (:pk application)])}
-                 "Go to Chat"]]]]))]]]]])))
+                        :let [{{speciality :speciality
+                                start :date-start
+                                finish :date-end
+                                pk :pk
+                                payment-amount :payment-amount
+                                payment-per-hour :payment-per-hour
+                                description :description
+                                :as shift} :shift
+                               date-created :date-created
+                               state :state
+                               {message-text :text
+                                :as last-message} :last-message} application]
+                        :when (if (nil? filter-state)
+                                true
+                                (= filter-state (:state application)))]
+
+                    [sa/Segment {:key (:pk application)
+                                 :class-name "messages__message-container"
+                                 :on-click (>event [:goto :resident :messages pk :discuss (:pk application)])}
+                     (.log js/console "application" application)
+                     [sa/Grid {:class-name "messages__message-grid"}
+                      [sa/GridColumn {:width 3}
+                       [:div.gray-font (.fromNow (js/moment date-created))]]
+                      [sa/GridColumn {:width 10}
+                       [:b (:name (<sub [:speciality speciality])) (format-date-time start finish)]
+                       (if message-text [:div.messages__message-text message-text])]
+                      [sa/GridColumn {:width 3}
+                       (map
+                        (fn [[key value]] (if (= key state) value))
+                        application-statuses)]]]))]]]]])))
 
 (pages/reg-page :core/resident-messages ShowAllApplications)
 (pages/reg-page :core/resident-messages-apply ApplyToShift)

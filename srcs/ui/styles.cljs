@@ -261,4 +261,11 @@
                           :background-color "#DFE2E9"}]
     [:.form__group._account-settings
      {:margin-bottom 0}
-     [:&:after {:content "none"}]]]))
+     [:&:after {:content "none"}]]]
+
+   ; Messages page styles
+   [:.messages__message-container {:cursor "pointer"
+                                   :transition "background-color .2s"}
+    [:&:hover {:background-color "#f3f3f3"}]]
+   [:.messages__message-grid {:padding "0 25px!important"}]
+   [:.messages__message-text {:margin-top (px 10)}]))
