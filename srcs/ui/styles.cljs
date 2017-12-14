@@ -235,16 +235,44 @@
    [:.shift__remove-shift {:color "#E64C66" :cursor "pointer"}]
    [:.shift__modal [:.form__label {:white-space :nowrap}]]
 
+   ; profile detail screen styles
+   [:.profile-detail__container {:border-radius (px 3)}
+    [:.form__group:after {:content "\"\""
+                          :position "absolute"
+                          :left (px -70)
+                          :right (px -70)
+                          :bottom (px -10)
+                          :height (px 1)
+                          :background-color "#DFE2E9"}]
+    [:.form__group:first-child {:margin-top 0}]
+    [:.form__group._last {:margin-bottom 0}
+     [:&:after {:content :none}]]
+    [:.form__group-title {:margin-bottom 0}]]
+   [:.profile-detail__grid {:margin-top "2px!important"}]
+   [:.profile-detail__radio {:display "inline-block"
+                             :margin-right (px 35)}
+    [:label {:opacity "1!important"}
+     [:&:before {:border-color "#d4d4d5!important"}]]]
+   [:.profile-detail__select {:diplay "inline-block"
+                              :padding "4px 8px"
+                              :margin-right (px 10)
+                              :font-size (px 12)
+                              :line-height (px 15)
+                              :font-weight "bold"
+                              :background-color "#DFE2E9"
+                              :border-radius (px 4)}]
+
    ; profile screen styles
    [:.profile__menu-wrapper {:position "relative"
                              :margin-right "-15px"
                              :z-index 1}]
-   [:.profile__container {:margin "0 0 0 -1em"
-                          :border "1px solid #d4d4d5"
-                          :border-radius "0 3px 3px"}
+   [:.profile__container
+    :.profile-detail__container {:margin "0 0 0 -1em"
+                                 :border "1px solid #d4d4d5"}
     [:.field._radio [:.form__label {:width "52%"}]]
     [:.form__group {:position "relative"
                     :margin "20px 0 40px"}]]
+   [:.profile__container {:border-radius "0 3px 3px"}]
    [:.profile__content {:margin-top (px -20)
                         :min-height (px 600)}]
    [:.profile__content._notifications
