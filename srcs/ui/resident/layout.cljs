@@ -55,6 +55,9 @@
           (when-not (is-new) [sa/MenuItem {:name "Notification Settings"
                                            :active (= (:match route) :core/resident-profile-notification)
                                            :on-click #(>evt [:goto :resident :profile :notification])}])
+          [sa/MenuItem {:name "Change Password"
+                        :active (= (:match route) :core/resident-profile-change-password)
+                        :on-click #(>evt [:goto :resident :profile :change-password])}]
           [sa/MenuItem {:name "Log out"
                         :on-click #(>evt [:logout])}]]]]
 

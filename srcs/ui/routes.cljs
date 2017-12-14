@@ -32,7 +32,8 @@
                                      :interceptors [is-approved]}
                          "statistics" {:. :core/resident-statistics}
                          "profile" {:. :core/resident-profile
-                                    "notification" :core/resident-profile-notification}}
+                                    "notification" :core/resident-profile-notification
+                                    "change-password" :core/resident-profile-change-password}}
              "scheduler" {:interceptors [is-scheduler]
                           :. :core/scheduler
                           "detail" {[:resident-pk] :scheduler/resident-profile-detail}
@@ -40,7 +41,8 @@
                           "messages" {:. :core/scheduler-messages
                                       [:shift-pk] {"discuss" {[:application-pk] :core/scheduler-messages-discuss}}}
                           "statistics" {:. :core/scheduler-statistics}
-                          "profile" {:. :core/scheduler-profile}}})
+                          "profile" {:. :core/scheduler-profile
+                                     "change-password" :core/scheduler-profile-change-password}}})
 
 (defn href
   ;; helper function to build urls also check url

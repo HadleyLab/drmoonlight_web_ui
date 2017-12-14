@@ -2,9 +2,11 @@
   (:require
    [reagent.core :as reagent]
    [ui.db.misc :refer [>event <sub get-url]]
-   [ui.db.resident-profile :refer [resident-profile-form-fields resident-notification-form-fields]]
+   [ui.db.resident-profile :refer [resident-profile-form-fields
+                                   resident-notification-form-fields]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
+   [ui.change-password.core :refer [ChangePasswordForm]]
    [ui.widgets :refer [BuildForm]]
    [ui.widgets.error-message :refer [ErrorMessage]]
    [ui.resident.layout :refer [ResidentLayout ResidentProfileLayout]]
@@ -18,16 +20,16 @@
   (rf/dispatch [:init-resident-notification-form])
   (let [resident-notification-form-cursor (<sub [:resident-notification-form-cursor])]
     (fn []
-      (let [{status :status errors :errors} (<sub [:resident-profile-form-response])]
-      [:div.profile__content._notifications
-       [sa/Form {:class-name "moonlight-form-inner"}
-        [BuildForm resident-notification-form-cursor resident-notification-form-fields]
-        (when (= status :failure)
-          [ErrorMessage {:errors errors}])
-        [:div.form__group
-         [sa/FormButton {:color :blue
-                         :loading (= status :loading)
-                         :on-click (>event [:update-resident-notifications])} "Save changes"]]]]))))
+      (let [{status :status errors :errors} (<sub [:resident-notification-form-response])]
+        [:div.profile__content._notifications
+         [sa/Form {:class-name "moonlight-form-inner"}
+          [BuildForm resident-notification-form-cursor resident-notification-form-fields]
+          (when (= status :failure)
+            [ErrorMessage {:errors errors}])
+          [:div.form__group
+           [sa/FormButton {:color :blue
+                           :loading (= status :loading)
+                           :on-click (>event [:update-resident-notifications])} "Save changes"]]]]))))
 
 (defn ResidentProfileForm []
   (rf/dispatch [:init-resident-profile-form])
@@ -50,3 +52,4 @@
 (pages/reg-page :core/resident-statistics (fn [] [ResidentLayout [sa/Header {} "statistics"]]))
 (pages/reg-page :core/resident-profile (fn [] [ResidentProfileLayout [ResidentProfileForm]]))
 (pages/reg-page :core/resident-profile-notification (fn [] [ResidentProfileLayout [ResidentNotificationForm]]))
+(pages/reg-page :core/resident-profile-change-password (fn [] [ResidentProfileLayout [ChangePasswordForm]]))

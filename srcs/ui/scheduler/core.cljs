@@ -4,6 +4,7 @@
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.db.misc :refer [<sub >event]]
+   [ui.change-password.core :refer [ChangePasswordForm]]
    [ui.scheduler.layout :refer [SchedulerLayout SchedulerProfileLayout]]
    [ui.db.scheduler-profile :refer [scheduler-profile-form-fields]]
    [re-frame.core :as rf]
@@ -37,4 +38,5 @@
 (pages/reg-page :core/scheduler (fn [] [SchedulerLayout [sa/Header {} "index"]]))
 (pages/reg-page :core/scheduler-statistics (fn [] [SchedulerLayout [sa/Header {} "statistics"]]))
 (pages/reg-page :core/scheduler-profile (fn [] [SchedulerProfileLayout [SchedulerProfileForm]]))
+(pages/reg-page :core/scheduler-profile-change-password (fn [] [SchedulerProfileLayout [ChangePasswordForm]]))
 (pages/reg-page :scheduler/resident-profile-detail WrappedResidentProfileDetail)

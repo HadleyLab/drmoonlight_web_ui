@@ -85,7 +85,7 @@
 
 (defn get-default-type [field]
   (cond
-    (= field :password) :password
+    (str/includes? (name field) "password") :password
     (= field :email) :email
     :else :text))
 
