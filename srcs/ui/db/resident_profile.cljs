@@ -23,6 +23,10 @@
                 :state-license {:type :radio
                                 :label "State Licence"
                                 :items {true "yes" false "no"}}
+                :state-license-states {:type :multy-select
+                                       :label "US States Licence"
+                                       :items #(<sub [:us-states-as-options])
+                                       :visibility-depends-on :state-license}
                 :federal-dea-active {:type :radio
                                      :label "Federal DEA active"
                                      :items {true "yes" false "no"}}

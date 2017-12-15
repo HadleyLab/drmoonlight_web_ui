@@ -52,3 +52,20 @@
  :speciality-as-options
  #(rf/subscribe [:speciality])
  #(as-options :name %))
+
+(rf/reg-sub
+ :us-states
+ (fn [db [_ id]]
+   (if (nil? id)
+     (get-in db [::constants :data :us-states] [])
+     (get-in db [::constants :data :us-states id]))))
+
+(rf/reg-sub
+ :us-state-name
+ (fn [db [_ id]]
+   (get-in db [::constants :data :us-states id :name])))
+
+(rf/reg-sub
+ :us-states-as-options
+ #(rf/subscribe [:us-states])
+ #(as-options :name %))
