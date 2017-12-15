@@ -27,6 +27,10 @@
           (when (= status :failure)
             [ErrorMessage {:errors errors}])
           [:div.form__group
+           (if (= status :succeed)
+             [sa/Message {:color "green"
+                          :compact true
+                          :header "Your notification settings has been successfully saved!"}])
            [sa/FormButton {:color :blue
                            :loading (= status :loading)
                            :on-click (>event [:update-resident-notifications])} "Save changes"]]]]))))
