@@ -3,7 +3,8 @@
    [reagent.core :as reagent]
    [ui.db.misc :refer [>event >atom <sub get-url reduce-statuses text-with-br]]
    [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
-   [ui.db.application :refer [application-statuses]]
+   [ui.db.application :refer [format-application-shift-date get-application-status-name]]
+   [ui.widgets.applications-dropdown :refer [ApplicationsDropdown]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.scheduler.layout :refer [SchedulerLayout]]
@@ -13,68 +14,82 @@
    [soda-ash.core :as sa]
    [ui.scheduler.schedule.core]))
 
+(defn Application [params]
+  (fn [params]
+    (let [user-id (<sub [:user-id])
+          {date-created :date-created
+           state :state
+           application-pk :pk
+           {speciality :speciality
+            start :date-start
+            finish :date-end
+            shift-pk :pk
+            payment-amount :payment-amount
+            payment-per-hour :payment-per-hour
+            description :description
+            :as shift} :shift
+           {first-name :first-name
+            last-name :last-name
+            specialities :specialities
+            :as owner} :owner
+           {last-message-text :text
+            last-message-owner :owner
+            :as last-message} :last-message} params]
+      [sa/Segment {:key application-pk
+                   :class-name (str "messages__message-wrapper" (if (= state 1) " _new"))
+                   :on-click (>event [:goto :scheduler :messages shift-pk :discuss application-pk])}
+       [sa/Grid {:class-name "messages__message-grid"}
+        [sa/GridColumn {:width 3}
+         [:b first-name " " last-name]
+         [:div.gray-font (.fromNow (js/moment date-created))]]
+        [sa/GridColumn {:width 10}
+         [:b (:name (<sub [:speciality speciality])) (format-application-shift-date start finish)]
+         (if last-message-text [:div.messages__message-text
+                                (if (= user-id last-message-owner) [:b "You: "])
+                                last-message-text])
+         [:div.messages__message-desc (str/join ", " (map #(<sub [:speciality-name %]) specialities))]]
+        [sa/GridColumn {:width 3}
+         [:div {:class-name (str "messages__message-label" " label-" state)}
+          (get-application-status-name state)]]]])))
+
 (defn ShowAllApplications [params]
   (rf/dispatch [:get-applications])
   (fn [params]
     (let [applications (<sub [:applications])
-          filter-state (<sub [:applications-filter-state])]
+          filter-state (<sub [:applications-filter-state])
+          applications-count (<sub [:count-applications-by-state filter-state])]
       [SchedulerLayout
-       [sa/Grid {}
+       [sa/Grid {:class-name "messages__container"}
         [sa/GridRow {}
          [sa/GridColumn {:width 3}
-          (doall (for [[state-key state] application-statuses]
-                   [:div {:key state}
-                    [sa/Label {:active (= state-key filter-state)
-                               :on-click (>event [:set-applications-filter-state state-key])}
-                     state
-                     [sa/LabelDetail (<sub [:count-applications-by-state state-key])]]
-                    [:br]
-                    [:br]]))]
+          [ApplicationsDropdown]]
          [sa/GridColumn {:width 13}
-          [sa/SegmentGroup
-           (doall (for [application (:data applications)
-                 :let [{{speciality :speciality
-                         start :date-start
-                         finish :date-end
-                         pk :pk
-                         payment-amount :payment-amount
-                         payment-per-hour :payment-per-hour
-                         description :description
-                         :as shift} :shift} application]
-                 :when (if (nil? filter-state)
-                         true
-                         (= filter-state (:state application)))]
-             [sa/Segment {:key (:pk application)}
-              [sa/Grid
-               [sa/GridColumn {:width 4}
-                [sa/Header (:name (<sub [:speciality speciality]))]
-                [:p [:strong "Starts: "] (as-apply-date-time start)]
-                [:p [:strong "Ends: "] (as-apply-date-time finish)]
-                [:p [:strong "Total: "] (as-hours-interval start finish) " hours"]
-                [:p [:strong "Payment amount: "] (str "$" payment-amount " per " (if payment-per-hour "hour" "shift"))]]
-               [sa/GridColumn {:width 9} description]
-               [sa/GridColumn {:width 3}
-                [sa/Button
-                 {:on-click (>event [:goto :scheduler :messages pk :discuss (:pk application)])}
-                 "Go to Chat"]]]]))]]]]])))
+          [sa/SegmentGroup {:class-name "messages__applications-list"}
+           (if (and (some? filter-state) (= applications-count 0))
+             [sa/Segment "No result found"]
+             (doall (for [application (:data applications)
+                          :when (if (nil? filter-state)
+                                  true
+                                  (= filter-state (:state application)))]
+                      ^{:key (:pk application)} [Application application])))]]]]])))
 
 (defn ApplicationLayout [application-info content]
   (let [{status :status application :data} application-info
         data-is-loading (or (and (nil? application) (= status :loading)) (= status :not-asked))]
-  [SchedulerLayout
-   [sa/Grid {}
-    [sa/GridRow {}
-     [sa/GridColumn {:width 3}
-      [sa/Segment
-       [sa/Dimmer {:active  data-is-loading} [sa/Loader]]
-       (when (not data-is-loading)
-         (let [{owner :owner} application]
-           [:div
-            [sa/Header
-             [:a {:href (href :scheduler :detail (:id owner))}
-              (str (:first-name owner) " " (:last-name owner))]]]))]]
-     [sa/GridColumn {:width 13 :class-name :moonlight-white}
-      content]]]]))
+    [SchedulerLayout
+     [sa/Grid {}
+      [sa/GridRow {}
+       [sa/GridColumn {:width 3}
+        [sa/Segment
+         [sa/Dimmer {:active  data-is-loading} [sa/Loader]]
+         (when (not data-is-loading)
+           (let [{owner :owner} application]
+             [:div
+              [sa/Header
+               [:a {:href (href :scheduler :detail (:id owner))}
+                (str (:first-name owner) " " (:last-name owner))]]]))]]
+       [sa/GridColumn {:width 13 :class-name :moonlight-white}
+        content]]]]))
 
 (defn DiscussShift [{application-pk :application-pk shift-pk :shift-pk}]
   (rf/dispatch [:get-shift-info shift-pk])

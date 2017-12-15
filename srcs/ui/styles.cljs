@@ -1,6 +1,7 @@
 (ns ui.styles
   (:require [garden.core :as garden]
-            [garden.units :as units]))
+            [garden.units :as units]
+            [garden.selectors :as s]))
 
 (def px units/px)
 
@@ -153,7 +154,7 @@
                                         :height (px 7)
                                         :border-radius "50%"}
     [:&._completed {:background-color "#00BFDD"}]
-    [:&._failed {:background-color "#000000"}]
+    [:&._failed {:background-color "#000"}]
     [:&._active {:background-color "#FFAB00"}]
     [:&._without_applies {:background-color "#E64C66"}]
     [:&._coverage_completed {:background-color "#44BE8D"}]
@@ -210,7 +211,7 @@
                     :cursor "default"
                     :word-wrap "break-word"}
     [:&._completed {:background-color "#00BFDD"}]
-    [:&._failed {:background-color "#000000"}]
+    [:&._failed {:background-color "#000"}]
     [:&._active {:background-color "#FFAB00"}]
     [:&._without_applies {:background-color "#E64C66"}]
     [:&._coverage_completed {:background-color "#44BE8D"}]
@@ -261,4 +262,78 @@
                           :background-color "#DFE2E9"}]
     [:.form__group._account-settings
      {:margin-bottom 0}
-     [:&:after {:content "none"}]]]))
+     [:&:after {:content "none"}]]]
+
+   ; Messages page styles
+   [:.messages__container
+    [:.label-1
+     :.messages__dropdown-item._1:before
+     (s/> :.messages__dropdown._1 :.text:before) {:background-color "#7874CF"}]
+    [:.label-2
+     :.messages__dropdown-item._2:before
+     (s/> :.messages__dropdown._2 :.text:before) {:background-color "#44BE8D"}]
+    [:.label-3
+     :.messages__dropdown-item._3:before
+     (s/> :.messages__dropdown._3 :.text:before) {:background-color "#E64C66"}]
+    [:.label-4
+     :.messages__dropdown-item._4:before
+     (s/> :.messages__dropdown._4 :.text:before) {:background-color "#FFAB00"}]
+    [:.label-5
+     :.messages__dropdown-item._5:before
+     (s/> :.messages__dropdown._5 :.text:before) {:background-color "#44BE8D"}]
+    [:.label-6
+     :.messages__dropdown-item._6:before
+     (s/> :.messages__dropdown._6 :.text:before) {:background-color "#E64C66"}]
+    [:.label-7
+     :.messages__dropdown-item._7:before
+     (s/> :.messages__dropdown._7 :.text:before) {:background-color "#000"}]
+    [:.label-8
+     :.messages__dropdown-item._8:before
+     (s/> :.messages__dropdown._8 :.text:before) {:background-color "#15A4FA"}]]
+   [:.messages__applications-list {:background-color "#fff"}]
+   [:.messages__message-wrapper {:cursor "pointer"
+                                 :transition "background-color .2s"}
+    [:&._new {:background-color "rgba(21,164,250,0.1)"}]
+    [:&:hover {:background-color "#f3f3f3"}]]
+   [:.messages__message-grid {:padding "0 25px!important"}]
+   [:.messages__message-text {:margin-top (px 10)}]
+   [:.messages__message-desc {:margin-top (px 10)
+                              :color "#8C97B2"}]
+   [:.messages__message-label {:display "inline-block"
+                               :vertical-align "top"
+                               :float "right"
+                               :padding "3px 8px"
+                               :color "#fff"
+                               :font-size (px 12)
+                               :line-height (px 14)
+                               :border-radius (px 4)}]
+   [:.messages__dropdown-item {:position "relative"
+                               :padding "10px 15px 10px 30px"
+                               :cursor "pointer"
+                               :font-weight "normal"
+                               :transition "background-color .1s"}
+    [:&:before {:content "\"\""
+                :display "inline-block"
+                :position "absolute"
+                :left (px 15)
+                :top (px 14)
+                :width (px 7)
+                :height (px 7)
+                :border-radius "50%"
+                :background-color "#8C97B2"}]
+    [:&:hover {:background-color "rgba(0,0,0,0.07)"}]
+    [:&._active
+     :&._active:hover {:background-color "rgba(0,0,0,0.1)"}]]
+   [:.messages__dropdown
+    [:.text {:position "relative"
+             :padding-left (px 10)
+             :display "inline-block"}
+     [:&:before {:content "\"\""
+                 :display "inline-block"
+                 :position "absolute"
+                 :left (px -5)
+                 :top (px 3)
+                 :width (px 7)
+                 :height (px 7)
+                 :border-radius "50%"
+                 :background-color "#8C97B2"}]]]))

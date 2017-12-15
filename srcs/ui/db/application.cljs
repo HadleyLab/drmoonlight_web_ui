@@ -14,7 +14,7 @@
     :comment-form {:fields {:text ""} :response {:status :not-asked}}}})
 
 (def application-statuses
-  {1 "New"
+  {1 "New application"
    2 "Approved"
    3 "Rejected"
    4 "Postponed"
@@ -22,6 +22,22 @@
    6 "Cancelled"
    7 "Failed"
    8 "Completed"})
+
+(defn get-application-status-name [state]
+  (if (nil? state)
+    "All messages"
+    (map
+     (fn [[key value]] (if (= key state) value))
+     application-statuses)))
+
+(defn format-application-shift-date [start finish]
+  (let [start-date (.format start "DD/MM")
+        finish-date (.format finish "DD/MM")
+        start-time (.format start "h:mm a")
+        finish-time (.format finish "h:mm a")]
+    (if (= start-date finish-date)
+      (str " at " start-date " from " start-time " to " finish-time)
+      (str " from " start-date " at " start-time " to " finish-date " at " finish-time))))
 
 (rf/reg-event-fx
  :get-applications
