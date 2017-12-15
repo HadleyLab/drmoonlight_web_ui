@@ -11,7 +11,7 @@
    [frames.openid :as openid]
    [frames.redirect :as redirect]
    [ui.db]
-   [ui.db.misc :refer [<sub]]
+   [ui.db.misc :refer [<sub >event]]
    [ui.dashboard.core]
    [ui.login.core]
    [ui.signup.core]
@@ -27,12 +27,18 @@
    [soda-ash.core :as sa]))
 
 (defn- NotFound []
-  [sa/Header
-    [:div.not-found (str "Page not found")]])
+  [sa/Container {:class-name "not-found__container align-items _center"}
+   [sa/Icon {:name "frown" :size "massive" :fitted true :class-name "not-found__icon"}]
+   [:div.not-found__title (str "404")]
+   [:div.not-found__subtitle (str "Page not found")]
+   [:div "The Page you are looking for doesn't exist or an other error occured."]
+   [:div "Go back or head over to "
+    [:span.not-found__link {:on-click (>event [:goto "/"])} "Dr. Moonlight Home"]
+    " to choose another direction."]])
 
 (defn- Preloader []
   [sa/Header
-    [:div.preloader (str "Loading")]])
+   [:div.preloader (str "Loading")]])
 
 ;; this is the root component wich switch pages
 ;; using current-route key from database
@@ -70,8 +76,8 @@
 
 (defn- mount-root []
   (reagent/render
-   [layout/layout [CurrentPage]]
-   (.getElementById js/document "app")))
+    [layout/layout [CurrentPage]]
+    (.getElementById js/document "app")))
 
 (defn init! [base-url]
   (rf/dispatch [::initialize base-url])
