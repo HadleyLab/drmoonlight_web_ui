@@ -126,12 +126,21 @@
                  :on-change (>atom cursor)
                  :options (items)}]])
 
+(defn input-visible? [fields
+                      {type :type visibility-depends-on :visibility-depends-on}]
+  (and
+   (not= type :mock)
+   (if (nil? visibility-depends-on)
+     true
+     (visibility-depends-on fields))))
+
 (defn RenderInput [{cursor :cursor field :field hide-error :hide-error}]
-  (let [field-cursor (reagent/cursor cursor [:fields field])
+  (let [fields-cursor (reagent/cursor cursor [:fields])
+        field-cursor (reagent/cursor cursor [:fields field])
         errors-cursor (reagent/cursor cursor [:response :errors field])]
     (fn [{field :field info :info}]
       (let [errors @errors-cursor]
-        (if (not= :mock (:type info))
+        (if (input-visible? @fields-cursor info)
           [sa/FormGroup {}
            (if (or (= :input (:type info)) (string? info))
              [sa/FormField {:width (or (:width info) 11) :error (:error info)}
