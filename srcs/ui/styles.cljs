@@ -97,6 +97,23 @@
                                              :border "1px solid rgb(224, 180, 180)"
                                              :background-color "rgb(255, 246, 246)"}]]
 
+   ; not found page styles
+   [:.not-found__container {:display "flex!important"
+                            :height "100vh"
+                            :min-height (px 600)
+                            :flex-direction "column"
+                            :color "#777"}]
+   [:.not-found__icon {:font-size "160px!important"}]
+   [:.not-found__title {:font-size (px 60)
+                        :line-height (px 60)
+                        :margin (px 20)}]
+   [:.not-found__subtitle {:font-size (px 26)
+                           :line-height (px 26)
+                           :color "#b8b8b8"
+                           :margin-bottom (px 20)}]
+   [:.not-found__link {:color "#1678c2" :cursor "pointer"}
+    [:&:hover {:text-decoration "underline"}]]
+
    ; dashboard styles
    [:.dashboard__header {:font-size (px 46)
                          :line-height (px 55)
