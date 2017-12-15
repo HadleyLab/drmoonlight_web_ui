@@ -134,13 +134,22 @@
 
 ;; API for verbose shift information
 
+(defn prepare-payment-per-hour [shift]
+  (let [payment-per-hour (:payment-per-hour shift)]
+    (merge shift {:payment-per-hour (if payment-per-hour "true" "false")})))
+
+(defn prepare-shift-data [shift]
+  (-> shift
+      (prepare-payment-per-hour)
+      (parse-date-time)))
+
 (rf/reg-event-fx
  :get-shift-info
  (fn [{db :db} [_ shift-pk fx]]
    {:json/fetch->path {:path [::shift :detail shift-pk]
                        :uri (get-url db "/api/shifts/shift/" shift-pk "/")
                        :token (<sub [:token])
-                       :map-result parse-date-time
+                       :map-result prepare-shift-data
                        :succeed-fx fx}}))
 
 (rf/reg-sub
