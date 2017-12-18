@@ -7,6 +7,7 @@
    [ui.pages :as pages]
    [ui.routes :refer [href]]
    [ui.change-password.core :refer [ChangePasswordForm]]
+   [ui.statistics.core :refer [Statistics]]
    [ui.widgets :refer [BuildForm]]
    [ui.widgets.error-message :refer [ErrorMessage]]
    [ui.resident.layout :refer [ResidentLayout ResidentProfileLayout]]
@@ -53,7 +54,7 @@
                            :on-click (>event [:update-resident-profile])} "Save changes"]]]]))))
 
 (pages/reg-page :core/resident (fn [] [ResidentLayout [sa/Header {} "index"]]))
-(pages/reg-page :core/resident-statistics (fn [] [ResidentLayout [sa/Header {} "statistics"]]))
+(pages/reg-page :core/resident-statistics (fn [] [ResidentLayout [Statistics]]))
 (pages/reg-page :core/resident-profile (fn [] [ResidentProfileLayout [ResidentProfileForm]]))
 (pages/reg-page :core/resident-profile-notification (fn [] [ResidentProfileLayout [ResidentNotificationForm]]))
 (pages/reg-page :core/resident-profile-change-password (fn [] [ResidentProfileLayout [ChangePasswordForm]]))

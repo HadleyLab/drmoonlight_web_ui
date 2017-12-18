@@ -115,6 +115,9 @@
    [:.not-found__link {:color "#1678c2" :cursor "pointer"}
     [:&:hover {:text-decoration "underline"}]]
 
+    ; statistics styles
+   [:.statistics__data-wrapper {:padding "20px 70px 70px"}]
+
    ; dashboard styles
    [:.dashboard__header {:font-size (px 46)
                          :line-height (px 55)
