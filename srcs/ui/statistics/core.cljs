@@ -7,6 +7,7 @@
    [ui.db.statistics :refer [statistic-field-names-map]]
    [ui.resident.layout :refer [ResidentHeader]]
    [ui.scheduler.layout :refer [SchedulerHeader]]
+   [ui.account-manager.core :refer [AccountManagerHeader]]
    [ui.dashboard.core :refer [CommonHeader]]))
 
 (defn StatisticsLayout [content]
@@ -16,7 +17,7 @@
        (case user-type
          :resident [ResidentHeader]
          :scheduler [SchedulerHeader]
-         [sa/GridRow [sa/Grid {:container true :padded "vertically"} [CommonHeader]]])
+         :account-manager [AccountManagerHeader])
        [sa/GridRow [sa/Grid {:container true :padded "vertically"} [CommonHeader]]])
      [sa/GridRow {}
       [sa/Container content]]]))
