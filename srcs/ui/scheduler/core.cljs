@@ -36,7 +36,6 @@
   [SchedulerLayout [ResidentProfileDetail params]])
 
 (pages/reg-page :core/scheduler (fn [] [SchedulerLayout [sa/Header {} "index"]]))
-(pages/reg-page :core/scheduler-statistics (fn [] [SchedulerLayout [sa/Header {} "statistics"]]))
 (pages/reg-page :core/scheduler-profile (fn [] [SchedulerProfileLayout [SchedulerProfileForm]]))
 (pages/reg-page :core/scheduler-profile-change-password (fn [] [SchedulerProfileLayout [ChangePasswordForm]]))
 (pages/reg-page :scheduler/resident-profile-detail WrappedResidentProfileDetail)

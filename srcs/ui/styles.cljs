@@ -116,7 +116,8 @@
     [:&:hover {:text-decoration "underline"}]]
 
     ; statistics styles
-   [:.statistics__data-wrapper {:padding "20px 70px 70px"}]
+   [:.statistics__data-wrapper {:padding "50px 70px!important"}]
+   [:.statistics__col-value {:font-weight "bold"}]
 
    ; dashboard styles
    [:.dashboard__header {:font-size (px 46)
@@ -274,7 +275,8 @@
                              :margin-right (px 35)}
     [:label {:opacity "1!important"}
      [:&:before {:border-color "#d4d4d5!important"}]]]
-   [:.profile-detail__select {:display "inline-block"
+   [:.statistics__col-select
+    :.profile-detail__select {:display "inline-block"
                               :padding "4px 8px"
                               :margin "2px 10px 2px 0"
                               :font-size (px 12)

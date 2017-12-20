@@ -4,7 +4,7 @@
    [soda-ash.core :as sa]
    [ui.widgets.header-logo :refer [HeaderLogo]]))
 
-(defn Header []
+(defn SchedulerHeader []
   (let [route (<sub [:route-map/current-route])]
     [sa/GridRow {:class-name "header__wrapper"}
      [sa/Container {:class-name "header__content"}
@@ -21,8 +21,8 @@
                    :class-name "header__menu-item"}
         [sa/Icon {:name :mail :size :large}]
         "Messages"]
-       [sa/Button {:active (= (:match route) :core/scheduler-statistics)
-                   :on-click (>event [:goto :scheduler :statistics])
+       [sa/Button {:active (= (:match route) :core/statistics)
+                   :on-click (>event [:goto :statistics])
                    :class-name "header__menu-item"}
         [sa/Icon {:name "line graph" :size :large}]
         "Statistics"]
@@ -35,7 +35,7 @@
 (defn SchedulerLayout [content]
   (let [route (<sub [:route-map/current-route])]
     [sa/Grid {}
-     [Header]
+     [SchedulerHeader]
      [sa/GridRow {}
       [sa/Container content]]]))
 

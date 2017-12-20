@@ -19,6 +19,7 @@
    [ui.resident.core]
    [ui.scheduler.core]
    [ui.account-manager.core]
+   [ui.statistics.core]
    [ui.pages :as pages]
    [ui.routes :as routes]
    [ui.layout :as layout]
