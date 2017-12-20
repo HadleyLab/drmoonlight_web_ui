@@ -53,7 +53,7 @@
        [sa/GridRow {}
         [sa/GridColumn {:width 4}
          [:div.profile__menu-wrapper
-          [sa/Header (str first-name last-name)]
+          [sa/Header (str first-name " " last-name)]
           [:p (string/join ", " specialities)]
           [:p.gray-font "signed up " (.format (js/moment date-joined) "DD/MM/YYYY")]]]
         [sa/GridColumn {:width 12}

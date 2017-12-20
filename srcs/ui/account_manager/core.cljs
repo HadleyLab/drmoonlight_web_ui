@@ -7,19 +7,26 @@
    [ui.routes :refer [href]]
    [ui.widgets.resident-profile-detail :refer [ResidentProfileDetail]]
    [re-frame.core :as rf]
-   [soda-ash.core :as sa]))
+   [soda-ash.core :as sa]
+   [ui.widgets.header-logo :refer [HeaderLogo]]))
+
+(defn Header []
+  (let []
+    [sa/GridRow {:class-name "header__wrapper"}
+     [sa/Container {:class-name "header__content"}
+      [HeaderLogo]
+      [sa/ButtonGroup {}
+       [sa/Button {:on-click (>event [:logout])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name "log out" :size :large}]
+        "Log out"]]]]))
 
 (defn AccountManagerLayout [content]
   (let [route (<sub [:route-map/current-route])]
     [sa/Grid {}
-     [sa/GridRow {:class-name "moonlight-header"}
-      [sa/GridColumn {:width 1}]
-      [sa/GridColumn {:width 12} [sa/Header {} "Dr.Moonlight"]]
-      [sa/GridColumn {:width 3} [sa/Button {:on-click (>event [:logout])} "Log out"]]]
+     [Header]
      [sa/GridRow {}
-      [sa/GridColumn {:width 1}]
-      [sa/GridColumn {:width 14} content]
-      [sa/GridColumn {:width 1}]]]))
+      [sa/Container content]]]))
 
 (defn Index [params]
   (rf/dispatch [:load-residents-which-waiting-for-approve])
@@ -64,8 +71,8 @@
       [AccountManagerLayout [ResidentProfileDetail
                              params
                              [sa/GridRow
-                              [sa/GridColumn {:width 3}]
-                              [sa/GridColumn {:width 3}
+                              [sa/GridColumn {:width 4}]
+                              [sa/GridColumn {:width 12 :class-name "account-manager__resident-buttons"}
                                ;;TODO use error widget from https://gitlab.bro.engineering/drmoonlight/drmoonlight_web_ui/issues/6#note_6233
                                (when (= status :failure) [:div.error (str errors)])
                                [sa/Button {:color :green :on-click (>event [:approve-resident pk [:goto :account-manager]])} "Approve"]

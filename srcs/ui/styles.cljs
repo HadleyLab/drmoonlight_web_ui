@@ -271,9 +271,9 @@
                              :margin-right (px 35)}
     [:label {:opacity "1!important"}
      [:&:before {:border-color "#d4d4d5!important"}]]]
-   [:.profile-detail__select {:diplay "inline-block"
+   [:.profile-detail__select {:display "inline-block"
                               :padding "4px 8px"
-                              :margin-right (px 10)
+                              :margin "2px 10px 2px 0"
                               :font-size (px 12)
                               :line-height (px 15)
                               :font-weight "bold"
@@ -381,4 +381,8 @@
                  :width (px 7)
                  :height (px 7)
                  :border-radius "50%"
-                 :background-color "#8C97B2"}]]]))
+                 :background-color "#8C97B2"}]]]
+
+   ; account manager styles
+   [:.account-manager__resident-buttons {:padding-bottom "50px"
+                                         :text-align "right"}]))
