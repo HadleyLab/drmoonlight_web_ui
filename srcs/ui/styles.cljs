@@ -250,7 +250,8 @@
                   :line-height (px 17)}
     [:i {:color "#8C97B2"
          :font-style "normal"}]]
-   [:.shift__remove-shift {:color "#E64C66" :cursor "pointer"}]
+   [:.shift__remove-shift {:color "#E64C66" :cursor "pointer"}
+    [:&:hover {:text-decoration "underline"}]]
    [:.shift__modal [:.form__label {:white-space :nowrap}]]
 
    ; profile detail screen styles

@@ -64,7 +64,8 @@
                         :on-click (>events [[[:close-edit-shift-popup] pk]
                                             [[:init-edit-shift-form] pk]
                                             [[:open-edit-shift-modal] pk]])} "Edit shift"]
-            [:div.shift__remove-shift "Remove shift"]]]
+            (if-not (contains? #{"completed" "active" "failed"} state)
+              [:div.shift__remove-shift {:on-click (>event [:delete-shift pk])} "Remove shift"])]]
      [EditModal pk]]))
 
 ;; TODO: rename to CreateModal to be consistent with EditModal

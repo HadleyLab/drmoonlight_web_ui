@@ -279,8 +279,22 @@
                        :succeed-fx [:update-shift-succeed pk]}}))
 
 (rf/reg-event-fx
+ :delete-shift
+ (fn [{db :db} [_ pk]]
+   {:json/fetch->path {:path [::shift :list]
+                       :uri (get-url db "/api/shifts/shift/" pk "/")
+                       :method "DELETE"
+                       :token (<sub [:token])
+                       :succeed-fx [:delete-shift-succeed pk]}}))
+
+(rf/reg-event-fx
  :update-shift-succeed
  (fn [{db :db} [_ pk]]
    {:dispatch-n [[:load-shifts]
                  [:close-edit-shift-modal pk]
                  [:init-new-shift-form]]}))
+
+(rf/reg-event-fx
+ :delete-shift-succeed
+ (fn [{db :db} [_ pk]]
+   {:dispatch-n [[:load-shifts]]}))
