@@ -285,7 +285,7 @@
                        :uri (get-url db "/api/shifts/shift/" pk "/")
                        :method "DELETE"
                        :token (<sub [:token])
-                       :succeed-fx [:delete-shift-succeed pk]}}))
+                       :succeed-fx [:load-shifts]}}))
 
 (rf/reg-event-fx
  :update-shift-succeed
@@ -293,8 +293,3 @@
    {:dispatch-n [[:load-shifts]
                  [:close-edit-shift-modal pk]
                  [:init-new-shift-form]]}))
-
-(rf/reg-event-fx
- :delete-shift-succeed
- (fn [{db :db} [_ pk]]
-   {:dispatch-n [[:load-shifts]]}))
