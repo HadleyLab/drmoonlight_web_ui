@@ -23,6 +23,7 @@
              "account-manager" {:interceptors [is-account-manager]
                                 :. :account-manager/index
                                 "detail" {[:resident-pk] :account-manager/resident-profile-detail}}
+             "statistics" {:. :core/statistics}
              "resident" {:interceptors [is-resident]
                          :. :core/resident
                          "schedule" {:. :core/resident-schedule}
@@ -30,7 +31,6 @@
                                      [:shift-pk] {:. :core/resident-messages-apply
                                                   "discuss" {[:application-pk] :core/resident-messages-discuss}}
                                      :interceptors [is-approved]}
-                         "statistics" {:. :core/resident-statistics}
                          "profile" {:. :core/resident-profile
                                     "notification" :core/resident-profile-notification
                                     "change-password" :core/resident-profile-change-password}}
@@ -40,7 +40,6 @@
                           "schedule" {:. :core/scheduler-schedule}
                           "messages" {:. :core/scheduler-messages
                                       [:shift-pk] {"discuss" {[:application-pk] :core/scheduler-messages-discuss}}}
-                          "statistics" {:. :core/scheduler-statistics}
                           "profile" {:. :core/scheduler-profile
                                      "change-password" :core/scheduler-profile-change-password}}})
 

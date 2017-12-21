@@ -10,12 +10,22 @@
    [soda-ash.core :as sa]
    [ui.widgets.header-logo :refer [HeaderLogo]]))
 
-(defn Header []
-  (let []
+(defn AccountManagerHeader []
+  (let [route (<sub [:route-map/current-route])]
     [sa/GridRow {:class-name "header__wrapper"}
      [sa/Container {:class-name "header__content"}
       [HeaderLogo]
       [sa/ButtonGroup {}
+       [sa/Button {:active (= (:match route) :account-manager/index)
+                   :on-click (>event [:goto :account-manager])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name "list layout" :size :large}]
+        "Dashboard"]
+       [sa/Button {:active (= (:match route) :core/statistics)
+                   :on-click (>event [:goto :statistics])
+                   :class-name "header__menu-item"}
+        [sa/Icon {:name "line graph" :size :large}]
+        "Statistics"]
        [sa/Button {:on-click (>event [:logout])
                    :class-name "header__menu-item"}
         [sa/Icon {:name "log out" :size :large}]
@@ -24,7 +34,7 @@
 (defn AccountManagerLayout [content]
   (let [route (<sub [:route-map/current-route])]
     [sa/Grid {}
-     [Header]
+     [AccountManagerHeader]
      [sa/GridRow {}
       [sa/Container content]]]))
 
