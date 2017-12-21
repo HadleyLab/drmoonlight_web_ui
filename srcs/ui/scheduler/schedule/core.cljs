@@ -68,8 +68,7 @@
               [:div.shift__remove-shift {:on-click (>event [:delete-shift pk])} "Remove shift"])]]
      [EditModal pk]]))
 
-;; TODO: rename to CreateModal to be consistent with EditModal
-(defn CreateNewShift [new-shift-form-cursor]
+(defn CreateModal [new-shift-form-cursor]
   (rf/dispatch [:init-new-shift-form])
   (fn [new-shift-form-cursor]
     (let [hide-field-errors true
@@ -108,7 +107,7 @@
         [SchedulerLayout
          [sa/Grid {}
           [sa/GridRow {}
-           [sa/GridColumn {:width 3} [CreateNewShift new-shift-form-cursor]]
+           [sa/GridColumn {:width 3} [CreateModal new-shift-form-cursor]]
            [CalendarMonthControl [sa/GridColumn {:width 13}]]]
           [sa/GridRow {}
            [sa/GridColumn {:width 3}
