@@ -63,7 +63,7 @@
   ([event default]
    (>event event default identity))
   ([event default coercer]
-   #(rf/dispatch (let [value (or (.-value %2) (.-checked %2))]
+   #(rf/dispatch (let [value (if (nil? %2) nil (or (.-value %2) (.-checked %2)))]
                    (conj event
                          (coercer (if (negligible? value)
                                     default
