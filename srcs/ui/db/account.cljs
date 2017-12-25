@@ -152,6 +152,17 @@
    {:store (dissoc store :token)
     :dispatch [:force-reload]}))
 
+(def states-map
+  {1 :new
+   2 :profile-filled
+   3 :approved
+   4 :rejected})
+
+(defn- convert-state [data]
+  (if (:state data)
+    (merge data {:state (get states-map (:state data))})
+    data))
+
 (rf/reg-event-fx
  :load-account-info
  (fn [{db :db} [_ final-succeed-fx]]
@@ -163,6 +174,7 @@
        {:json/fetch->path {:path [::account :info-response]
                            :uri (get-url db (str "/api/accounts/" (name user-type) "/" user-id "/"))
                            :token token
+                           :map-result convert-state
                            :succeed-fx [:dispatch-fx final-succeed-fx]}}))))
 
 (rf/reg-event-db
@@ -245,16 +257,16 @@
   (= (<sub [:user-type]) :account-manager))
 
 (defn is-new []
-  (= (<sub [:user-state])  1))
+  (= (<sub [:user-state]) :new))
 
 (defn is-profile-filled []
-  (= (<sub [:user-state])  2))
+  (= (<sub [:user-state]) :profile-filled))
 
 (defn is-approved []
-  (= (<sub [:user-state])  3))
+  (= (<sub [:user-state]) :approved))
 
 (defn is-rejected []
-  (= (<sub [:user-state])  4))
+  (= (<sub [:user-state]) :rejected))
 
 (rf/reg-event-db
  :init-forgot-password-form

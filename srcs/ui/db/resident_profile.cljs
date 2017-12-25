@@ -99,8 +99,7 @@
    (let [pk (<sub [:user-id])
          state (<sub [:user-state])
          body (<sub [::resident-profile :profile-form :fields])
-         ; TODO: use keyword constants instead of numbers
-         is-new-or-rejected (or (= state 1) (= state 4))
+         is-new-or-rejected (or (= state :new) (= state :rejected))
          url (if is-new-or-rejected
                (get-url db "/api/accounts/resident/" pk "/fill_profile/")
                (get-url db "/api/accounts/resident/" pk "/"))]
