@@ -227,7 +227,8 @@
 (rf/reg-event-db
  :init-new-shift-form
  (fn [db [_]]
-   (assoc-in db [::shift :shift-form] (get-in schema [::shift :shift-form]))))
+   (assoc-in db [::shift :shift-form :fields]
+             (fields->schema shift-form-fields shift-form-default-values))))
 
 (rf/reg-event-fx
  :init-edit-shift-form

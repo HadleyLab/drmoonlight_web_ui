@@ -69,13 +69,13 @@
      [EditModal pk]]))
 
 (defn CreateModal [new-shift-form-cursor]
-  (rf/dispatch [:init-new-shift-form])
   (fn [new-shift-form-cursor]
     (let [hide-field-errors true
           {status :status errors :errors} (<sub [:shift-form-response])]
       [sa/Modal {:trigger (reagent/as-element [sa/Button {:color :blue
                                                           :fluid true
-                                                          :on-click (>event [:open-new-shift-modal])}
+                                                          :on-click (>events [[[:init-new-shift-form]]
+                                                                              [[:open-new-shift-modal]]])}
                                                [sa/Icon {:name :plus}] "Create new shift"])
                  :open (<sub [:new-shift-modal])
                  :on-close (>event [:close-new-shift-modal])
