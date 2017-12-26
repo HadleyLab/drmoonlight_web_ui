@@ -8,7 +8,8 @@
    [ui.widgets.resident-profile-detail :refer [ResidentProfileDetail]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]
-   [ui.widgets.header-logo :refer [HeaderLogo]]))
+   [ui.widgets.header-logo :refer [HeaderLogo]]
+   [ui.widgets.error-message :refer [ErrorMessage]]))
 
 (defn AccountManagerHeader []
   (let [route (<sub [:route-map/current-route])]
@@ -83,8 +84,8 @@
                              [sa/GridRow
                               [sa/GridColumn {:width 4}]
                               [sa/GridColumn {:width 12 :class-name "account-manager__resident-buttons"}
-                               ;;TODO use error widget from https://gitlab.bro.engineering/drmoonlight/drmoonlight_web_ui/issues/6#note_6233
-                               (when (= status :failure) [:div.error (str errors)])
+                               (when (= status :failure)
+                                 [ErrorMessage {:errors errors}])
                                [sa/Button {:color :green :on-click (>event [:approve-resident pk [:goto :account-manager]])} "Approve"]
                                [sa/Button {:color :red :on-click (>event [:reject-resident pk [:goto :account-manager]])} "Reject"]]]]])))
 

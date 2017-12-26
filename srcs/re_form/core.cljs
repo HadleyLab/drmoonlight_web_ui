@@ -1,4 +1,4 @@
-(ns re-form.core 
+(ns re-form.core
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
@@ -14,17 +14,14 @@
       (assoc (or m {}) k value))))
 
 ;; TODO: use db/write
-;; TODO: use db/write
 (rf/reg-event-db
  :re-form/change
  (fn [db [_ path value]]
-   (.log js/console "ups")
    (insert-by-path db path value)))
 
 (rf/reg-sub-raw
  :re-form/data
  (fn [db [_ path]] (reaction (get-in @db path))))
-
 
 (defn input [{b-pth :base-path pth :path :as props}]
   (let [sub (rf/subscribe [:re-form/data (into b-pth pth)])]

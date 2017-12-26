@@ -25,7 +25,6 @@
 (rf/reg-sub-raw :cursor (fn [db [k path]] (reaction (reagent/cursor db path))))
 (rf/reg-sub-raw :db/by-path
                 (fn [db [_ path]]
-                  (.log js/console "by-path" path)
                   (reaction (get-in @db path))))
 (rf/reg-event-db
  :db/write

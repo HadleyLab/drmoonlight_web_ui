@@ -27,7 +27,6 @@
   (fn [params]
     (let [statistics (<sub [:statistics-data])]
       [sa/Grid {:class-name "statistics__container"}
-       (.log js/console "statistics" statistics)
        [sa/GridRow {}
         [sa/GridColumn {:width 4}
          [sa/Header "Statistics"]]

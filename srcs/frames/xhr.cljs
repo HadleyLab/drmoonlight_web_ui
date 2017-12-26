@@ -25,7 +25,6 @@
      (js/fetch (str (:uri opts) (when params (str "?" (to-query params))))
                (clj->js fetch-opts))
      (.then (fn [resp]
-              (.log js/console "resp" resp)
               (if (= (.-status resp) 204)
                 (rf/dispatch [(:event success)
                               (merge success
@@ -33,7 +32,6 @@
                                       :response resp})])
                 (.then (.json resp)
                        (fn [doc]
-                         (.log js/console "doc" (.-status resp) doc)
                          (if (< (.-status resp) 299)
                            (rf/dispatch [(:event success)
                                          (merge success
@@ -84,12 +82,11 @@
                 (-> (.json resp)
                     (.then #(js->clj % :keywordize-keys true))
                     (.then (fn [doc]
-                             (.log js/console "doc" (.-status resp) doc)
                              (if (>= (.-status resp) 400)
                                (dispatch-write-with-fx path {:status :failure
-                                                       :errors doc} failure-fx)
+                                                             :errors doc} failure-fx)
                                (dispatch-write-with-fx path {:status :succeed
-                                                       :data (map-result doc)} succeed-fx)))))))))))
+                                                             :data (map-result doc)} succeed-fx)))))))))))
 (rf/reg-fx :json/fetch->path json-fetch->path)
 
 (rf/reg-fx
