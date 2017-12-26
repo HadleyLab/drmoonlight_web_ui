@@ -136,7 +136,8 @@
                        :uri (get-url db "/api/shifts/application/" application-pk "/" transition "/")
                        :method "POST"
                        :token (<sub [:token])
-                       :body {:text @(<sub [:comment-cursor])}}}))
+                       :body {:text @(<sub [:comment-cursor])}
+                       :succeed-fx [:reset-comment-text]}}))
 
 (rf/reg-event-fx
  :application-state-changed
@@ -149,3 +150,8 @@
  :message-created
  (fn [db [_ {{application :application :as message} :message}]]
    (update-in db [::application :messages (str application) :data] #(cons message %))))
+
+(rf/reg-event-db
+ :reset-comment-text
+ (fn [db [_]]
+   (assoc-in db [::application :comment-form :fields :text] "")))

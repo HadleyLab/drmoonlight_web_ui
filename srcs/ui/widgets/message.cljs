@@ -28,12 +28,11 @@
                :key transition
                :class-name "chat__button"
                :on-click (>event [:add-comment application-pk] transition)}
-              (.log js/console "transition" transition)
               (string/capitalize transition)])
            [sa/Button
             {:color :blue
              :floated "right"
-             :on-click (>event [:add-comment application-pk] "Send message")}
+             :on-click (>event [:add-comment application-pk] "message")}
             "Send message"]]]]))))
 
 (defn Message [message]
