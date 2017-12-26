@@ -411,6 +411,22 @@
                           :margin-top (px 5)}]
    [:.chat__form-container {:border-top "1px solid rgba(34,36,38,.15)"
                             :padding "25px 39px!important"}]
+   [:.chat__messages-group {:border-top "1px solid rgba(34,36,38,.15)"}
+    [:&:first-child {:border-top 0}]]
+   [:.chat__messages-date {:color "#8C97B2"
+                           :text-align "center"
+                           :margin-top (px 20)}]
+   [:.chat__link {:color "#2185d0"
+                  :cursor "pointer"}
+    [:&:hover {:text-decoration "underline"}]]
+   [:.chat__apply-for-shift {:padding "25px 40px"}]
+   [:.chat__resident-name {:font-size (px 18)
+                           :font-weight "bold"
+                           :margin-bottom (px 5)}]
+   [:.chat__button {:margin-right "10px!important"}]
+   [:.chat__buttons:after  {:content "\"\""
+                            :display "block"
+                            :clear "both"}]
 
    ; account manager styles
    [:.account-manager__resident-buttons {:padding-bottom "50px"

@@ -12,6 +12,7 @@
    [re-frame.core :as rf]
    [clojure.string :as str]
    [soda-ash.core :as sa]
+   [clojure.string :as string]
    [ui.scheduler.schedule.core]
    [ui.widgets.shift-info :refer [ShortShiftInfo]]))
 
@@ -80,17 +81,18 @@
     [SchedulerLayout
      [sa/Grid {}
       (when (not data-is-loading)
-        [sa/GridRow {}
-         [sa/GridColumn {:width 3}
-          [sa/Segment
-           [sa/Dimmer {:active  data-is-loading} [sa/Loader]]
-           (let [{owner :owner} application]
-             [:div
-              [sa/Header
-               [:a {:href (href :scheduler :detail (:id owner))}
-                (str (:first-name owner) " " (:last-name owner))]]])]]
-         [sa/GridColumn {:width 13 :class-name "chat__container"}
-          content]])]]))
+        (let [{owner :owner} application
+              {date-joined :date-joined
+               id :id} owner
+              specialities (map #(<sub [:speciality-name %]) (:specialities owner))]
+          [sa/GridRow {}
+           [sa/GridColumn {:width 3}
+            [:div.chat__resident-name (str (:first-name owner) " " (:last-name owner))]
+            [:p (string/join ", " specialities)]
+            [:div.gray-font "signed up " (.format (js/moment date-joined) "DD/MM/YYYY")]
+            [:span.chat__link {:on-click (>event [:goto :scheduler :detail id])} "Go to user profile"]]
+           [sa/GridColumn {:width 13 :class-name "chat__container"}
+            content]]))]]))
 
 (defn DiscussShift [{application-pk :application-pk shift-pk :shift-pk}]
   (rf/dispatch [:get-shift-info shift-pk])

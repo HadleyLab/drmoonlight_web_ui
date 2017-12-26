@@ -15,16 +15,18 @@
    [soda-ash.core :as sa]
    [ui.widgets.shift-info :refer [ShortShiftInfo]]))
 
-(defn ApplyForm [shift-pk name]
-  (let [apply-for-shift-result (<sub [:apply-for-shift shift-pk])]
-    [sa/Segment
+(defn ApplyForm [shift]
+  (let [apply-for-shift-result (<sub [:apply-for-shift (:pk shift)])]
+    [:div.chat__apply-for-shift
+     [sa/Header {:textAlign "center" :class-name "chat__messages-header"}
+      [ShortShiftInfo shift]]
      (when (= (:status apply-for-shift-result) :failure)
        [sa/Message {:negative true}
         [sa/MenuHeader "Error"]
         [:p (str (:errors apply-for-shift-result))]])
      [sa/Form
-      [:p (str "I would like to apply for the " name " shift")]
-      [sa/FormButton {:color :green :on-click (>event [:apply-for-shift shift-pk])} "Apply"]]]))
+      [:p "I would like to apply for the " [ShortShiftInfo shift]]
+      [sa/FormButton {:color :green :on-click (>event [:apply-for-shift (:pk shift)])} "Apply"]]]))
 
 (defn ShiftLayout [shift-pk content]
   (let [{status :status shift :data} (<sub [:shift-info shift-pk])
@@ -34,7 +36,7 @@
       (when (not data-is-loading)
         [sa/GridRow {}
          [sa/GridColumn {:width 3}
-          [:span "Back to all messages"]]
+          [:span.chat__link {:on-click (>event [:goto :resident :messages])} "Back to all messages"]]
          [sa/GridColumn {:width 13 :class-name "chat__container"}
           content]])]]))
 
@@ -43,11 +45,8 @@
   (fn [{shift-pk :shift-pk}]
     (let [{status :status shift :data} (<sub [:shift-info shift-pk])]
       [ShiftLayout shift-pk
-       [sa/SegmentGroup
-        (when (= status :succeed)
-          [ApplyForm
-           shift-pk
-           (:name (<sub [:speciality (:speciality shift)]))])]])))
+       (when (= status :succeed)
+         [ApplyForm shift])])))
 
 (defn DiscussShift [{application-pk :application-pk shift-pk :shift-pk}]
   (rf/dispatch [:get-shift-info shift-pk])

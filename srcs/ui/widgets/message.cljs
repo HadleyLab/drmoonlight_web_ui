@@ -4,6 +4,7 @@
    [ui.widgets :refer [concatv]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]
+   [clojure.string :as string]
    [ui.widgets.shift-info :refer [ShortShiftInfo]]))
 
 (defn MessageForm []
@@ -19,13 +20,21 @@
                          :value @comment-cursor
                          :on-change (>atom comment-cursor)}]
           (when-not (nil? (:text errors)) [:div.error (str (clojure.string/join "," (:text errors)))])
-          [sa/ButtonGroup
-           (for [transition (conj available-transitions "Send message")]
-             [sa/FormButton
-              {:color :blue
+          [:div.chat__buttons
+           (for [transition available-transitions]
+             [sa/Button
+              {:color (if (= transition "reject") "red" "green")
+               :basic true
                :key transition
+               :class-name "chat__button"
                :on-click (>event [:add-comment application-pk] transition)}
-              transition])]]]))))
+              (.log js/console "transition" transition)
+              (string/capitalize transition)])
+           [sa/Button
+            {:color :blue
+             :floated "right"
+             :on-click (>event [:add-comment application-pk] "Send message")}
+            "Send message"]]]]))))
 
 (defn Message [message]
   (let [user-id (<sub [:user-id])
@@ -35,11 +44,15 @@
                  "You"
                  (<sub [:application-participant (str (:application message)) owner-id]))]
     [sa/Grid {:class-name "chat__message-container"}
-     (.log js/console "message" message)
      [sa/GridColumn {:width 3} [:b author ":"]]
      [sa/GridColumn {:width 13} [:div {"dangerouslySetInnerHTML"
                                        #js {:__html (text-with-br (:text message))}}]
       [:p.chat__message-time (.format (js/moment date-created) "h:mm a")]]]))
+
+(defn group-messages [messages]
+  (group-by (fn [{date-created :date-created}]
+              (.format (js/moment date-created) "MM-DD"))
+            messages))
 
 (defn Discussion [shift application messages status]
   (if (= status :loading)
@@ -48,5 +61,11 @@
      [:div.chat__messages-list
       [sa/Header {:textAlign "center" :class-name "chat__messages-header"}
        [ShortShiftInfo shift]]
-      (map (fn [m] ^{:key (:pk m)} [Message m]) (reverse messages))]
+      [:div
+       (map (fn [[key groped-messages]]
+              ^{:key key} [:div.chat__messages-group
+                           [:div.chat__messages-date
+                            (.format (js/moment key) "D MMM")]
+                           (map (fn [m] ^{:key (:pk m)} [Message m]) groped-messages)])
+            (group-messages (reverse messages)))]]
      [MessageForm application]]))
