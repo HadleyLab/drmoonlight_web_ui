@@ -394,6 +394,24 @@
                  :border-radius "50%"
                  :background-color "#8C97B2"}]]]
 
+   ; chat page styles
+   [:.chat__container {:border-radius (px 3)
+                       :margin "0 0 0 -1em"
+                       :border "1px solid #d4d4d5"
+                       :background-color "#FFF"
+                       :padding "0!important"}]
+   [:.chat__messages-list {:max-height (px 660)
+                           :overflow "auto"}]
+   [:.chat__messages-header {:padding-top "25px!important"}]
+   [:.chat__message-container {:margin "0!important"
+                               :padding "0 25px!important"
+                               :border-bottom "1px solid rgba(34,36,38,.15)"}
+    [:&:last-child {:border-bottom 0}]]
+   [:.chat__message-time {:color "#8C97B2"
+                          :margin-top (px 5)}]
+   [:.chat__form-container {:border-top "1px solid rgba(34,36,38,.15)"
+                            :padding "25px 39px!important"}]
+
    ; account manager styles
    [:.account-manager__resident-buttons {:padding-bottom "50px"
                                          :text-align "right"}]))

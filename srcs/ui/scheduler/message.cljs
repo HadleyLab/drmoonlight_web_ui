@@ -3,7 +3,7 @@
    [reagent.core :as reagent]
    [ui.db.misc :refer [>event >atom <sub get-url reduce-statuses text-with-br]]
    [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
-   [ui.db.application :refer [format-application-shift-date get-application-status-name]]
+   [ui.db.application :refer [get-application-status-name]]
    [ui.widgets.applications-dropdown :refer [ApplicationsDropdown]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
@@ -12,7 +12,8 @@
    [re-frame.core :as rf]
    [clojure.string :as str]
    [soda-ash.core :as sa]
-   [ui.scheduler.schedule.core]))
+   [ui.scheduler.schedule.core]
+   [ui.widgets.shift-info :refer [ShortShiftInfo]]))
 
 (defn Application [params]
   (fn [params]
@@ -43,7 +44,7 @@
          [:b first-name " " last-name]
          [:div.gray-font (.fromNow (js/moment date-created))]]
         [sa/GridColumn {:width 10}
-         [:b (:name (<sub [:speciality speciality])) (format-application-shift-date start finish)]
+         [:b [ShortShiftInfo shift]]
          (if last-message-text [:div.messages__message-text
                                 (if (= user-id last-message-owner) [:b "You: "])
                                 last-message-text])
@@ -78,18 +79,18 @@
         data-is-loading (or (and (nil? application) (= status :loading)) (= status :not-asked))]
     [SchedulerLayout
      [sa/Grid {}
-      [sa/GridRow {}
-       [sa/GridColumn {:width 3}
-        [sa/Segment
-         [sa/Dimmer {:active  data-is-loading} [sa/Loader]]
-         (when (not data-is-loading)
+      (when (not data-is-loading)
+        [sa/GridRow {}
+         [sa/GridColumn {:width 3}
+          [sa/Segment
+           [sa/Dimmer {:active  data-is-loading} [sa/Loader]]
            (let [{owner :owner} application]
              [:div
               [sa/Header
                [:a {:href (href :scheduler :detail (:id owner))}
-                (str (:first-name owner) " " (:last-name owner))]]]))]]
-       [sa/GridColumn {:width 13 :class-name :moonlight-white}
-        content]]]]))
+                (str (:first-name owner) " " (:last-name owner))]]])]]
+         [sa/GridColumn {:width 13 :class-name "chat__container"}
+          content]])]]))
 
 (defn DiscussShift [{application-pk :application-pk shift-pk :shift-pk}]
   (rf/dispatch [:get-shift-info shift-pk])
