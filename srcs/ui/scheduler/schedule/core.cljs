@@ -7,7 +7,7 @@
    [ui.widgets :refer [BuildForm]]
    [ui.widgets.error-message :refer [ErrorMessage]]
    [ui.widgets.calendar :refer [Calendar CalendarMonthControl]]
-   [ui.widgets.shift-info :refer [ShiftInfo]]
+   [ui.widgets.shift-info :refer [ShiftInfo ShiftsFilter]]
    [ui.scheduler.layout :refer [SchedulerLayout]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
@@ -89,19 +89,11 @@
            [ErrorMessage {:errors errors :field-names-map field-names-map}])]]
        [sa/ModalActions [sa/Button {:color :blue :on-click (>event [:create-new-shift])} "Done"]]])))
 
-(def shift-types [{:type "completed" :label "Completed shifts"}
-                  {:type "active" :label "Active shifts"}
-                  {:type "without_applies" :label "Shifts without applies"}
-                  {:type "coverage_completed" :label "Coverage completed"}
-                  {:type "require_approval" :label "Require approval"}
-                  {:type "failed" :label "Failed shifts"}])
-
 (defn Index [params]
   (rf/dispatch [:load-shifts])
   (let [new-shift-form-cursor (<sub [:new-shift-form-cursor])]
     (fn [params]
       (let [calendar-month (<sub [:calendar-month])
-            shifts-count-by-state (<sub [:shifts-count-by-state])
             filter-state (<sub [:shifts-filter-state])
             filtered-shifts (<sub [:shifts-filtered-by-state filter-state])]
         [SchedulerLayout
@@ -111,17 +103,7 @@
            [CalendarMonthControl [sa/GridColumn {:width 13}]]]
           [sa/GridRow {}
            [sa/GridColumn {:width 3}
-            (for [state shift-types]
-              (let [type (:type state)
-                    label (:label state)]
-                [:div {:key type :class-name "schedule__shifts-menu-item"}
-                 [:label {:class-name "schedule__shifts-menu-item-label"
-                          :on-click (>event [:set-shifts-filter-state type])}
-                  [:span {:class-name (str "schedule__shifts-menu-item-color _" type)}]
-                  label " (" (get shifts-count-by-state type 0) ")"]
-                 [sa/Checkbox {:checked (= type filter-state)
-                               :class-name "schedule__shifts-menu-item-checkbox"
-                               :on-click (>event [:set-shifts-filter-state type])}]]))]
+            [ShiftsFilter]]
            [sa/GridColumn {:width 13}
             [Calendar calendar-month filtered-shifts ShiftLabel]]]]]))))
 
