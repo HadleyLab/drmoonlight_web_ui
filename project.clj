@@ -91,7 +91,7 @@
                            {:main "ui.prod"
                             :verbose true
                             :output-to "build/js/ui.js"
-                            :optimizations :simple
-                            ;; :optimizations :advanced
+                            ;; :optimizations :simple
+                            :optimizations :advanced
                             :infer-externs true
                             :pretty-print  false}}}}}})
