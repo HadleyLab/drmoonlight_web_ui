@@ -5,7 +5,7 @@
    [ui.db.misc :refer [>event <sub]]
    [ui.pages :as pages]
    [ui.widgets.calendar :refer [Calendar CalendarMonthControl]]
-   [ui.widgets.shift-info :refer [ShiftInfo]]
+   [ui.widgets.shift-info :refer [ShiftInfo ShiftsFilter]]
    [ui.resident.layout :refer [ResidentLayout]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]))
@@ -31,7 +31,8 @@
         speciality-name (:name (<sub [:speciality speciality]))]
     [:div [sa/Popup
            {:trigger (reagent/as-element [:div {:class-name (str "shift__label _" state)}
-                                          speciality-name])
+                                          speciality-name
+                                          (if has-already-applied [sa/Icon {:name "checkmark"}])])
             :position "left center"
             :offset 2
             :hoverable true
@@ -42,15 +43,18 @@
 (defn Index [params]
   (rf/dispatch [:load-shifts])
   (fn [params]
-    (let [calendar-month (<sub [:calendar-month])]
+    (let [calendar-month (<sub [:calendar-month])
+          filter-state (<sub [:shifts-filter-state])
+          filtered-shifts (<sub [:shifts-filtered-by-state filter-state])]
       [ResidentLayout
        [sa/Grid {}
         [sa/GridRow {}
-         [sa/GridColumn {:width 6}]
-         [CalendarMonthControl [sa/GridColumn {:width 4}]]
-         [sa/GridColumn {:width 6}]]
+         [sa/GridColumn {:width 3}]
+         [CalendarMonthControl [sa/GridColumn {:width 13}]]]
         [sa/GridRow {}
-         [sa/GridColumn {:width 16}
-          [Calendar calendar-month (<sub [:shifts]) ShiftLabel]]]]])))
+         [sa/GridColumn {:width 3}
+          [ShiftsFilter]]
+         [sa/GridColumn {:width 13}
+          [Calendar calendar-month filtered-shifts ShiftLabel]]]]])))
 
 (pages/reg-page :core/resident-schedule Index)

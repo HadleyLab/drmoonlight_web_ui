@@ -1,7 +1,31 @@
 (ns ui.widgets.shift-info
   (:require
-   [ui.db.misc :refer [<sub format-date-time]]
-   [ui.db.shift :refer [as-hours-interval]]))
+   [ui.db.misc :refer [<sub >event format-date-time]]
+   [ui.db.shift :refer [as-hours-interval]]
+   [soda-ash.core :as sa]))
+
+(def shift-types [{:type "completed" :label "Completed shifts"}
+                  {:type "active" :label "Active shifts"}
+                  {:type "without_applies" :label "Shifts without applies"}
+                  {:type "coverage_completed" :label "Coverage completed"}
+                  {:type "require_approval" :label "Require approval"}
+                  {:type "failed" :label "Failed shifts"}])
+
+(defn ShiftsFilter []
+  (let [shifts-count-by-state (<sub [:shifts-count-by-state])
+        filter-state (<sub [:shifts-filter-state])]
+    [:div
+     (for [state shift-types]
+       (let [type (:type state)
+             label (:label state)]
+         [:div {:key type :class-name "schedule__shifts-menu-item"}
+          [:label {:class-name "schedule__shifts-menu-item-label"
+                   :on-click (>event [:set-shifts-filter-state type])}
+           [:span {:class-name (str "schedule__shifts-menu-item-color _" type)}]
+           label " (" (get shifts-count-by-state type 0) ")"]
+          [sa/Checkbox {:checked (= type filter-state)
+                        :class-name "schedule__shifts-menu-item-checkbox"
+                        :on-click (>event [:set-shifts-filter-state type])}]]))]))
 
 (defn ShiftInfo [{speciality :speciality
                   start :date-start

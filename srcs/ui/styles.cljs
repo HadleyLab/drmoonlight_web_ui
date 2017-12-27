@@ -223,7 +223,7 @@
                        :color "#000"}]]
    ; shifts styles
    [:.shift__label {:position "relative"
-                    :padding "3px 8px"
+                    :padding "3px 18px 3px 8px"
                     :color "#fff"
                     :font-size (px 12)
                     :line-height (px 14)
@@ -236,7 +236,10 @@
     [:&._active {:background-color "#FFAB00"}]
     [:&._without_applies {:background-color "#E64C66"}]
     [:&._coverage_completed {:background-color "#44BE8D"}]
-    [:&._require_approval {:background-color "#7874CF"}]]
+    [:&._require_approval {:background-color "#7874CF"}]
+    [:.icon {:position "absolute"
+             :top "3px"
+             :right "0"}]]
    [:.shift__popup {:padding "0!important"}]
    [:.shift__popup-content {:padding "20px 20px 10px"}]
    [:.shift__popup-footer._scheduler {:display :flex
@@ -247,7 +250,9 @@
     [:p {:margin 0
          :padding "0 20px 20px"
          :font-weight "bold"}]
-    [:.ui.button {:border-top-left-radius "0"
+    [:.ui.button {:position "relative"
+                  :z-index 2
+                  :border-top-left-radius "0"
                   :border-top-right-radius "0"}]]
    [:.shift__row {:margin "10px 0"
                   :font-size (px 14)
