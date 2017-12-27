@@ -5,7 +5,8 @@
    [re-frame.core :as rf]
    [soda-ash.core :as sa]
    [clojure.string :as string]
-   [ui.widgets.shift-info :refer [ShortShiftInfo]]))
+   [ui.widgets.shift-info :refer [get-short-shift-info]]
+   [ui.widgets.error-message :refer [ErrorMessage]]))
 
 (defn MessageForm []
   (rf/dispatch-sync [:init-comment-form])
@@ -15,11 +16,12 @@
       (let [{status :status errors :errors} (<sub [:comment-form])]
         [:div.chat__form-container
          [sa/Form {:error (= status :failure)}
+          (when (= status :failure)
+            [ErrorMessage {:errors errors}])
           [sa/FormInput {:placeholder "Add Comment..."
                          :error (= status :failure)
                          :value @comment-cursor
                          :on-change (>atom comment-cursor)}]
-          (when-not (nil? (:text errors)) [:div.error (str (clojure.string/join "," (:text errors)))])
           [:div.chat__buttons
            (for [transition available-transitions]
              [sa/Button
@@ -59,7 +61,7 @@
     [:div
      [:div.chat__messages-list
       [sa/Header {:textAlign "center" :class-name "chat__messages-header"}
-       [ShortShiftInfo shift]]
+       (get-short-shift-info shift)]
       [:div
        (map (fn [[key groped-messages]]
               ^{:key key} [:div.chat__messages-group

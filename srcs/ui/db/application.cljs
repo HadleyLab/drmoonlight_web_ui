@@ -121,6 +121,12 @@
  (fn [db _]
    (assoc-in db [::application :comment-form] (get-in schema [::application :comment-form]))))
 
+(rf/reg-event-db
+ :init-apply-form
+ (fn [db [_ text]]
+   (-> db
+       (assoc-in [::application :comment-form :fields :text] text))))
+
 (rf/reg-sub
  :comment-cursor
  #(<sub [:cursor [::application :comment-form :fields :text]]))

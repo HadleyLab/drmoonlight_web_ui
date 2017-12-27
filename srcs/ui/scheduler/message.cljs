@@ -14,7 +14,7 @@
    [soda-ash.core :as sa]
    [clojure.string :as string]
    [ui.scheduler.schedule.core]
-   [ui.widgets.shift-info :refer [ShortShiftInfo]]))
+   [ui.widgets.shift-info :refer [get-short-shift-info]]))
 
 (defn Application [params]
   (fn [params]
@@ -45,7 +45,7 @@
          [:b first-name " " last-name]
          [:div.gray-font (.fromNow (js/moment date-created))]]
         [sa/GridColumn {:width 10}
-         [:b [ShortShiftInfo shift]]
+         [:b (get-short-shift-info shift)]
          (if last-message-text [:div.messages__message-text
                                 (if (= user-id last-message-owner) [:b "You: "])
                                 last-message-text])

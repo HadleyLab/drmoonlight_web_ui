@@ -13,19 +13,25 @@
    [re-frame.core :as rf]
    [clojure.string :as str]
    [soda-ash.core :as sa]
-   [ui.widgets.shift-info :refer [ShortShiftInfo]]))
+   [ui.widgets.shift-info :refer [get-short-shift-info]]
+   [ui.widgets.error-message :refer [ErrorMessage]]))
 
 (defn ApplyForm [shift]
-  (let [apply-for-shift-result (<sub [:apply-for-shift (:pk shift)])]
+  (rf/dispatch-sync [:init-apply-form (str "I would like to apply for the "
+                                           (get-short-shift-info shift))])
+  (let [apply-for-shift-result (<sub [:apply-for-shift (:pk shift)])
+        comment-cursor (<sub [:comment-cursor])
+        status (:status apply-for-shift-result)]
     [:div.chat__apply-for-shift
      [sa/Header {:textAlign "center" :class-name "chat__messages-header"}
-      [ShortShiftInfo shift]]
-     (when (= (:status apply-for-shift-result) :failure)
-       [sa/Message {:negative true}
-        [sa/MenuHeader "Error"]
-        [:p (str (:errors apply-for-shift-result))]])
+      (get-short-shift-info shift)]
+     (when (= status :failure)
+       [ErrorMessage {:errors (:errors apply-for-shift-result)}])
      [sa/Form
-      [:p "I would like to apply for the " [ShortShiftInfo shift]]
+      [sa/FormInput {:placeholder "Add Comment..."
+                     :error (= status :failure)
+                     :value @comment-cursor
+                     :on-change (>atom comment-cursor)}]
       [sa/FormButton {:color :green :on-click (>event [:apply-for-shift (:pk shift)])} "Apply"]]]))
 
 (defn ShiftLayout [shift-pk content]
@@ -83,7 +89,7 @@
         [sa/GridColumn {:width 3}
          [:div.gray-font (.fromNow (js/moment date-created))]]
         [sa/GridColumn {:width 10}
-         [:b [ShortShiftInfo shift]]
+         [:b (get-short-shift-info shift)]
          (if last-message-text [:div.messages__message-text
                                 (if (= user-id last-message-owner) [:b "You: "])
                                 last-message-text])]

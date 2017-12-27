@@ -47,7 +47,7 @@
      [:p.shift__row [:i "Payment amount: "] [:b "$" payment-amount] (str " per " (if payment-per-hour "hour" "shift"))]
      [:p.shift__row description]]))
 
-(defn ShortShiftInfo [{speciality :speciality
-                       start :date-start
-                       finish :date-end}]
-  [:span (:name (<sub [:speciality speciality])) (format-application-shift-date start finish)])
+(defn get-short-shift-info [{speciality :speciality
+                             start :date-start
+                             finish :date-end}]
+  (str (:name (<sub [:speciality speciality])) (format-application-shift-date start finish)))
