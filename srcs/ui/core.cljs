@@ -53,9 +53,8 @@
           [:div (str "Page " (str page) " is not registered")])
         (do
           (when (nil? (<sub [:token]))
-            ;; TODO: save route and redirect to it after succeed login
-            ;; TODO: move logic out from render
-            (rf/dispatch [:goto :login]))
+            ;; TODO: think about moving this logic out from render
+            (rf/dispatch [:goto-preserving-path :login]))
           [NotFound]))
       [Preloader])))
 
