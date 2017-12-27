@@ -105,9 +105,11 @@
 (rf/reg-event-fx
  ::setup-login-form-and-redirect
  (fn [{db :db} _]
-   (let [user-type (<sub [:user-type])]
+   (let [user-type (<sub [:user-type])
+         redirect-path (<sub [::account :redirect-path])]
      {:db (assoc-in db [::account :login-form] (get-in schema [::account :login-form]))
       :dispatch (cond
+                  (not-empty redirect-path) [:goto-path redirect-path]
                   (= user-type :account-manager) [:goto user-type]
                   :else [:goto user-type :schedule])})))
 
@@ -138,6 +140,18 @@
                        :token (<sub [:token])
                        :succeed-fx [:load-account-info final-succeed-fx]
                        :failure-fx [:process-invalid-token]}}))
+
+(rf/reg-event-fx
+ :goto-preserving-path
+ (fn [{db :db} [_ page]]
+   {:db (assoc-in db [::account :redirect-path] (.-hash js/location))
+    :dispatch [:goto page]}))
+
+(rf/reg-event-fx
+ :goto-path
+ (fn [_ [_ path]]
+   (set! (.-hash js/location) path)
+   {}))
 
 (rf/reg-event-fx
  :force-reload
