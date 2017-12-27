@@ -31,7 +31,8 @@
         speciality-name (:name (<sub [:speciality speciality]))]
     [:div [sa/Popup
            {:trigger (reagent/as-element [:div {:class-name (str "shift__label _" state)}
-                                          speciality-name])
+                                          speciality-name
+                                          (if has-already-applied [sa/Icon {:name "checkmark"}])])
             :position "left center"
             :offset 2
             :hoverable true
