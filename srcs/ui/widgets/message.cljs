@@ -3,7 +3,10 @@
    [ui.db.misc :refer [>event >atom <sub get-url text-with-br]]
    [ui.widgets :refer [concatv]]
    [re-frame.core :as rf]
-   [soda-ash.core :as sa]))
+   [soda-ash.core :as sa]
+   [clojure.string :as string]
+   [ui.widgets.shift-info :refer [get-short-shift-info]]
+   [ui.widgets.error-message :refer [ErrorMessage]]))
 
 (defn MessageForm []
   (rf/dispatch-sync [:init-comment-form])
@@ -11,37 +14,59 @@
     (fn [{application-pk :pk
           available-transitions :available-transitions}]
       (let [{status :status errors :errors} (<sub [:comment-form])]
-        [sa/Segment
-         (.log js/console "available-transitions" available-transitions)
+        [:div.chat__form-container
          [sa/Form {:error (= status :failure)}
-          [sa/FormInput {:placeholder "Add comment ..."
+          (when (= status :failure)
+            [ErrorMessage {:errors errors}])
+          [sa/FormInput {:placeholder "Add Comment..."
                          :error (= status :failure)
                          :value @comment-cursor
                          :on-change (>atom comment-cursor)}]
-          (when-not (nil? (:text errors)) [:div.error (str (clojure.string/join "," (:text errors)))])
-          [sa/ButtonGroup
-           (for [transition (conj available-transitions "message")]
-             [sa/FormButton
-              {:color :blue
+          [:div.chat__buttons
+           (for [transition available-transitions]
+             [sa/Button
+              {:color (if (= transition "reject") "red" "green")
+               :basic true
                :key transition
+               :class-name "chat__button"
                :on-click (>event [:add-comment application-pk] transition)}
-              transition])]]]))))
+              (string/capitalize transition)])
+           [sa/Button
+            {:color :blue
+             :floated "right"
+             :on-click (>event [:add-comment application-pk] "message")}
+            "Send message"]]]]))))
 
 (defn Message [message]
   (let [user-id (<sub [:user-id])
         owner-id (:owner message)
+        date-created (:date-created message)
         author (if (= user-id owner-id)
                  "You"
                  (<sub [:application-participant (str (:application message)) owner-id]))]
-    [sa/Segment
-     [sa/Grid
-      [sa/GridColumn {:width 2} [:p author ":"]]
-      [sa/GridColumn {:width 12} [:div {"dangerouslySetInnerHTML"
-                                        #js {:__html (text-with-br (:text message))}}]]]]))
+    [sa/Grid {:class-name "chat__message-container"}
+     [sa/GridColumn {:width 3} [:b author ":"]]
+     [sa/GridColumn {:width 13} [:div {"dangerouslySetInnerHTML"
+                                       #js {:__html (text-with-br (:text message))}}]
+      [:p.chat__message-time (.format (js/moment date-created) "h:mm a")]]]))
+
+(defn group-messages [messages]
+  (group-by (fn [{date-created :date-created}]
+              (.format (js/moment date-created) "MM-DD"))
+            messages))
 
 (defn Discussion [shift application messages status]
   (if (= status :loading)
     [sa/Loader]
-    (concatv [sa/SegmentGroup]
-             (map (fn [m] [Message m]) (reverse messages))
-             [[MessageForm application]])))
+    [:div
+     [:div.chat__messages-list
+      [sa/Header {:textAlign "center" :class-name "chat__messages-header"}
+       (get-short-shift-info shift)]
+      [:div
+       (map (fn [[key groped-messages]]
+              ^{:key key} [:div.chat__messages-group
+                           [:div.chat__messages-date
+                            (.format (js/moment key) "D MMM")]
+                           (map (fn [m] ^{:key (:pk m)} [Message m]) groped-messages)])
+            (group-messages (reverse messages)))]]
+     [MessageForm application]]))

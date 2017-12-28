@@ -165,7 +165,8 @@
                        :uri (get-url db "/api/shifts/application/apply/")
                        :method "POST"
                        :token @(rf/subscribe [:token])
-                       :body {:shift shift-pk}
+                       :body {:shift shift-pk
+                              :text @(<sub [:comment-cursor])}
                        :succeed-fx (fn [data] [:goto :resident :messages shift-pk :discuss (:pk data)])}}))
 
 (rf/reg-sub

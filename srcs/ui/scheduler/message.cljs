@@ -3,7 +3,7 @@
    [reagent.core :as reagent]
    [ui.db.misc :refer [>event >atom <sub get-url reduce-statuses text-with-br]]
    [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
-   [ui.db.application :refer [format-application-shift-date get-application-status-name]]
+   [ui.db.application :refer [get-application-status-name]]
    [ui.widgets.applications-dropdown :refer [ApplicationsDropdown]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
@@ -12,7 +12,9 @@
    [re-frame.core :as rf]
    [clojure.string :as str]
    [soda-ash.core :as sa]
-   [ui.scheduler.schedule.core]))
+   [clojure.string :as string]
+   [ui.scheduler.schedule.core]
+   [ui.widgets.shift-info :refer [get-short-shift-info]]))
 
 (defn Application [params]
   (fn [params]
@@ -43,7 +45,7 @@
          [:b first-name " " last-name]
          [:div.gray-font (.fromNow (js/moment date-created))]]
         [sa/GridColumn {:width 10}
-         [:b (:name (<sub [:speciality speciality])) (format-application-shift-date start finish)]
+         [:b (get-short-shift-info shift)]
          (if last-message-text [:div.messages__message-text
                                 (if (= user-id last-message-owner) [:b "You: "])
                                 last-message-text])
@@ -78,18 +80,19 @@
         data-is-loading (or (and (nil? application) (= status :loading)) (= status :not-asked))]
     [SchedulerLayout
      [sa/Grid {}
-      [sa/GridRow {}
-       [sa/GridColumn {:width 3}
-        [sa/Segment
-         [sa/Dimmer {:active  data-is-loading} [sa/Loader]]
-         (when (not data-is-loading)
-           (let [{owner :owner} application]
-             [:div
-              [sa/Header
-               [:a {:href (href :scheduler :detail (:id owner))}
-                (str (:first-name owner) " " (:last-name owner))]]]))]]
-       [sa/GridColumn {:width 13 :class-name :moonlight-white}
-        content]]]]))
+      (when (not data-is-loading)
+        (let [{owner :owner} application
+              {date-joined :date-joined
+               id :id} owner
+              specialities (map #(<sub [:speciality-name %]) (:specialities owner))]
+          [sa/GridRow {}
+           [sa/GridColumn {:width 3}
+            [:div.chat__resident-name (str (:first-name owner) " " (:last-name owner))]
+            [:p (string/join ", " specialities)]
+            [:div.gray-font "signed up " (.format (js/moment date-joined) "DD/MM/YYYY")]
+            [:span.chat__link {:on-click (>event [:goto :scheduler :detail id])} "Go to user profile"]]
+           [sa/GridColumn {:width 13 :class-name "chat__container"}
+            content]]))]]))
 
 (defn DiscussShift [{application-pk :application-pk shift-pk :shift-pk}]
   (rf/dispatch [:get-shift-info shift-pk])

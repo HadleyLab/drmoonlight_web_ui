@@ -121,6 +121,12 @@
  (fn [db _]
    (assoc-in db [::application :comment-form] (get-in schema [::application :comment-form]))))
 
+(rf/reg-event-db
+ :init-apply-form
+ (fn [db [_ text]]
+   (-> db
+       (assoc-in [::application :comment-form :fields :text] text))))
+
 (rf/reg-sub
  :comment-cursor
  #(<sub [:cursor [::application :comment-form :fields :text]]))
@@ -136,7 +142,8 @@
                        :uri (get-url db "/api/shifts/application/" application-pk "/" transition "/")
                        :method "POST"
                        :token (<sub [:token])
-                       :body {:text @(<sub [:comment-cursor])}}}))
+                       :body {:text @(<sub [:comment-cursor])}
+                       :succeed-fx [:reset-comment-text]}}))
 
 (rf/reg-event-fx
  :application-state-changed
@@ -149,3 +156,8 @@
  :message-created
  (fn [db [_ {{application :application :as message} :message}]]
    (update-in db [::application :messages (str application) :data] #(cons message %))))
+
+(rf/reg-event-db
+ :reset-comment-text
+ (fn [db [_]]
+   (assoc-in db [::application :comment-form :fields :text] "")))

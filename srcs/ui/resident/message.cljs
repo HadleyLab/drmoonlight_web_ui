@@ -3,7 +3,7 @@
    [reagent.core :as reagent]
    [ui.db.misc :refer [>event >atom <sub get-url reduce-statuses text-with-br]]
    [ui.db.shift :refer [as-apply-date-time as-hours-interval]]
-   [ui.db.application :refer [get-application-status-name format-application-shift-date]]
+   [ui.db.application :refer [get-application-status-name]]
    [ui.widgets.applications-dropdown :refer [ApplicationsDropdown]]
    [ui.pages :as pages]
    [ui.routes :refer [href]]
@@ -12,56 +12,47 @@
    [ui.resident.layout :refer [ResidentLayout ResidentProfileLayout]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [soda-ash.core :as sa]))
+   [soda-ash.core :as sa]
+   [ui.widgets.shift-info :refer [get-short-shift-info]]
+   [ui.widgets.error-message :refer [ErrorMessage]]))
 
-(defn ApplyForm [shift-pk name]
-  (let [apply-for-shift-result (<sub [:apply-for-shift shift-pk])]
-    [sa/Segment
-     (when (= (:status apply-for-shift-result) :failure)
-       [sa/Message {:negative true}
-        [sa/MenuHeader "Error"]
-        [:p (str (:errors apply-for-shift-result))]])
+(defn ApplyForm [shift]
+  (rf/dispatch-sync [:init-apply-form (str "I would like to apply for the "
+                                           (get-short-shift-info shift))])
+  (let [apply-for-shift-result (<sub [:apply-for-shift (:pk shift)])
+        comment-cursor (<sub [:comment-cursor])
+        status (:status apply-for-shift-result)]
+    [:div.chat__apply-for-shift
+     [sa/Header {:textAlign "center" :class-name "chat__messages-header"}
+      (get-short-shift-info shift)]
      [sa/Form
-      [:p (str "I would like to apply for the " name " shift")]
-      [sa/FormButton {:color :green :on-click (>event [:apply-for-shift shift-pk])} "Apply"]]]))
+      [sa/FormInput {:placeholder "Add Comment..."
+                     :error (= status :failure)
+                     :value @comment-cursor
+                     :on-change (>atom comment-cursor)}]
+      (when (= status :failure)
+        [ErrorMessage {:errors (:errors apply-for-shift-result)}])
+      [sa/FormButton {:color :green :on-click (>event [:apply-for-shift (:pk shift)])} "Apply"]]]))
 
 (defn ShiftLayout [shift-pk content]
   (let [{status :status shift :data} (<sub [:shift-info shift-pk])
         data-is-loading (or (and (nil? shift) (= status :loading)) (= status :not-asked))]
     [ResidentLayout
      [sa/Grid {}
-      [sa/GridRow {}
-       [sa/GridColumn {:width 3}
-        [sa/Segment
-         [sa/Dimmer {:active  data-is-loading} [sa/Loader]]
-         (when (not data-is-loading)
-           (let [{speciality :speciality
-                  start :date-start
-                  finish :date-end
-                  pk :pk
-                  payment-amount :payment-amount
-                  payment-per-hour :payment-per-hour
-                  description :description} shift]
-             [:div
-              [sa/Header (:name (<sub [:speciality speciality]))]
-              [:p [:strong "Starts: "] (as-apply-date-time start)]
-              [:p [:strong "Ends: "] (as-apply-date-time finish)]
-              [:p [:strong "Total: "] (as-hours-interval start finish) " hours"]
-              [:p [:strong "Payment amount: "] (str "$" payment-amount " per " (if payment-per-hour "hour" "shift"))]
-              [:p description]]))]]
-       [sa/GridColumn {:width 13 :class-name :moonlight-white}
-        content]]]]))
+      (when (not data-is-loading)
+        [sa/GridRow {}
+         [sa/GridColumn {:width 3}
+          [:span.chat__link {:on-click (>event [:goto :resident :messages])} "Back to all messages"]]
+         [sa/GridColumn {:width 13 :class-name "chat__container"}
+          content]])]]))
 
 (defn ApplyToShift [{shift-pk :shift-pk}]
   (rf/dispatch [:get-shift-info shift-pk])
   (fn [{shift-pk :shift-pk}]
     (let [{status :status shift :data} (<sub [:shift-info shift-pk])]
       [ShiftLayout shift-pk
-       [sa/SegmentGroup
-        (when (= status :succeed)
-          [ApplyForm
-           shift-pk
-           (:name (<sub [:speciality (:speciality shift)]))])]])))
+       (when (= status :succeed)
+         [ApplyForm shift])])))
 
 (defn DiscussShift [{application-pk :application-pk shift-pk :shift-pk}]
   (rf/dispatch [:get-shift-info shift-pk])
@@ -98,7 +89,7 @@
         [sa/GridColumn {:width 3}
          [:div.gray-font (.fromNow (js/moment date-created))]]
         [sa/GridColumn {:width 10}
-         [:b (:name (<sub [:speciality speciality])) (format-application-shift-date start finish)]
+         [:b (get-short-shift-info shift)]
          (if last-message-text [:div.messages__message-text
                                 (if (= user-id last-message-owner) [:b "You: "])
                                 last-message-text])]
