@@ -25,6 +25,8 @@
    [:.position._relative {:position "relative"}]
    [:.gray-font {:color "#8C97B2"}]
    [:.moonlight-white {:background-color "#FFF"}]
+   [:.ui.blue.basic.button:hover {:color "#FFF!important"
+                                  :background-color "#2185d0!important"}]
 
    ; header styles
    [:.header__wrapper {:height (px 80)
