@@ -25,13 +25,13 @@
     [:div.chat__apply-for-shift
      [sa/Header {:textAlign "center" :class-name "chat__messages-header"}
       (get-short-shift-info shift)]
-     (when (= status :failure)
-       [ErrorMessage {:errors (:errors apply-for-shift-result)}])
      [sa/Form
       [sa/FormInput {:placeholder "Add Comment..."
                      :error (= status :failure)
                      :value @comment-cursor
                      :on-change (>atom comment-cursor)}]
+      (when (= status :failure)
+        [ErrorMessage {:errors (:errors apply-for-shift-result)}])
       [sa/FormButton {:color :green :on-click (>event [:apply-for-shift (:pk shift)])} "Apply"]]]))
 
 (defn ShiftLayout [shift-pk content]

@@ -166,7 +166,7 @@
                        :method "POST"
                        :token @(rf/subscribe [:token])
                        :body {:shift shift-pk
-                              :message @(<sub [:comment-cursor])}
+                              :text @(<sub [:comment-cursor])}
                        :succeed-fx (fn [data] [:goto :resident :messages shift-pk :discuss (:pk data)])}}))
 
 (rf/reg-sub
