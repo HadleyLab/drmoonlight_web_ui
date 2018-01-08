@@ -183,14 +183,13 @@
    (let [user-type (<sub [:user-type])
          user-id (<sub [:user-id])
          token (<sub [:token])]
-     (if (= user-type :account-manager)
+     (if (or (nil? user-type) (= user-type :account-manager))
        {:dispatch [:dispatch-fx final-succeed-fx]}
        {:json/fetch->path {:path [::account :info-response]
                            :uri (get-url db (str "/api/accounts/" (name user-type) "/" user-id "/"))
                            :token token
                            :map-result convert-state
                            :succeed-fx [:dispatch-fx final-succeed-fx]}}))))
-
 (rf/reg-event-db
  :update-account-info
  (fn [db [_ data]]
