@@ -7,11 +7,11 @@
   {"" {:date-start
        {:type :date-time-picker
         :label "Starts"
-        :date-format "DD/MM/YYYY"}
+        :date-format "MM/DD/YYYY"}
        :date-end
        {:type :date-time-picker
         :label "Ends"
-        :date-format "DD/MM/YYYY"}}
+        :date-format "MM/DD/YYYY"}}
    "Required staff" {:speciality
                      {:type :select
                       :label "Speciality name"
