@@ -31,8 +31,8 @@
      application-statuses)))
 
 (defn format-application-shift-date [start finish]
-  (let [start-date (.format start "DD/MM")
-        finish-date (.format finish "DD/MM")
+  (let [start-date (.format start "MM/DD")
+        finish-date (.format finish "MM/DD")
         start-time (.format start "h:mm a")
         finish-time (.format finish "h:mm a")]
     (if (= start-date finish-date)

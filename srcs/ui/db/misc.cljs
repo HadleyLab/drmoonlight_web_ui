@@ -116,7 +116,7 @@
     (into {} (map (fn [[key value]] [key (initial-values key value)]) data))))
 
 (defn format-date-time [date]
-  (let [formatted-date (.format date "DD/MM/YYYY")
+  (let [formatted-date (.format date "MM/DD/YYYY")
         hour (.format date "h")
         minute (.format date "mm")
         am-pm (.format date "a")]
