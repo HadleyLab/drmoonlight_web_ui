@@ -13,6 +13,7 @@
 (defn ActionButton [pk state has-already-applied]
   [:div.shift__popup-footer._resident
    (cond
+     (and (true? has-already-applied)(= state "coverage_completed")) [:p "You have been approved for the shift"]
      (= state "coverage_completed") [:p "The coverage for this shift is already completed"]
      (= state "completed") [:p "The shift is completed"]
      (= state "active") [:p "The shift is active"]
