@@ -9,7 +9,7 @@
                                         :label "First Name"}
                            :last-name {:type :input
                                        :label "Last Name"}}
-   "Residency" (array-map
+   "" (array-map
                 :facility-name {:type :input
                                 :label "Hospital / Facility name"}
                 :department-name {:type :input
