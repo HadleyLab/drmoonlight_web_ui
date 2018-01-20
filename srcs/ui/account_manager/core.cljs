@@ -67,8 +67,8 @@
                                            (mapv (fn [id] [sa/Label
                                                            {:key id}
                                                            (<sub [:speciality-name id])]) specialities))]
-                                 [[:p [:strong "Residency program: "]
-                                   [sa/Label (<sub [:residency-program-name residency-program])]]])
+                                 [[:p [:strong "Residency/Fellowship program: "]
+                                   [sa/Label residency-program]]])
                         [sa/GridColumn {:width 4}
                          [sa/Button
                           {:on-click (>event [:goto :account-manager :detail pk])}

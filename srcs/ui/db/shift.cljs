@@ -25,10 +25,6 @@
                                       :width 5}
                      :payment-per-hour {:type :mock}
                      :description {:type :textarea :label "Description" :desc "optional"}
-                     :residency-program {:type :select
-                                         :label "Residency program"
-                                         :items #(<sub [:residency-program-as-options])
-                                         :desc "optional"}
                      :residency-years-required {:type :input
                                                 :label "Residency years required"
                                                 :width 3
