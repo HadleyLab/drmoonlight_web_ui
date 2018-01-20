@@ -11,15 +11,14 @@
                            :last-name {:type :input
                                        :label "Last Name"}}
    "Residency" (array-map
-                :residency-program {:type :select
-                                    :label "Residency Program"
-                                    :items #(<sub [:residency-program-as-options])}
+                :residency-program {:type :textarea
+                                    :label "Residency/Fellowship Program"}
                 :specialities {:type :multy-select
                                :label "Specialities"
                                :items #(<sub [:speciality-as-options])}
                 :residency-years {:type :input
-                                  :label "Residency Years"
-                                  :width 3}
+                                  :label "Residency/Fellowship Years"
+                                  :width 4}
                 :state-license {:type :radio
                                 :label "State Licence"
                                 :items {true "yes" false "no"}}

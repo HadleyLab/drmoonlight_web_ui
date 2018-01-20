@@ -20,23 +20,6 @@
   (map (fn [[key value]] {:key key :text (get-text value) :value key}) data))
 
 (rf/reg-sub
- :residency-program
- (fn [db [_ id]]
-   (if (nil? id)
-     (get-in db [::constants :data :residency-program] [])
-     (get-in db [::constants :data :residency-program id]))))
-
-(rf/reg-sub
- :residency-program-name
- (fn [db [_ id]]
-   (get-in db [::constants :data :residency-program id :name])))
-
-(rf/reg-sub
- :residency-program-as-options
- #(rf/subscribe [:residency-program])
- #(as-options :name %))
-
-(rf/reg-sub
  :speciality
  (fn [db [_ id]]
    (if (nil? id)

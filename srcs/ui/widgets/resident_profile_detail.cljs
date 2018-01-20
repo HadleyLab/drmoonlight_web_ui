@@ -42,20 +42,20 @@
   (rf/dispatch [:load-resident-profile-detail pk])
   (fn [params]
     (let [{status :status resident :data} (<sub [:get-resident-profile-detail pk])
-          residency-program (<sub [:residency-program-name (:residency-program resident)])
           specialities (map #(<sub [:speciality-name %]) (:specialities resident))
           {first-name :first-name
            last-name :last-name
            date-joined :date-joined
            email :email
-           residency-years :residency-years} resident]
+           residency-years :residency-years
+           residency-program :residency-program} resident]
       [sa/Grid {}
        [sa/GridRow {}
         [sa/GridColumn {:width 4}
          [:div.profile__menu-wrapper
           [sa/Header (str first-name " " last-name)]
           [:p (string/join ", " specialities)]
-          [:p.gray-font "signed up " (.format (js/moment date-joined) "DD/MM/YYYY")]]]
+          [:p.gray-font "signed up " (.format (js/moment date-joined) "MM/DD/YYYY")]]]
         [sa/GridColumn {:width 12}
          [:div {:class-name "profile-detail__container moonlight-form-inner moonlight-white"}
           [Details (merge

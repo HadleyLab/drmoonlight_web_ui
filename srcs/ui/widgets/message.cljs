@@ -50,9 +50,10 @@
                                        #js {:__html (text-with-br (:text message))}}]
       [:p.chat__message-time (.format (js/moment date-created) "h:mm a")]]]))
 
+
 (defn group-messages [messages]
   (group-by (fn [{date-created :date-created}]
-              (.format (js/moment date-created) "MM-DD"))
+              (.format (js/moment date-created) "YYYY-MM-DD"))
             messages))
 
 (defn Discussion [shift application messages status]
@@ -64,7 +65,8 @@
        (get-short-shift-info shift)]
       [:div
        (map (fn [[key groped-messages]]
-              ^{:key key} [:div.chat__messages-group
+              ^{:key key}
+              [:div.chat__messages-group
                            [:div.chat__messages-date
                             (.format (js/moment key) "D MMM")]
                            (map (fn [m] ^{:key (:pk m)} [Message m]) groped-messages)])
