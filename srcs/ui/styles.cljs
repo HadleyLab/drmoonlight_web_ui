@@ -432,4 +432,9 @@
 
    ; account manager styles
    [:.account-manager__resident-buttons {:padding-bottom "50px"
-                                         :text-align "right"}]))
+                                         :text-align "right"}]
+
+   [:.avatar {:border-radius "50%"}]
+   [:.avatar-small {:width "50px"
+                    :height "50px"}]
+   ))

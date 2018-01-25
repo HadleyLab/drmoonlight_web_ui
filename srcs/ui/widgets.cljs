@@ -134,6 +134,11 @@
      true
      (visibility-depends-on fields))))
 
+(defn FormAvatar [{cursor :cursor label :label error :error}]
+  [sa/FormField {:width 11 :error error}
+    [:label label]
+    [:img.avatar {:src @cursor}]])
+
 (defn RenderInput [{cursor :cursor field :field hide-error :hide-error}]
   (let [fields-cursor (reagent/cursor cursor [:fields])
         field-cursor (reagent/cursor cursor [:fields field])
@@ -150,7 +155,7 @@
                          :error (not= errors nil)
                          :on-change (>atom field-cursor)}]]
              (case (:type info)
-               :avatar [:img {:src @field-cursor}]
+               :avatar [FormAvatar (merge {:cursor field-cursor} info)]
                :radio [FormRadio (merge {:cursor field-cursor} info)]
                :toggle [FormToggle (merge {:cursor field-cursor} info)]
                :textarea [FormTextarea (merge {:cursor field-cursor} info)]
