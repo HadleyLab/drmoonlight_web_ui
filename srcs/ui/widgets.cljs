@@ -150,6 +150,7 @@
                          :error (not= errors nil)
                          :on-change (>atom field-cursor)}]]
              (case (:type info)
+               :avatar [:img {:src @field-cursor}]
                :radio [FormRadio (merge {:cursor field-cursor} info)]
                :toggle [FormToggle (merge {:cursor field-cursor} info)]
                :textarea [FormTextarea (merge {:cursor field-cursor} info)]
