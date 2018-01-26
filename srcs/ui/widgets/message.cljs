@@ -41,11 +41,14 @@
   (let [user-id (<sub [:user-id])
         owner-id (:owner message)
         date-created (:date-created message)
+        avatar (:owner-avatar message)
         author (if (= user-id owner-id)
                  "You"
                  (<sub [:application-participant (str (:application message)) owner-id]))]
     [sa/Grid {:class-name "chat__message-container"}
-     [sa/GridColumn {:width 3} [:b author ":"]]
+     [sa/GridColumn {:width 3}
+      [:b author ":"]
+      [:img.avatar.avatar-small.chat__message-avatar {:src avatar}]]
      [sa/GridColumn {:width 13} [:div {"dangerouslySetInnerHTML"
                                        #js {:__html (text-with-br (:text message))}}]
       [:p.chat__message-time (.format (js/moment date-created) "h:mm a")]]]))

@@ -406,9 +406,13 @@
                            :overflow "auto"}]
    [:.chat__messages-header {:padding-top "25px!important"}]
    [:.chat__message-container {:margin "0!important"
-                               :padding "0 25px!important"
-                               :border-bottom "1px solid rgba(34,36,38,.15)"}
+                               :padding "0 25px 0 50px!important"
+                               :border-bottom "1px solid rgba(34,36,38,.15)"
+                               :position "relative"}
     [:&:last-child {:border-bottom 0}]]
+   [:.chat__message-avatar {:position "absolute"
+                           :top "5px"
+                           :left "-45px"}]
    [:.chat__message-time {:color "#8C97B2"
                           :margin-top (px 5)}]
    [:.chat__form-container {:border-top "1px solid rgba(34,36,38,.15)"
