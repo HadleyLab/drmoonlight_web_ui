@@ -21,11 +21,11 @@
   ;; formData.append("patronym", "Робертович");
 
 
-  ;; (defn generate-form-data [params]
-  ;;   (let [form-data (js/FormData.)]
-  ;;     (doseq [[k v] params]
-  ;;       (.append form-data (name k) v))
-  ;;     form-data))
+; (defn generate-form-data [params]
+;   (let [form-data (js/FormData.)]
+;     (doseq [[k v] params]
+;       (.append form-data (name k) v))
+;     form-data))
 
 (defn SchedulerProfileForm []
   (rf/dispatch [:init-scheduler-profile-form])

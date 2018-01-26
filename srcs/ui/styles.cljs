@@ -441,4 +441,6 @@
    [:.avatar {:border-radius "50%"}]
    [:.avatar-small {:width "50px"
                     :height "50px"}]
+   [:.avatar-change {:cursor "pointer"
+                     :color "#8C97B2"}]
    ))

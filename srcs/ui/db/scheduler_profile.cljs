@@ -46,6 +46,12 @@
  :scheduler-profile-form-response
  #(<sub [::scheduler-profile :profile-form :response]))
 
+ (defn generate-form-data [params]
+   (let [form-data (js/FormData.)]
+     (doseq [[k v] params]
+       (.append form-data (name k) v))
+     form-data))
+
 (rf/reg-event-fx
  :update-scheduler-profile
  (fn [{db :db} [_ type]]
@@ -57,7 +63,7 @@
                          :uri url
                          :method (if (= state 1) "POST" "PATCH")
                          :token (<sub [:token])
-                         :body (merge body {:timezone (get-timezone-str)})
+                         :body generate-form-data (merge body {:timezone (get-timezone-str)})
                          :succeed-fx (fn [data]
                                        [:update-account-info
                                         (if (= state 1)

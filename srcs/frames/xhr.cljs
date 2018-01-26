@@ -61,6 +61,7 @@
                          map-result :map-result
                          succeed-fx :succeed-fx
                          failure-fx :failure-fx :as opts}]
+  (println (:body opts))
   (let [headers (merge {"Content-Type" "application/json"}
                        (or headers {})
                        (if (nil? token) {} {"Authorization" (str "Token " token)}))

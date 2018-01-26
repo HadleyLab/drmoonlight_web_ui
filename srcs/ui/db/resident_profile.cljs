@@ -9,7 +9,9 @@
   {"Personal Information" {:first-name {:type :input
                                         :label "First Name"}
                            :last-name {:type :input
-                                       :label "Last Name"}}
+                                       :label "Last Name"}
+                           :avatar {:type :avatar
+                                    :label "Avatar"}}
    "Residency" (array-map
                 :residency-program {:type :textarea
                                     :label "Residency/Fellowship Program"}

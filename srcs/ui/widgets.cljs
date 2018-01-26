@@ -137,7 +137,11 @@
 (defn FormAvatar [{cursor :cursor label :label error :error}]
   [sa/FormField {:width 11 :error error}
     [:label label]
-    [:img.avatar {:src @cursor}]])
+    [:img.avatar {:src @cursor}]
+    [:span.avatar-change "click to change"]
+    [sa/Input {:type "file"
+               :error (not= error nil)
+               :on-change (>atom cursor)}]])
 
 (defn RenderInput [{cursor :cursor field :field hide-error :hide-error}]
   (let [fields-cursor (reagent/cursor cursor [:fields])
