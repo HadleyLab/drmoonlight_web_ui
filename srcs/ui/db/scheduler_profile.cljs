@@ -59,11 +59,13 @@
          state (<sub [:user-state])
          body (<sub [::scheduler-profile :profile-form :fields])
          url (get-url db "/api/accounts/scheduler/" pk "/")]
+     ; (let [a (generate-form-data (merge body {:timezone (get-timezone-str)}))]
+     ; (println a))
      {:json/fetch->path {:path [::scheduler-profile :profile-form :response]
                          :uri url
                          :method (if (= state 1) "POST" "PATCH")
                          :token (<sub [:token])
-                         :body generate-form-data (merge body {:timezone (get-timezone-str)})
+                         :body (generate-form-data (merge body {:timezone (get-timezone-str)}))
                          :succeed-fx (fn [data]
                                        [:update-account-info
                                         (if (= state 1)
