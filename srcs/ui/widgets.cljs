@@ -6,7 +6,8 @@
    [cljs.pprint :as pp]
    [cljsjs.react-datepicker]
    [clojure.string :as str]
-   [soda-ash.core :as sa]))
+   [soda-ash.core :as sa]
+   [reagent.core :as r]))
 
 (def DatePicker (reagent/adapt-react-class (.-default js/DatePicker)))
 
@@ -134,14 +135,32 @@
      true
      (visibility-depends-on fields))))
 
+(defn read-file [file file-path]
+  (let [file-reader (js/FileReader.)
+        _ (set! (.-onload file-reader) #(reset! file-path (.-result file-reader)))
+        res (.readAsDataURL file-reader file)]
+    res))
+
 (defn FormAvatar [{cursor :cursor label :label error :error}]
-  [sa/FormField {:width 11 :error error}
-    [:label label]
-    [:img.avatar {:src @cursor}]
-    [:span.avatar-change "click to change"]
-    [sa/Input {:type "file"
-               :error (not= error nil)
-               :on-change (>atom cursor)}]])
+  (let [file-path (reagent/atom "")]
+    (fn [{cursor :cursor label :label error :error}]
+     (let [file @cursor
+           src (if (string? file) file
+                   (do (read-file file file-path)
+                       @file-path))]
+       (println "render")
+       [sa/FormField {:width 11 :error error}
+        [:label label]
+        [:img.avatar {:src src}]
+        [:span.avatar-change "click to change"]
+        [sa/Input {:type "file"
+                   :error (not= error nil)
+                   :on-change (fn [e]
+                                (-> e
+                                    .-target
+                                    .-files
+                                    (aget 0)
+                                    (->> (dispatch-set! cursor))))}]]))))
 
 (defn RenderInput [{cursor :cursor field :field hide-error :hide-error}]
   (let [fields-cursor (reagent/cursor cursor [:fields])
