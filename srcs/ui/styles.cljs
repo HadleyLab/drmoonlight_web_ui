@@ -438,7 +438,9 @@
    [:.account-manager__resident-buttons {:padding-bottom "50px"
                                          :text-align "right"}]
 
-   [:.avatar {:border-radius "50%"}]
+   [:.avatar {:border-radius "50%"
+              :width "100px"
+              :height "100px"}]
    [:.avatar-small {:width "50px"
                     :height "50px"}]
    [:.avatar-change {:cursor "pointer"

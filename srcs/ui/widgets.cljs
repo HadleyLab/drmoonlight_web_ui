@@ -148,13 +148,15 @@
            src (if (string? file) file
                    (do (read-file file file-path)
                        @file-path))]
-       (println "render")
        [sa/FormField {:width 11 :error error}
         [:label label]
         [:img.avatar {:src src}]
-        [:span.avatar-change "click to change"]
+        [:span.avatar-change {:on-click #(.click (.getElementById js/document "id_avatar_input"))}
+          "click to change"]
         [sa/Input {:type "file"
                    :error (not= error nil)
+                   :style {:display "none"}
+                   :id "id_avatar_input"
                    :on-change (fn [e]
                                 (-> e
                                     .-target

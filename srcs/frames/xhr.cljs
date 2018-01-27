@@ -88,8 +88,7 @@
                      (assoc fetch-opts :body body)
                      fetch-opts)
         status-path (conj path :status)
-        map-result (or map-result identity)
-        _ (js/console.log (clj->js fetch-opts))]
+        map-result (or map-result identity)]
     (rf/dispatch [:db/write status-path :loading])
     (->
      (js/fetch (str (:uri opts) (when params (str "?" (to-query params))))
