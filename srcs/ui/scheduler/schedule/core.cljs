@@ -3,6 +3,8 @@
    [reagent.core :as reagent]
    [ui.db.misc :refer [<sub >event >events]]
    [ui.db.shift :refer [shift-form-fields]]
+   [ui.db.scheduler :refer [shift-types]]
+   [ui.db.shift :refer [get-shift-type]]
    [ui.pages :as pages]
    [ui.widgets :refer [BuildForm]]
    [ui.widgets.error-message :refer [ErrorMessage]]
@@ -43,11 +45,12 @@
 (defn ShiftLabel [params]
   (let [pk (:pk params)
         state (:state params)
+        type (get-shift-type params shift-types)
         speciality (:speciality params)
         speciality-name (:name (<sub [:speciality speciality]))]
     [:div [sa/Popup
            {:trigger (reagent/as-element
-                      [:div {:class-name (str "shift__label _" state)}
+                      [:div {:class-name (str "shift__label _" type)}
                        (<sub [:speciality-name speciality])])
             :open (<sub [:edit-shift-popup pk])
             :on-open (>event [:open-edit-shift-popup pk])
@@ -103,7 +106,7 @@
            [CalendarMonthControl [sa/GridColumn {:width 13}]]]
           [sa/GridRow {}
            [sa/GridColumn {:width 3}
-            [ShiftsFilter]]
+            [ShiftsFilter shift-types]]
            [sa/GridColumn {:width 13}
             [Calendar calendar-month filtered-shifts ShiftLabel]]]]]))))
 

@@ -227,6 +227,7 @@
    [:.shift__label {:position "relative"
                     :padding "3px 18px 3px 8px"
                     :color "#fff"
+                    :background-color "#000"
                     :font-size (px 12)
                     :line-height (px 14)
                     :border-radius (px 4)

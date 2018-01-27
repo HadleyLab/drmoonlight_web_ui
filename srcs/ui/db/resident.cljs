@@ -62,3 +62,23 @@
                        :token (<sub [:token])
                        :method "POST"
                        :succeed-fx fx}}))
+(def shift-types
+  [{:type "available"
+    :pred #(and (not (:has-already-applied %))
+                (#{"without_applies" "require_approval"} (:state %)))
+    :label  "Available shifts"}
+   {:type "approved"
+    :pred #(and (:has-already-applied %)
+                (= "coverage_completed" (:state %)))
+    :label [:span "Available shifts" [:br] "(approved)"]}
+   {:type "pending"
+    :pred #(and (:has-already-applied %)
+                (not (:was-rejected %))
+                (= "require_approval" (:state %)))
+    :label [:span "Available shifts" [:br] "(pending)"]}
+   {:type "rejected"
+    :pred :was-rejected
+    :label [:span "Available shifts" [:br] "(rejected)"]}
+   {:type "completed"
+    :pred #(and (:has-already-applied %) (= "completed" (:state %)))
+    :label [:span "Past shifts" [:br] "(worked)"]}])

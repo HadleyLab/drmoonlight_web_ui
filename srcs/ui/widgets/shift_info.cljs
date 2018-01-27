@@ -5,14 +5,7 @@
    [ui.db.application :refer [format-application-shift-date]]
    [soda-ash.core :as sa]))
 
-(def shift-types [{:type "completed" :label "Completed shifts"}
-                  {:type "active" :label "Active shifts"}
-                  {:type "without_applies" :label "Shifts without applies"}
-                  {:type "coverage_completed" :label "Coverage completed"}
-                  {:type "require_approval" :label "Require approval"}
-                  {:type "failed" :label "Failed shifts"}])
-
-(defn ShiftsFilter []
+(defn ShiftsFilter [shift-types]
   (let [shifts-count-by-state (<sub [:shifts-count-by-state])
         filter-state (<sub [:shifts-filter-state])]
     [:div

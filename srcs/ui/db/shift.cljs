@@ -1,6 +1,9 @@
 (ns ui.db.shift
   (:require
    [ui.db.misc :refer [get-url <sub fields->schema setup-form-initial-values]]
+   [ui.db.account :refer [is-resident is-scheduler]]
+   [ui.db.resident]
+   [ui.db.scheduler]
    [re-frame.core :as rf]))
 
 (def shift-form-fields
@@ -89,24 +92,44 @@
  :shifts
  #(<sub [::shift :list]))
 
+(defn get-shift-type [shift shift-types]
+  (->> shift-types
+       (map #(when ((:pred %) shift) (:type %)))
+       (filter identity)
+       first))
+
 (rf/reg-sub
  :shifts-count-by-state
- #(into {}
-        (map (fn [[key value]] [key (count value)])
-             (group-by identity
-                       (mapcat (fn [[key values]]
-                                 (map :state values))
-                               (<sub [::shift :list :data]))))))
+ #(->> (<sub [::shift :list :data])
+       (mapcat second)
+       (group-by (fn [shift]
+                   (get-shift-type shift (if (is-scheduler)
+                                           ui.db.scheduler/shift-types
+                                           ui.db.resident/shift-types))))
+       (map (fn [[key value]] [key (count value)]))
+       (into {})))
+
+
+(defn get-pred-fn [filter-state]
+  (let [pred-fn #(= filter-state (:state %))]
+    (->> (if (is-scheduler)
+           ui.db.scheduler/shift-types
+           ui.db.resident/shift-types)
+         (map #(when (= (:type %) filter-state) (:pred %)))
+         (filter identity)
+         first)))
+
 (rf/reg-sub
  :shifts-filtered-by-state
  (fn [db [_ filter-state]]
-   (let [shifts (<sub [:shifts])]
+   (let [shifts (<sub [:shifts])
+         pred-fn (get-pred-fn filter-state)]
      (if (nil? filter-state) shifts
          {:status (:status shifts)
           :data (into {}
                       (map
                        (fn [[key values]]
-                         [key (filter #(= filter-state (:state %)) values)])
+                         [key (filter pred-fn values)])
                        (:data shifts)))}))))
 
 (rf/reg-sub
