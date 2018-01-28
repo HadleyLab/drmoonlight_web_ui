@@ -181,7 +181,11 @@
     [:&._active {:background-color "#FFAB00"}]
     [:&._without_applies {:background-color "#E64C66"}]
     [:&._coverage_completed {:background-color "#44BE8D"}]
-    [:&._require_approval {:background-color "#7874CF"}]]
+    [:&._require_approval {:background-color "#7874CF"}]
+    [:&._available {:background-color "#E64C66"}]
+    [:&._approved {:background-color "#44BE8D"}]
+    [:&._pending {:background-color "#7874CF"}]
+    [:&._rejected {:background-color "#000"}]]
 
    ; calendar styles
    [:.calendar__table {:table-layout :fixed}]
@@ -240,6 +244,10 @@
     [:&._without_applies {:background-color "#E64C66"}]
     [:&._coverage_completed {:background-color "#44BE8D"}]
     [:&._require_approval {:background-color "#7874CF"}]
+    [:&._available {:background-color "#E64C66"}]
+    [:&._approved {:background-color "#44BE8D"}]
+    [:&._pending {:background-color "#7874CF"}]
+    [:&._rejected {:background-color "#000"}]
     [:.icon {:position "absolute"
              :top "3px"
              :right "0"}]]
