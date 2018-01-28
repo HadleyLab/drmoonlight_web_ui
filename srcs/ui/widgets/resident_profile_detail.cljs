@@ -15,6 +15,8 @@
        (:label info)
        (if (:desc info) [:span.gray-font " (" (:desc info) ")"])]
       [sa/GridColumn {:width 10}
+       (if (= field :cv-link)
+       [:a {:href (field data) :target "_blank"} (field data)]
        (case (:type info)
          :radio (map (fn [[key value]]
                        [sa/FormRadio {:disabled true
@@ -26,7 +28,7 @@
                         (fn [item]
                           [:span.profile-detail__select (str item)])
                         (field data))
-         [:b (field data)])]]]))
+         [:b (field data)]))]]]))
 
 (defn Details [data field-sets]
   (concatv [:div]

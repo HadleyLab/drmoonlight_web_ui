@@ -53,7 +53,9 @@
                 :earliest-availability-for-shift {:type :input
                                                   :label "Earliest availability for a shift"}
                 :preferences-for-work-location {:type :input
-                                                :label "Any preference for work location"})})
+                                                :label "Any preference for work location"}
+                :cv-link {:type :input
+                          :label "Link to CV on any external resource"})})
 
 (def resident-notification-form-fields
   {"I would like to recieve emails when:"
