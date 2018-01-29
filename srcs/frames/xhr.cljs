@@ -53,6 +53,14 @@
     (fn? fx) (rf/dispatch (fx (:data data)))
     :else (rf/dispatch fx)))
 
+
+(defn generate-form-data [params]
+  (let [form-data (js/FormData.)]
+    (doseq [[k v] params]
+      (.append form-data (name k) v))
+    form-data))
+
+
 (defn json-fetch->path [{path :path
                          uri :uri
                          token :token
@@ -61,14 +69,23 @@
                          map-result :map-result
                          succeed-fx :succeed-fx
                          failure-fx :failure-fx :as opts}]
-  (let [headers (merge (or headers {})
-                       {"Content-Type" "application/json"}
+  (let [headers (merge {"Content-Type" "application/json"}
+                       (or headers {})
                        (if (nil? token) {} {"Authorization" (str "Token " token)}))
         fetch-opts (-> (merge {:method "get"} opts)
                        (dissoc :uri :headers :success :error :params)
                        (assoc :headers headers))
+        body (:body opts)
+        body (if (= (headers "Content-Type") "multipart/form-data")
+               (generate-form-data body)
+               (-> body
+                   clj->js
+                   js/JSON.stringify))
+        fetch-opts (if (= (headers "Content-Type") "multipart/form-data")
+                  (update fetch-opts :headers dissoc "Content-Type")
+                  fetch-opts)
         fetch-opts (if (:body opts)
-                     (assoc fetch-opts :body (.stringify js/JSON (clj->js (:body opts))))
+                     (assoc fetch-opts :body body)
                      fetch-opts)
         status-path (conj path :status)
         map-result (or map-result identity)]

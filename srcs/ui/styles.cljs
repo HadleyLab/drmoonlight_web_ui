@@ -415,9 +415,13 @@
                            :overflow "auto"}]
    [:.chat__messages-header {:padding-top "25px!important"}]
    [:.chat__message-container {:margin "0!important"
-                               :padding "0 25px!important"
-                               :border-bottom "1px solid rgba(34,36,38,.15)"}
+                               :padding "0 25px 0 50px!important"
+                               :border-bottom "1px solid rgba(34,36,38,.15)"
+                               :position "relative"}
     [:&:last-child {:border-bottom 0}]]
+   [:.chat__message-avatar {:position "absolute"
+                           :top "5px"
+                           :left "-45px"}]
    [:.chat__message-time {:color "#8C97B2"
                           :margin-top (px 5)}]
    [:.chat__form-container {:border-top "1px solid rgba(34,36,38,.15)"
@@ -441,4 +445,17 @@
 
    ; account manager styles
    [:.account-manager__resident-buttons {:padding-bottom "50px"
-                                         :text-align "right"}]))
+                                         :text-align "right"}]
+
+   [:.avatar {:border-radius "50%"
+              :width "100px"
+              :height "100px"}]
+   [:.avatar-small {:width "50px"
+                    :height "50px"}]
+   [:.avatar-change {:cursor "pointer"
+                     :color "#8C97B2"
+                     :width "100px"
+                     :text-align "center"}]
+   [:.avatar_label {:width "100px"
+                    :text-align "center"}]
+   ))

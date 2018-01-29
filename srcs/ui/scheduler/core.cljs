@@ -15,6 +15,18 @@
    [ui.widgets.resident-profile-detail :refer [ResidentProfileDetail]]
    [ui.scheduler.message]))
 
+
+  ;; var formData = new FormData(document.forms.person);
+  ;; // добавить к пересылке ещё пару ключ - значение
+  ;; formData.append("patronym", "Робертович");
+
+
+; (defn generate-form-data [params]
+;   (let [form-data (js/FormData.)]
+;     (doseq [[k v] params]
+;       (.append form-data (name k) v))
+;     form-data))
+
 (defn SchedulerProfileForm []
   (rf/dispatch [:init-scheduler-profile-form])
   (let [scheduler-profile-form-cursor (<sub [:scheduler-profile-form-cursor])]

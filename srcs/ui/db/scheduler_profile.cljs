@@ -8,7 +8,9 @@
   {"Personal Information" {:first-name {:type :input
                                         :label "First Name"}
                            :last-name {:type :input
-                                       :label "Last Name"}}
+                                       :label "Last Name"}
+                           :avatar {:type :avatar
+                                    :label "Avatar"}}
    "" (array-map
                 :facility-name {:type :input
                                 :label "Hospital / Facility name"}
@@ -50,9 +52,13 @@
    (let [pk (<sub [:user-id])
          state (<sub [:user-state])
          body (<sub [::scheduler-profile :profile-form :fields])
+         body (if (string? (:avatar body))
+                (dissoc body :avatar)
+                body)
          url (get-url db "/api/accounts/scheduler/" pk "/")]
      {:json/fetch->path {:path [::scheduler-profile :profile-form :response]
                          :uri url
+                         :headers {"Content-Type" "multipart/form-data"}
                          :method (if (= state 1) "POST" "PATCH")
                          :token (<sub [:token])
                          :body (merge body {:timezone (get-timezone-str)})
