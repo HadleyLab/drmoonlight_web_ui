@@ -100,12 +100,16 @@
    (let [pk (<sub [:user-id])
          state (<sub [:user-state])
          body (<sub [::resident-profile :profile-form :fields])
+         body (if (string? (:avatar body))
+                (dissoc body :avatar)
+                body)
          is-new-or-rejected (or (= state :new) (= state :rejected))
          url (if is-new-or-rejected
                (get-url db "/api/accounts/resident/" pk "/fill_profile/")
                (get-url db "/api/accounts/resident/" pk "/"))]
      {:json/fetch->path {:path [::resident-profile :profile-form :response]
                          :uri url
+                         :headers {"Content-Type" "multipart/form-data"}
                          :method (if is-new-or-rejected "POST" "PATCH")
                          :token (<sub [:token])
                          :body (merge body {:timezone (get-timezone-str)})
