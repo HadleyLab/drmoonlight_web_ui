@@ -149,9 +149,9 @@
                    (do (read-file file file-path)
                        @file-path))]
        [sa/FormField {:width 11 :error error}
-        [:label label]
+        [:label.avatar_label label]
         [:img.avatar {:src src}]
-        [:span.avatar-change {:on-click #(.click (.getElementById js/document "id_avatar_input"))}
+        [:div.avatar-change {:on-click #(.click (.getElementById js/document "id_avatar_input"))}
           "click to change"]
         [sa/Input {:type "file"
                    :error (not= error nil)

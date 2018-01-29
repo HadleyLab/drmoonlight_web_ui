@@ -444,5 +444,9 @@
    [:.avatar-small {:width "50px"
                     :height "50px"}]
    [:.avatar-change {:cursor "pointer"
-                     :color "#8C97B2"}]
+                     :color "#8C97B2"
+                     :width "100px"
+                     :text-align "center"}]
+   [:.avatar_label {:width "100px"
+                    :text-align "center"}]
    ))
