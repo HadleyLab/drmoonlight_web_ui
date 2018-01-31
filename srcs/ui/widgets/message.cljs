@@ -25,14 +25,15 @@
                          :error (= status :failure)
                          :value @comment-cursor
                          :on-change (>atom comment-cursor)}]
-          (if-not (nil? attached-filename) [:div.attached-file-label "Attached file: " attached-filename])
+          ; (when-not (nil? attached-filename) [:div.attached-file-label "Attached file: " attached-filename])
           ; TODO not works
-          ; [:div.attached-file-label
-          ;   (if (not (nil? attached-filename)) (str "Attached file: " attached-filename) " ")]
+          [:div
+            (if (not (nil? attached-filename)) (str "Attached file: " attached-filename) " ")]
           [sa/Input {:type :file
                      :id "id_attachment_input"
                      :style {:display "none"}
-                     :value @attachment-cursor
+                     :value (if (nil? @attachment-cursor) " " @attachment-cursor)
+                     ; :value @attachment-cursor
                      :on-change (fn [e]
                                   (-> e
                                       .-target
@@ -77,7 +78,7 @@
       [:img.avatar.avatar-small.chat__message-avatar {:src avatar}]]
      [sa/GridColumn {:width 13} [:div {"dangerouslySetInnerHTML"
                                        #js {:__html (text-with-br (:text message))}}]
-      (if-not (nil? attachment) [:a {:href attachment
+      (when-not (nil? attachment) [:a {:href attachment
                                      :target "_blank"}
                                   [:img.attachment-image {
                                     :src (if (nil? thumbnail) "/doc_icon.svg" thumbnail)}]])
