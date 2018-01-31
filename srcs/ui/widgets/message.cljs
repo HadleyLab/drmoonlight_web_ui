@@ -35,7 +35,13 @@
             {:color :blue
              :floated "right"
              :on-click (>event [:add-comment application-pk] "message")}
-            "Send message"]]]]))))
+            "Send message"]
+           [sa/Button
+            {:basic true
+             :color "blue"
+             :floated "right"
+             :class-name "attachment_button"}
+            [sa/Icon {:name "file outline" :size :large}]]]]]))))
 
 (defn Message [message]
   (let [user-id (<sub [:user-id])
