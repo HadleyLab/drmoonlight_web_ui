@@ -462,4 +462,5 @@
                      :text-align "center"}]
    [:.avatar_label {:width "100px"
                     :text-align "center"}]
+   [:.attached-file-label {:margin "-1em 0 1em 0"}]
    ))

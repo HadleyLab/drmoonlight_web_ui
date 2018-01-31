@@ -15,7 +15,8 @@
         attachment-cursor (<sub [:attachment-cursor])]
     (fn [{application-pk :pk
           available-transitions :available-transitions}]
-      (let [{status :status errors :errors} (<sub [:comment-form])]
+      (let [{status :status errors :errors} (<sub [:comment-form])
+            attached-filename (if (nil? @attachment-cursor) nil (.-name @attachment-cursor))]
         [:div.chat__form-container
          [sa/Form {:error (= status :failure)}
           (when (= status :failure)
@@ -24,14 +25,19 @@
                          :error (= status :failure)
                          :value @comment-cursor
                          :on-change (>atom comment-cursor)}]
-          [sa/FormInput {:type :file
-                         :value @attachment-cursor
-                         :on-change (fn [e]
-                                      (-> e
-                                          .-target
-                                          .-files
-                                          (aget 0)
-                                          (->> (dispatch-set! attachment-cursor))))}]
+          (if-not (nil? attached-filename) [:div.attached-file-label "Attached file: " attached-filename])
+          ; [:div.attached-file-label
+          ;   (if (not (nil? attached-filename)) (str "Attached file: " attached-filename) " ")]
+          [sa/Input {:type :file
+                     :id "id_attachment_input"
+                     :style {:display "none"}
+                     :value @attachment-cursor
+                     :on-change (fn [e]
+                                  (-> e
+                                      .-target
+                                      .-files
+                                      (aget 0)
+                                      (->> (dispatch-set! attachment-cursor))))}]
           [:div.chat__buttons
            (for [transition available-transitions]
              [sa/Button
@@ -51,7 +57,8 @@
             {:basic true
              :color "blue"
              :floated "right"
-             :class-name "attachment_button"}
+             :class-name "attachment_button"
+             :on-click #(.click (.getElementById js/document "id_attachment_input"))}
             [sa/Icon {:name "file outline" :size :large}]]]]]))))
 
 (defn Message [message]
