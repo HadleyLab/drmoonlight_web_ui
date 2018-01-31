@@ -25,10 +25,9 @@
                          :error (= status :failure)
                          :value @comment-cursor
                          :on-change (>atom comment-cursor)}]
-          ; (when-not (nil? attached-filename) [:div.attached-file-label "Attached file: " attached-filename])
-          ; TODO not works
-          [:div
-            (if (not (nil? attached-filename)) (str "Attached file: " attached-filename) " ")]
+          (if-not (nil? attached-filename)
+            [:div.attached-file-label "Attached file: " attached-filename]
+            [:div])
           [sa/Input {:type :file
                      :id "id_attachment_input"
                      :style {:display "none"}
