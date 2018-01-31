@@ -31,7 +31,7 @@
           [sa/Input {:type :file
                      :id "id_attachment_input"
                      :style {:display "none"}
-                     :value (if (nil? @attachment-cursor) " " @attachment-cursor)
+                     :value (if (nil? @attachment-cursor) "" @attachment-cursor)
                      :on-change (fn [e]
                                   (-> e
                                       .-target
