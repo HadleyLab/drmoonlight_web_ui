@@ -26,6 +26,7 @@
                          :value @comment-cursor
                          :on-change (>atom comment-cursor)}]
           (if-not (nil? attached-filename) [:div.attached-file-label "Attached file: " attached-filename])
+          ; TODO not works
           ; [:div.attached-file-label
           ;   (if (not (nil? attached-filename)) (str "Attached file: " attached-filename) " ")]
           [sa/Input {:type :file
@@ -52,7 +53,6 @@
              :floated "right"
              :on-click (>event [:add-comment application-pk] "message")}
             "Send message"]
-            ; TODO need to add tooltp on hover
            [sa/Button
             {:basic true
              :color "blue"
@@ -66,6 +66,8 @@
         owner-id (:owner message)
         date-created (:date-created message)
         avatar (:owner-avatar message)
+        attachment (:attachment message)
+        thumbnail (:thumbnail message)
         author (if (= user-id owner-id)
                  "You"
                  (<sub [:application-participant (str (:application message)) owner-id]))]
@@ -75,6 +77,10 @@
       [:img.avatar.avatar-small.chat__message-avatar {:src avatar}]]
      [sa/GridColumn {:width 13} [:div {"dangerouslySetInnerHTML"
                                        #js {:__html (text-with-br (:text message))}}]
+      (if-not (nil? attachment) [:a {:href attachment
+                                     :target "_blank"}
+                                  [:img.attachment-image {
+                                    :src (if (nil? thumbnail) "/doc_icon.svg" thumbnail)}]])
       [:p.chat__message-time (.format (js/moment date-created) "h:mm a")]]]))
 
 
