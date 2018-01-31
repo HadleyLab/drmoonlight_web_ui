@@ -2,6 +2,7 @@
   (:require
    [ui.db.misc :refer [>event >atom <sub get-url text-with-br]]
    [ui.widgets :refer [concatv]]
+   [ui.db.misc :refer [>event >atom dispatch-set!]]
    [re-frame.core :as rf]
    [soda-ash.core :as sa]
    [clojure.string :as string]
@@ -10,7 +11,8 @@
 
 (defn MessageForm []
   (rf/dispatch-sync [:init-comment-form])
-  (let [comment-cursor (<sub [:comment-cursor])]
+  (let [comment-cursor (<sub [:comment-cursor])
+        attachment-cursor (<sub [:attachment-cursor])]
     (fn [{application-pk :pk
           available-transitions :available-transitions}]
       (let [{status :status errors :errors} (<sub [:comment-form])]
@@ -22,6 +24,14 @@
                          :error (= status :failure)
                          :value @comment-cursor
                          :on-change (>atom comment-cursor)}]
+          [sa/FormInput {:type :file
+                         :value @attachment-cursor
+                         :on-change (fn [e]
+                                      (-> e
+                                          .-target
+                                          .-files
+                                          (aget 0)
+                                          (->> (dispatch-set! attachment-cursor))))}]
           [:div.chat__buttons
            (for [transition available-transitions]
              [sa/Button
@@ -36,6 +46,7 @@
              :floated "right"
              :on-click (>event [:add-comment application-pk] "message")}
             "Send message"]
+            ; TODO need to add tooltp on hover
            [sa/Button
             {:basic true
              :color "blue"
