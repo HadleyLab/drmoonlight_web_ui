@@ -170,4 +170,5 @@
 (rf/reg-event-db
  :reset-comment-text
  (fn [db [_]]
-   (assoc-in db [::application :comment-form :fields :text] "")))
+   (assoc-in db [::application :comment-form :fields] {:text ""
+                                                       :attachment ""})))
