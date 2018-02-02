@@ -80,7 +80,8 @@
                                         (rf/dispatch [:init-edit-shift-form pk])
                                         (rf/dispatch [:open-edit-shift-modal pk]))} "Edit shift"]
                 (if-not (contains? #{"completed" "active" "failed"} state)
-                  [:div.shift__remove-shift {:on-click (>event [:delete-shift pk])} "Remove shift"])]]]))))
+                  [:div.shift__remove-shift {:on-click (fn [] (reset! hovered false)
+                                                         (rf/dispatch [:delete-shift pk]))} "Remove shift"])]]]))))
 
 (defn CreateModal [new-shift-form-cursor]
   (fn [new-shift-form-cursor]
@@ -105,7 +106,6 @@
 
 (defn Index [params]
   (rf/dispatch [:load-shifts])
-  (rf/dispatch [:new-load-shifts])
   (let [new-shift-form-cursor (<sub [:new-shift-form-cursor])]
     (fn [params]
       (let [calendar-month (<sub [:calendar-month])

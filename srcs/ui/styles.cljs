@@ -187,46 +187,6 @@
     [:&._pending {:background-color "#7874CF"}]
     [:&._rejected {:background-color "#000"}]]
 
-   ; calendar styles
-   [:.calendar__table {:table-layout :fixed}]
-   [:.calendar__table-header [:th {:padding "7px!important"
-                                   :text-align "center!important"}]]
-   [:.calendar__controls {:display "flex"
-                          :align-items "center"
-                          :justify-content "center"}]
-   [:.calendar__button {:display "inline-block"
-                        :color "#8C97B2"
-                        :cursor "pointer"
-                        :transition "color 0.2s"}
-    [:&:hover {:color "#000"}]]
-   [:.calendar__month-name {:font-size (px 18)
-                            :font-weight "bold"
-                            :letter-spacing (px -0.12)
-                            :margin "0 10px"}]
-   [:.calendar__cell {:position "relative"
-                      :width "14.28%"
-                      :max-width "14.28%"
-                      :padding "0!important"
-                      :vertical-align "top"}]
-   [:.calendar__cell-inner {:height "inherit"
-                            :width "100%"
-                            :padding "22px 7px 5px"
-                            :min-height (px 105)}]
-   [:.calendar__date {:position "absolute"
-                      :right (px 7)
-                      :top (px 6)
-                      :color "rgba(140,151,178,0.3)"
-                      :font-size (px 12)}]
-   [:.calendar__cell-inner._current-month [:.calendar__date {:color "#888A8C"}]]
-   [:.calendar__cell-inner._today
-    [:.calendar__cell-bg {:position "absolute"
-                          :left 0
-                          :top 0
-                          :right 0
-                          :bottom 0
-                          :background-color "rgba(140,151,178,0.17)"}]
-    [:.calendar__date {:font-weight "bold"
-                       :color "#000"}]]
    ; shifts styles
    [:.shift__label {:position "relative"
                     :padding "3px 18px 3px 8px"

@@ -41,6 +41,7 @@
 (def schema
   {::shift
    {:list {:status :not-asked}
+    :plain-shifts-list []
     :detail {}
     :filter-value nil
     :apply-requests {}
@@ -81,25 +82,14 @@
    {:json/fetch->path {:path [::shift :list]
                        :uri (get-url db "/api/shifts/shift/")
                        :token @(rf/subscribe [:token])
-                       :map-result convert-shifts}}))
+                       :map-result convert-shifts
+                       :succeed-fx [:get-plain-shifts-list]}}))
 
-; (defn- new-convert-shifts [data]
-;   (into {} (map (fn [shift] [(str (:pk shift)) shift]) data)))
-;
-; (rf/reg-event-fx
-;  :new-load-shifts
-;  (fn [{db :db} [_]]
-;    {:json/fetch->path {:path [::shift :new-list]
-;                        :uri (get-url db "/api/shifts/shift/")
-;                        :token @(rf/subscribe [:token])
-;                        :map-result new-convert-shifts}}))
-
-(rf/reg-event-fx
- :new-load-shifts
- (fn [{db :db} [_]]
-   {:json/fetch->path {:path [::shift :new-list]
-                       :uri (get-url db "/api/shifts/shift/")
-                       :token @(rf/subscribe [:token])}}))
+(rf/reg-event-db
+ :get-plain-shifts-list
+ (fn [db _]
+   (assoc-in db [::shift :plain-shifts-list]
+             (flatten (map (fn [[_ item]] item) (get-in db [::shift :list :data]))))))
 
 (rf/reg-sub
  ::shift
@@ -169,8 +159,8 @@
  #(<sub [::shift :list :data]))
 
 (rf/reg-sub
- :new-shifts-data
- #(<sub [::shift :new-list :data]))
+ :plain-shifts-list
+ #(<sub [::shift :plain-shifts-list]))
 
 ;; API for verbose shift information
 

@@ -76,49 +76,8 @@
                           :flex-direction "row"
                           :flex-wrap "wrap"}]]]))
 
-(defn- as-key [date]
-  (.format date "YYYY-MM-DD"))
-
-(defn- get-shifts-for-day [shifts day]
-  (get-in shifts [:data (as-key day)] []))
-
-(defn- format-day [day]
-  (if (> (count (str day)) 1) day (str 0 day)))
-
 (def days-of-week
   ["Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat"])
-
-(defn- draw-cell [render-shift-label row column selected shifts]
-  (let [month-start (.weekday selected)
-        index (+ (* row 7) column)
-        day (+ (- index month-start) 1)
-        prev-month (.subtract (js/moment selected) 1 "month")
-        next-month (.add (js/moment selected) 1 "month")
-        selected-month-max-day (-> selected
-                                   (js/moment)
-                                   (.endOf "month")
-                                   (.date))
-        prev-month-max-day        (-> prev-month
-                                      (js/moment)
-                                      (.endOf "month")
-                                      (.date))
-        cell-date (cond
-                    (<= day 0) (js/moment (str (.format prev-month "YYYY-MM-")
-                                               (format-day (+ prev-month-max-day day))))
-                    (> day selected-month-max-day) (js/moment
-                                                    (str (.format next-month "YYYY-MM-")
-                                                         (format-day (- day selected-month-max-day))))
-                    :else (js/moment (str (.format selected "YYYY-MM-") (format-day day))))
-        is-today (= (.format (js/moment) "YYYY-MM-DD") (.format cell-date "YYYY-MM-DD"))
-        is-current-month (= (.month (js/moment selected)) (.month cell-date))]
-    (concatv [:div {:class-name (str "calendar__cell-inner"
-                                     " "
-                                     (if is-current-month "_current-month")
-                                     " "
-                                     (if is-today "_today"))}
-              [:div.calendar__cell-bg]
-              [:div.calendar__date (.date cell-date)]]
-             (mapv render-shift-label (get-shifts-for-day shifts cell-date)))))
 
 ; Start week 6, end week 10 => number of weeks in month (10 - 6) + 1 = 5
 ; Special case for end of a year:
@@ -155,7 +114,7 @@
      :week-end (.startOf week-end-date "day")}))
 
 (defn get-week-shifts [{:keys [week-start week-end]}]
-  (let [new-shifts-data (<sub [:new-shifts-data])]
+  (let [plain-shifts-list (<sub [:plain-shifts-list])]
     (filter (fn [shift]
               (let [date-start (js/moment (:date-start shift))
                     date-end (js/moment (:date-end shift))
@@ -167,7 +126,7 @@
                 (or shift-start-on-this-week
                     shift-ends-on-this-week
                     shift-includes-the-hole-week)))
-            new-shifts-data)))
+            plain-shifts-list)))
 
 (defn prepare-shifts-data [shifts {:keys [week-start week-end]}]
   (mapv (fn [shift]
@@ -210,7 +169,7 @@
 
 (defn Calendar [current-month shifts ShiftLabel]
   (fn [current-month shifts ShiftLabel]
-    [:div
+    [:div {:style {:padding-bottom "100px"}}
      [:div.calendar calendar-styles
       (concatv [:div.header] (mapv (fn [day] [:div day]) days-of-week))
       (concatv [:div]
@@ -227,34 +186,28 @@
                              (when-not (empty? prepared-shifts)
                                (concatv [:div.shifts-row]
                                         (mapv #(draw-shift % ShiftLabel) prepared-shifts))))]]))
-                     (range (get-weeks-number current-month))))]
+                     (range (get-weeks-number current-month))))]]))
 
-     ; [sa/Table {:class-name "calendar__table" :celled true}
-     ;  [sa/TableHeader {:class-name "calendar__table-header"}
-     ;   [sa/TableRow
-     ;    [sa/TableHeaderCell "Sun"]
-     ;    [sa/TableHeaderCell "Mon"]
-     ;    [sa/TableHeaderCell "Tue"]
-     ;    [sa/TableHeaderCell "Wed"]
-     ;    [sa/TableHeaderCell "Thu"]
-     ;    [sa/TableHeaderCell "Fri"]
-     ;    [sa/TableHeaderCell "Sat"]]]
-     ;  (concatv [sa/TableBody]
-     ;           (mapv (fn [row]
-     ;                   (concatv [sa/TableRow]
-     ;                            (mapv (fn [column]
-     ;                                    [sa/TableCell {:class-name "calendar__cell"}
-     ;                                     [draw-cell render-shift-label row column current-month shifts]])
-     ;                                  (range 7))))
-     ;                 (range (get-weeks-number current-month))))]
-]))
+(def calendar-controls-styles
+  (style [:.calendar-controls {:display "flex"
+                               :align-items "center"
+                               :justify-content "center"}
+          [:.button {:display "inline-block"
+                     :color "#8C97B2"
+                     :cursor "pointer"
+                     :transition "color 0.2s"}
+           [:&:hover {:color "#000"}]]
+          [:.month-name {:font-size "18px"
+                         :font-weight "bold"
+                         :letter-spacing "-0.12px"
+                         :margin "0 10px"}]]))
 
 (defn CalendarMonthControl [parent]
   (into parent
-        [[:div.calendar__controls
-          [:div.calendar__button {:on-click (>event [:dec-calendar-month])}
+        [[:div.calendar-controls calendar-controls-styles
+          [:div.button {:on-click (>event [:dec-calendar-month])}
            [sa/Icon {:name "angle left" :size "big"}]]
-          [:span.calendar__month-name (<sub [:calendar-month-formated])]
-          [:div.calendar__button {:on-click (>event [:inc-calendar-month])}
+          [:span.month-name (<sub [:calendar-month-formated])]
+          [:div.button {:on-click (>event [:inc-calendar-month])}
            [sa/Icon {:name "angle right" :size "big"}]]]
          [sa/GridColumn {:width 6}]]))
