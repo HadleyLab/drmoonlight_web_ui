@@ -11,7 +11,7 @@
     :detail {}
     :messages {}
     :filter-value nil
-    :comment-form {:fields {:text ""} :response {:status :not-asked}}}})
+    :comment-form {:fields {:text "" :attachment nil} :response {:status :not-asked}}}})
 
 (def application-statuses
   {1 "New application"
@@ -131,6 +131,10 @@
  :comment-cursor
  #(<sub [:cursor [::application :comment-form :fields :text]]))
 
+ (rf/reg-sub
+  :attachment-cursor
+  #(<sub [:cursor [::application :comment-form :fields :attachment]]))
+
 (rf/reg-sub
  :comment-form
  #(<sub [::application :comment-form :response]))
@@ -138,12 +142,18 @@
 (rf/reg-event-fx
  :add-comment
  (fn [{db :db} [_ application-pk transition]]
-   {:json/fetch->path {:path [::application :comment-form :response]
-                       :uri (get-url db "/api/shifts/application/" application-pk "/" transition "/")
-                       :method "POST"
-                       :token (<sub [:token])
-                       :body {:text @(<sub [:comment-cursor])}
-                       :succeed-fx [:reset-comment-text]}}))
+   (let [text @(<sub [:comment-cursor])
+         attachment @(<sub [:attachment-cursor])
+         body (if (nil? attachment) {:text text}
+                                    {:text text
+                                     :attachment attachment})]
+     {:json/fetch->path {:path [::application :comment-form :response]
+                         :uri (get-url db "/api/shifts/application/" application-pk "/" transition "/")
+                         :headers {"Content-Type" "multipart/form-data"}
+                         :method "POST"
+                         :token (<sub [:token])
+                         :body body
+                         :succeed-fx [:reset-comment-text]}})))
 
 (rf/reg-event-fx
  :application-state-changed
@@ -160,4 +170,5 @@
 (rf/reg-event-db
  :reset-comment-text
  (fn [db [_]]
-   (assoc-in db [::application :comment-form :fields :text] "")))
+   (assoc-in db [::application :comment-form :fields] {:text ""
+                                                       :attachment ""})))

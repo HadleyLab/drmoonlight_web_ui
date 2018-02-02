@@ -442,6 +442,10 @@
    [:.chat__buttons:after  {:content "\"\""
                             :display "block"
                             :clear "both"}]
+   [:.chat__buttons
+    [:button.attachment_button {:padding "8px 10px 11px 15px!important"
+                                :margin-right "6px!important"}
+     [:i {:margin-right "0!important"}]]]
 
    ; account manager styles
    [:.account-manager__resident-buttons {:padding-bottom "50px"
@@ -458,4 +462,6 @@
                      :text-align "center"}]
    [:.avatar_label {:width "100px"
                     :text-align "center"}]
+   [:.attached-file-label {:margin "-1em 0 1em 0"}]
+   [:.attachment-image {:margin-top "5px"}]
    ))
