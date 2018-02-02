@@ -28,34 +28,31 @@
      :else [sa/Button {:on-click (>event [:goto :resident :profile]) :fluid true :color "blue"} "Fill profile to apply"])])
 
 (defn ShiftLabel [params draw-data]
-  (let [hovered (reagent/atom false)]
-    (fn [params draw-data]
-      (let [pk (:pk params)
-            state (:state params)
-            was-rejected (:was-rejected params)
-            type (get-shift-type params shift-types)
-            has-already-applied (:has-already-applied params)
-            speciality (:speciality params)
-            speciality-name (:name (<sub [:speciality speciality]))
-            {:keys [starts-on-prev-week ends-on-next-week]} draw-data
-            opened (<sub [:edit-shift-popup pk])]
-        [:div [sa/Popup
-               {:trigger (reagent/as-element [:div {:class-name (str
-                                                                 "shift__label _" type
-                                                                 (when starts-on-prev-week " _starts-on-prev-week")
-                                                                 (when ends-on-next-week " _ends-on-next-week")
-                                                                 (when opened " _hovered"))}
-                                              speciality-name
-                                              (if has-already-applied [sa/Icon {:name "checkmark"}])])
-                :open @hovered
-                :on-open #(reset! hovered true)
-                :on-close #(reset! hovered false)
-                :position "left center"
-                :offset 2
-                :hoverable true
-                :class-name "shift__popup"}
-               [ShiftInfo params]
-               [ActionButton pk state has-already-applied was-rejected]]]))))
+  (let [pk (:pk params)
+        state (:state params)
+        was-rejected (:was-rejected params)
+        type (get-shift-type params shift-types)
+        has-already-applied (:has-already-applied params)
+        speciality (:speciality params)
+        speciality-name (:name (<sub [:speciality speciality]))
+        {:keys [starts-on-prev-week ends-on-next-week]} draw-data
+        opened (<sub [:edit-shift-popup pk])]
+    [:div [sa/Popup
+           {:trigger (reagent/as-element [:div {:class-name (str
+                                                             "shift__label _" type
+                                                             (when starts-on-prev-week " _starts-on-prev-week")
+                                                             (when ends-on-next-week " _ends-on-next-week")
+                                                             (when opened " _hovered"))}
+                                          speciality-name
+                                          (if has-already-applied [sa/Icon {:name "checkmark"}])])
+            :on-open #(rf/dispatch [:open-edit-shift-popup pk])
+            :on-close #(rf/dispatch [:close-edit-shift-popup pk])
+            :position "left center"
+            :offset 2
+            :hoverable true
+            :class-name "shift__popup"}
+           [ShiftInfo params]
+           [ActionButton pk state has-already-applied was-rejected]]]))
 
 (defn Index [params]
   (rf/dispatch [:load-shifts])

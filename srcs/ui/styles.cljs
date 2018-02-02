@@ -199,10 +199,11 @@
                     :cursor "default"
                     :word-wrap "break-word"
                     :transition "background-color .2s"}
+    [:&._hovered {:background-color "#444"}]
     [:&._completed {:background-color "#00BFDD"}
      [:&._hovered {:background-color "#00A6C4"}]]
     [:&._failed {:background-color "#000"}
-     [:&._hovered {:background-color "#333"}]]
+     [:&._hovered {:background-color "#444"}]]
     [:&._active {:background-color "#FFAB00"}
      [:&._hovered {:background-color "#E69200"}]]
     [:&._without_applies {:background-color "#E64C66"}
@@ -218,7 +219,7 @@
     [:&._pending {:background-color "#7874CF"}
      [:&._hovered {:background-color "#5F5BB6"}]]
     [:&._rejected {:background-color "#000"}
-     [:&._hovered {:background-color "#333"}]]
+     [:&._hovered {:background-color "#444"}]]
     [:&._starts-on-prev-week {:border-top-left-radius 0
                               :border-bottom-left-radius 0}]
     [:&._ends-on-next-week {:border-top-right-radius 0
