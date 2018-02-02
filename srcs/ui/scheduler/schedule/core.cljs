@@ -109,8 +109,6 @@
   (let [new-shift-form-cursor (<sub [:new-shift-form-cursor])]
     (fn [params]
       (let [calendar-month (<sub [:calendar-month])
-            filter-state (<sub [:shifts-filter-state])
-            filtered-shifts (<sub [:shifts-filtered-by-state filter-state])
             editing-shift-pk (<sub [:editing-shift-pk])]
         [SchedulerLayout
          [sa/Grid {}
@@ -122,6 +120,6 @@
             [ShiftsFilter shift-types]]
            [sa/GridColumn {:width 13}
             (when-not (nil? editing-shift-pk) [EditModal])
-            [Calendar calendar-month filtered-shifts ShiftLabel]]]]]))))
+            [Calendar calendar-month ShiftLabel]]]]]))))
 
 (pages/reg-page :core/scheduler-schedule Index)

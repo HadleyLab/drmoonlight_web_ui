@@ -113,20 +113,19 @@
     {:week-start (.startOf week-start-date "day")
      :week-end (.startOf week-end-date "day")}))
 
-(defn get-week-shifts [{:keys [week-start week-end]}]
-  (let [plain-shifts-list (<sub [:plain-shifts-list])]
-    (filter (fn [shift]
-              (let [date-start (js/moment (:date-start shift))
-                    date-end (js/moment (:date-end shift))
-                    shift-start-on-this-week (.isBetween date-start week-start week-end "day" "[]")
-                    shift-ends-on-this-week (.isBetween date-end week-start week-end "day" "[]")
-                    shift-includes-the-hole-week (and
-                                                  (.isBetween week-start date-start date-end "day" "[]")
-                                                  (.isBetween week-end date-start date-end "day" "[]"))]
-                (or shift-start-on-this-week
-                    shift-ends-on-this-week
-                    shift-includes-the-hole-week)))
-            plain-shifts-list)))
+(defn get-week-shifts [shifts {:keys [week-start week-end]}]
+  (filter (fn [shift]
+            (let [date-start (js/moment (:date-start shift))
+                  date-end (js/moment (:date-end shift))
+                  shift-start-on-this-week (.isBetween date-start week-start week-end "day" "[]")
+                  shift-ends-on-this-week (.isBetween date-end week-start week-end "day" "[]")
+                  shift-includes-the-hole-week (and
+                                                (.isBetween week-start date-start date-end "day" "[]")
+                                                (.isBetween week-end date-start date-end "day" "[]"))]
+              (or shift-start-on-this-week
+                  shift-ends-on-this-week
+                  shift-includes-the-hole-week)))
+          shifts))
 
 (defn prepare-shifts-data [shifts {:keys [week-start week-end]}]
   (mapv (fn [shift]
@@ -167,26 +166,29 @@
      [:div.bg]
      [:div.date (.date current-date)]]))
 
-(defn Calendar [current-month shifts ShiftLabel]
-  (fn [current-month shifts ShiftLabel]
-    [:div {:style {:padding-bottom "100px"}}
-     [:div.calendar calendar-styles
-      (concatv [:div.header] (mapv (fn [day] [:div day]) days-of-week))
-      (concatv [:div]
-               (mapv (fn [week-index]
-                       (let [week-bounds (get-week-bounds current-month week-index)]
-                         [:div.row
-                          (concatv [:div.colums]
-                                   (mapv (fn [day-index]
-                                           [render-calendar-cell current-month week-bounds day-index])
-                                         (range 7)))
-                          [:div.shifts
-                           (let [week-shifts (get-week-shifts week-bounds)
-                                 prepared-shifts (prepare-shifts-data week-shifts week-bounds)]
-                             (when-not (empty? prepared-shifts)
-                               (concatv [:div.shifts-row]
-                                        (mapv #(draw-shift % ShiftLabel) prepared-shifts))))]]))
-                     (range (get-weeks-number current-month))))]]))
+(defn Calendar [current-month ShiftLabel]
+  (fn [current-month ShiftLabel]
+    (let [filter-state (<sub [:shifts-filter-state])
+          filtered-shifts (<sub [:shifts-filtered-by-state filter-state])
+          shifts (flatten (map (fn [[_ item]] item) (:data filtered-shifts)))]
+      [:div {:style {:padding-bottom "100px"}}
+       [:div.calendar calendar-styles
+        (concatv [:div.header] (mapv (fn [day] [:div day]) days-of-week))
+        (concatv [:div]
+                 (mapv (fn [week-index]
+                         (let [week-bounds (get-week-bounds current-month week-index)]
+                           [:div.row
+                            (concatv [:div.colums]
+                                     (mapv (fn [day-index]
+                                             [render-calendar-cell current-month week-bounds day-index])
+                                           (range 7)))
+                            [:div.shifts
+                             (let [week-shifts (get-week-shifts shifts week-bounds)
+                                   prepared-shifts (prepare-shifts-data week-shifts week-bounds)]
+                               (when-not (empty? prepared-shifts)
+                                 (concatv [:div.shifts-row]
+                                          (mapv #(draw-shift % ShiftLabel) prepared-shifts))))]]))
+                       (range (get-weeks-number current-month))))]])))
 
 (def calendar-controls-styles
   (style [:.calendar-controls {:display "flex"
