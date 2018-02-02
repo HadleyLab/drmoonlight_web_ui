@@ -7,7 +7,73 @@
    [ui.widgets :refer [concatv]]
    [re-frame.core :as rf]
    [clojure.string :as str]
-   [soda-ash.core :as sa]))
+   [soda-ash.core :as sa]
+   [ui.styles :refer [style]]))
+
+(def calendar-styles
+  (style [:.calendar {:background-color "#fff"
+                      :border-radius "4px"}
+          [:.header {:display "flex"
+                     :width "100%"
+                     :flex-direction "row"
+                     :align-items "stretch"
+                     :font-size "14px"
+                     :line-height "20px"
+                     :font-weight "bold"}
+           [:div {:flex-grow 7
+                  :flex-shrink 0
+                  :background-color "rgb(249, 250, 251)"
+                  :max-width (str (/ 100 7) "%")
+                  :padding "7px"
+                  :text-align "center"
+                  :border-top "1px solid rgba(34,36,38,.15)"
+                  :border-right "1px solid rgba(34,36,38,.15)"
+                  :box-sizing "border-box"}
+            [:&:first-child {:border-left "1px solid rgba(34,36,38,.15)"
+                             :border-top-left-radius "4px"}]
+            [:&:last-child {:border-top-right-radius "4px"}]]]
+          [:.row {:position "relative"
+                  :min-height "105px"}
+           [:.colums {:position "absolute"
+                      :display "flex"
+                      :width "100%"
+                      :flex-direction "row"
+                      :align-items "stretch"
+                      :height "100%"}]
+           [:.segment {:position "relative"
+                       :flex-grow 7
+                       :flex-shrink 0
+                       :height "100%"
+                       :border-right "1px solid rgba(34,36,38,.15)"
+                       :border-bottom "1px solid rgba(34,36,38,.15)"
+                       :max-width (str (/ 100 7) "%")}
+            [:&:first-child {:border-left "1px solid rgba(34,36,38,.15)"}]
+            [:.date {:position "absolute"
+                     :right "7px"
+                     :top "6px"
+                     :color "rgba(140,151,178,0.3)"
+                     :font-size "12px"}]]
+           [:&:first-child {}
+            [:.segment {:border-top "1px solid rgba(34,36,38,.15)"}]]
+           [:&:last-child {}
+            [:.segment:first-child {:border-bottom-left-radius "4px"}]
+            [:.segment:last-child {:border-bottom-right-radius "4px"}]]
+           [:.segment._current-month [:.date {:color "#888A8C"}]]
+           [:.segment._today [:.bg {:position "absolute"
+                                    :left 0
+                                    :top 0
+                                    :right 0
+                                    :bottom 0
+                                    :background-color "rgba(140,151,178,0.17)"}]]
+           [:.shifts {:position "relative"
+                      :display "flex"
+                      :width "100%"
+                      :flex-direction "column"
+                      :padding-top "30px"}]
+           [:.shifts-row {:display "flex"
+                          :width "100%"
+                          :flex-direction "row"
+                          :flex-wrap "wrap"}]]]))
 
 (defn- as-key [date]
   (.format date "YYYY-MM-DD"))
@@ -17,6 +83,9 @@
 
 (defn- format-day [day]
   (if (> (count (str day)) 1) day (str 0 day)))
+
+(def days-of-week
+  ["Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat"])
 
 (defn- draw-cell [render-shift-label row column selected shifts]
   (let [month-start (.weekday selected)
@@ -48,64 +117,6 @@
                                      (if is-today "_today"))}
               [:div.calendar__cell-bg]
               [:div.calendar__date (.date cell-date)]]
-             (mapv render-shift-label (get-shifts-for-day shifts cell-date)))))
-
-(defn- draw-cell2 [render-shift-label row column selected shifts]
-  (let [month-start (.weekday selected)
-        index (+ (* row 7) column)
-        day (+ (- index month-start) 1)
-        prev-month (.subtract (js/moment selected) 1 "month")
-        next-month (.add (js/moment selected) 1 "month")
-        selected-month-max-day (-> selected
-                                   (js/moment)
-                                   (.endOf "month")
-                                   (.date))
-        prev-month-max-day        (-> prev-month
-                                      (js/moment)
-                                      (.endOf "month")
-                                      (.date))
-        cell-date (cond
-                    (<= day 0) (js/moment (str (.format prev-month "YYYY-MM-")
-                                               (format-day (+ prev-month-max-day day))))
-                    (> day selected-month-max-day) (js/moment
-                                                    (str (.format next-month "YYYY-MM-")
-                                                         (format-day (- day selected-month-max-day))))
-                    :else (js/moment (str (.format selected "YYYY-MM-") (format-day day))))
-        is-today (= (.format (js/moment) "YYYY-MM-DD") (.format cell-date "YYYY-MM-DD"))
-        is-current-month (= (.month (js/moment selected)) (.month cell-date))]
-    (concatv [:div
-              {:class-name (str
-                            " "
-                            (if is-current-month "_current-month")
-                            " "
-                            (if is-today "_today"))}
-              [:div.calendar__cell-bg]
-              [:div.calendar__date (.date cell-date)]])))
-
-(defn- draw-shifts-row [render-shift-label current-month week-index row-index shifts]
-  (let [month-start (.weekday current-month)
-        index (+ (* week-index 7) row-index)
-        day (+ (- index month-start) 1)
-        prev-month (.subtract (js/moment current-month) 1 "month")
-        next-month (.add (js/moment current-month) 1 "month")
-        month-end (-> current-month
-                      (js/moment)
-                      (.endOf "month")
-                      (.date))
-        prev-month-end       (-> prev-month
-                                 (js/moment)
-                                 (.endOf "month")
-                                 (.date))
-        cell-date (cond
-                    (<= day 0) (js/moment (str (.format prev-month "YYYY-MM-")
-                                               (format-day (+ prev-month-end day))))
-                    (> day month-end) (js/moment
-                                       (str (.format next-month "YYYY-MM-")
-                                            (format-day (- day month-end))))
-                    :else (js/moment (str (.format current-month "YYYY-MM-") (format-day day))))
-        is-today (= (.format (js/moment) "YYYY-MM-DD") (.format cell-date "YYYY-MM-DD"))
-        is-current-month (= (.month (js/moment current-month)) (.month cell-date))]
-    (concatv [:div]
              (mapv render-shift-label (get-shifts-for-day shifts cell-date)))))
 
 ; Start week 6, end week 10 => number of weeks in month (10 - 6) + 1 = 5
@@ -174,9 +185,6 @@
                                 :ends-on-next-week (not ends-on-this-week)}})))
         shifts))
 
-(defn put-week-shifs-in-order []
-  (let []))
-
 (defn draw-shift [shift render-shift-label]
   (let [draw-data (:draw-data shift)
         length (:length draw-data)
@@ -193,43 +201,37 @@
      ; (render-shift-label shift)
 ]))
 
+(defn render-calendar-cell [current-month {:keys [week-start]} day-index]
+  (let [current-date (.add (js/moment week-start) day-index "days")
+        is-current-month (.isSame (js/moment current-month) current-date "month")
+        is-today (.isSame (js/moment) current-date "day")]
+    [:div {:class-name
+           (str "segment"
+                (when is-current-month " _current-month")
+                (when is-today " _today"))}
+     [:div.bg]
+     [:div.date (.date current-date)]]))
+
 (defn Calendar [current-month shifts render-shift-label]
-  (fn [current-month shifts]
-    (js/console.log "current-month" current-month)
+  (fn [current-month shifts render-shift-label]
     [:div
-     (let [week-bounds (get-week-bounds current-month 4)
-           week-shifts (get-week-shifts week-bounds)
-           prepared-shifts (prepare-shifts-data week-shifts week-bounds)]
-       (js/console.log "week-bounds" (clj->js week-bounds))
-       (js/console.log "week-shifts" (clj->js week-shifts))
-       (js/console.log "prepared-shifts" (clj->js prepared-shifts)))
-     (concatv [:div.new-table]
-              (mapv (fn [week-index]
-                      [:div.new-row
-                       (concatv [:div.new-colums]
-                                (mapv (fn [day-index]
-                                        [:div.segment [draw-cell2 render-shift-label week-index day-index current-month shifts]])
-                                      (range 7)))
-                       ; (concatv [:div.new-shifts]
-                       ;          (mapv (fn [row-index]
-                       ;                  (let [week-bounds (get-week-bounds current-month week-index)
-                       ;                        week-shifts (get-week-shifts week-bounds)
-                       ;                        prepared-shifts (prepare-shifts-data week-shifts week-bounds)]
-                       ;                    (if-not (empty? prepared-shifts)
-                       ;                      (concatv [:div.new-shifts-row]
-                       ;                               (mapv #(draw-shift % render-shift-label) prepared-shifts))
-                       ;                      [:div.empty])))
-                       ;                (range 7)))])
-                       [:div.new-shifts {:style {:padding-top "30px"}}
-                        (let [week-bounds (get-week-bounds current-month week-index)
-                              _ (js/console.log "week-bounds" (clj->js week-bounds))
-                              week-shifts (get-week-shifts week-bounds)
-                              prepared-shifts (prepare-shifts-data week-shifts week-bounds)]
-                          (if-not (empty? prepared-shifts)
-                            (concatv [:div.new-shifts-row]
-                                     (mapv #(draw-shift % render-shift-label) prepared-shifts))
-                            [:div.empty]))]])
-                    (range (get-weeks-number current-month))))
+     [:div.calendar calendar-styles
+      [:div.header (map (fn [day] [:div day]) days-of-week)]
+      (concatv [:div]
+               (mapv (fn [week-index]
+                       (let [week-bounds (get-week-bounds current-month week-index)]
+                         [:div.row
+                          (concatv [:div.colums]
+                                   (mapv (fn [day-index]
+                                           [render-calendar-cell current-month week-bounds day-index])
+                                         (range 7)))
+                          [:div.shifts
+                           (let [week-shifts (get-week-shifts week-bounds)
+                                 prepared-shifts (prepare-shifts-data week-shifts week-bounds)]
+                             (when-not (empty? prepared-shifts)
+                               (concatv [:div.shifts-row]
+                                        (mapv #(draw-shift % render-shift-label) prepared-shifts))))]]))
+                     (range (get-weeks-number current-month))))]
 
      [sa/Table {:class-name "calendar__table" :celled true}
       [sa/TableHeader {:class-name "calendar__table-header"}

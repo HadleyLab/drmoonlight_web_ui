@@ -420,8 +420,8 @@
                                :position "relative"}
     [:&:last-child {:border-bottom 0}]]
    [:.chat__message-avatar {:position "absolute"
-                           :top "5px"
-                           :left "-45px"}]
+                            :top "5px"
+                            :left "-45px"}]
    [:.chat__message-time {:color "#8C97B2"
                           :margin-top (px 5)}]
    [:.chat__form-container {:border-top "1px solid rgba(34,36,38,.15)"
@@ -447,35 +447,6 @@
                                 :margin-right "6px!important"}
      [:i {:margin-right "0!important"}]]]
 
-   [:.new-table {:border "1px solid rgba(34,36,38,.15)"}]
-   [:.new-row {:position "relative"
-               :min-height "105px"}
-    [:.new-colums {:position "absolute"
-                   :display "flex"
-                   :width "100%"
-                   :flex-direction "row"
-                   :align-items "stretch"
-                   :height "100%"}]
-    [:.new-shifts {:position "relative"
-                   :display "flex"
-                   :width "100%"
-                   :flex-direction "column"}]
-    [:.new-shifts-row {:display "flex"
-                       :width "100%"
-                       :flex-direction "row"
-                       :flex-wrap "wrap"}]
-    [:.segment {:position "relative"
-                :background-color "#fff"
-                :flex-grow 7
-                :flex-shrink 0
-                :height "100%"
-                :border-right "1px solid rgba(34,36,38,.15)"
-                :border-bottom "1px solid rgba(34,36,38,.15)"
-                :max-width (str (/ 100 7) "%")}]
-    [:.segment:last-child {:border-right 0}]]
-   [:.new-row:last-child {}
-    [:.segment {:border-bottom 0}]]
-
    ; account manager styles
    [:.account-manager__resident-buttons {:padding-bottom "50px"
                                          :text-align "right"}]
@@ -492,5 +463,4 @@
    [:.avatar_label {:width "100px"
                     :text-align "center"}]
    [:.attached-file-label {:margin "-1em 0 1em 0"}]
-   [:.attachment-image {:margin-top "5px"}]
-   ))
+   [:.attachment-image {:margin-top "5px"}]))
