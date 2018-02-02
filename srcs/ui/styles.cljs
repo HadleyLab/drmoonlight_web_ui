@@ -237,17 +237,32 @@
                     :border-radius (px 4)
                     :margin-top (px 2)
                     :cursor "default"
-                    :word-wrap "break-word"}
-    [:&._completed {:background-color "#00BFDD"}]
-    [:&._failed {:background-color "#000"}]
-    [:&._active {:background-color "#FFAB00"}]
-    [:&._without_applies {:background-color "#E64C66"}]
-    [:&._coverage_completed {:background-color "#44BE8D"}]
-    [:&._require_approval {:background-color "#7874CF"}]
-    [:&._available {:background-color "#E64C66"}]
-    [:&._approved {:background-color "#44BE8D"}]
-    [:&._pending {:background-color "#7874CF"}]
-    [:&._rejected {:background-color "#000"}]
+                    :word-wrap "break-word"
+                    :transition "background-color .2s"}
+    [:&._completed {:background-color "#00BFDD"}
+     [:&._hovered {:background-color "#00A6C4"}]]
+    [:&._failed {:background-color "#000"}
+     [:&._hovered {:background-color "#333"}]]
+    [:&._active {:background-color "#FFAB00"}
+     [:&._hovered {:background-color "#E69200"}]]
+    [:&._without_applies {:background-color "#E64C66"}
+     [:&._hovered {:background-color "#CD334D"}]]
+    [:&._coverage_completed {:background-color "#44BE8D"}
+     [:&._hovered {:background-color "#2BA574"}]]
+    [:&._require_approval {:background-color "#7874CF"}
+     [:&._hovered {:background-color "#5F5BB6"}]]
+    [:&._available {:background-color "#E64C66"}
+     [:&._hovered {:background-color "#CD334D"}]]
+    [:&._approved {:background-color "#44BE8D"}
+     [:&._hovered {:background-color "#2BA574"}]]
+    [:&._pending {:background-color "#7874CF"}
+     [:&._hovered {:background-color "#5F5BB6"}]]
+    [:&._rejected {:background-color "#000"}
+     [:&._hovered {:background-color "#333"}]]
+    [:&._starts-on-prev-week {:border-top-left-radius 0
+                              :border-bottom-left-radius 0}]
+    [:&._ends-on-next-week {:border-top-right-radius 0
+                            :border-bottom-right-radius 0}]
     [:.icon {:position "absolute"
              :top "3px"
              :right "0"}]]

@@ -33,9 +33,9 @@
     [:div.shift__popup-content
      (if (= user-type :resident)
        [:p.shift__row [:i "Hospital / Facility name: "] (:facility-name owner)])
-     [:p.shift__row [:i "Starts: "] (format-date-time start)]
-     [:p.shift__row [:i "Ends: "] (format-date-time finish)]
-     [:p.shift__row [:i "Total: "] (as-hours-interval start finish) " hours"]
+     [:p.shift__row [:i "Starts: "] (format-date-time (js/moment start))]
+     [:p.shift__row [:i "Ends: "] (format-date-time (js/moment finish))]
+     [:p.shift__row [:i "Total: "] (as-hours-interval (js/moment start) (js/moment finish)) " hours"]
      [:p.shift__row [:i "Required staff: "] speciality-name]
      [:p.shift__row [:i "Payment amount: "] [:b "$" payment-amount] (str " per " (if payment-per-hour "hour" "shift"))]
      [:p.shift__row description]]))

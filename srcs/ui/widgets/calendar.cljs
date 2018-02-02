@@ -69,7 +69,8 @@
                       :display "flex"
                       :width "100%"
                       :flex-direction "column"
-                      :padding-top "30px"}]
+                      :padding-top "24px"
+                      :padding-bottom "7px"}]
            [:.shifts-row {:display "flex"
                           :width "100%"
                           :flex-direction "row"
@@ -185,21 +186,16 @@
                                 :ends-on-next-week (not ends-on-this-week)}})))
         shifts))
 
-(defn draw-shift [shift render-shift-label]
+(defn draw-shift [shift ShiftLabel]
   (let [draw-data (:draw-data shift)
-        length (:length draw-data)
-        offset-left (:offset-left draw-data)
-        offset-right (:offset-right draw-data)]
+        {:keys [length offset-left offset-right]} draw-data]
     [:div {:style {:width (str (* (/ length 7) 100) "%")
                    :margin-left (str (* (/ offset-left 7) 100) "%")
                    :margin-right (str (* (/ offset-right 7) 100) "%")
-                   :height "24px"
-                   :padding "2px"
-                   :box-sizing "border-box"}}
-     [:div {:style {:height "20px"
-                    :background-color "green"}}]
-     ; (render-shift-label shift)
-]))
+                   :padding "0 7px"}}
+     [ShiftLabel shift
+      (select-keys draw-data
+                   [:starts-on-prev-week :ends-on-next-week])]]))
 
 (defn render-calendar-cell [current-month {:keys [week-start]} day-index]
   (let [current-date (.add (js/moment week-start) day-index "days")
@@ -212,11 +208,11 @@
      [:div.bg]
      [:div.date (.date current-date)]]))
 
-(defn Calendar [current-month shifts render-shift-label]
-  (fn [current-month shifts render-shift-label]
+(defn Calendar [current-month shifts ShiftLabel]
+  (fn [current-month shifts ShiftLabel]
     [:div
      [:div.calendar calendar-styles
-      [:div.header (map (fn [day] [:div day]) days-of-week)]
+      (concatv [:div.header] (mapv (fn [day] [:div day]) days-of-week))
       (concatv [:div]
                (mapv (fn [week-index]
                        (let [week-bounds (get-week-bounds current-month week-index)]
@@ -230,27 +226,28 @@
                                  prepared-shifts (prepare-shifts-data week-shifts week-bounds)]
                              (when-not (empty? prepared-shifts)
                                (concatv [:div.shifts-row]
-                                        (mapv #(draw-shift % render-shift-label) prepared-shifts))))]]))
+                                        (mapv #(draw-shift % ShiftLabel) prepared-shifts))))]]))
                      (range (get-weeks-number current-month))))]
 
-     [sa/Table {:class-name "calendar__table" :celled true}
-      [sa/TableHeader {:class-name "calendar__table-header"}
-       [sa/TableRow
-        [sa/TableHeaderCell "Sun"]
-        [sa/TableHeaderCell "Mon"]
-        [sa/TableHeaderCell "Tue"]
-        [sa/TableHeaderCell "Wed"]
-        [sa/TableHeaderCell "Thu"]
-        [sa/TableHeaderCell "Fri"]
-        [sa/TableHeaderCell "Sat"]]]
-      (concatv [sa/TableBody]
-               (mapv (fn [row]
-                       (concatv [sa/TableRow]
-                                (mapv (fn [column]
-                                        [sa/TableCell {:class-name "calendar__cell"}
-                                         [draw-cell render-shift-label row column current-month shifts]])
-                                      (range 7))))
-                     (range (get-weeks-number current-month))))]]))
+     ; [sa/Table {:class-name "calendar__table" :celled true}
+     ;  [sa/TableHeader {:class-name "calendar__table-header"}
+     ;   [sa/TableRow
+     ;    [sa/TableHeaderCell "Sun"]
+     ;    [sa/TableHeaderCell "Mon"]
+     ;    [sa/TableHeaderCell "Tue"]
+     ;    [sa/TableHeaderCell "Wed"]
+     ;    [sa/TableHeaderCell "Thu"]
+     ;    [sa/TableHeaderCell "Fri"]
+     ;    [sa/TableHeaderCell "Sat"]]]
+     ;  (concatv [sa/TableBody]
+     ;           (mapv (fn [row]
+     ;                   (concatv [sa/TableRow]
+     ;                            (mapv (fn [column]
+     ;                                    [sa/TableCell {:class-name "calendar__cell"}
+     ;                                     [draw-cell render-shift-label row column current-month shifts]])
+     ;                                  (range 7))))
+     ;                 (range (get-weeks-number current-month))))]
+]))
 
 (defn CalendarMonthControl [parent]
   (into parent
