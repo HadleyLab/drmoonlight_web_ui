@@ -83,6 +83,24 @@
                        :token @(rf/subscribe [:token])
                        :map-result convert-shifts}}))
 
+; (defn- new-convert-shifts [data]
+;   (into {} (map (fn [shift] [(str (:pk shift)) shift]) data)))
+;
+; (rf/reg-event-fx
+;  :new-load-shifts
+;  (fn [{db :db} [_]]
+;    {:json/fetch->path {:path [::shift :new-list]
+;                        :uri (get-url db "/api/shifts/shift/")
+;                        :token @(rf/subscribe [:token])
+;                        :map-result new-convert-shifts}}))
+
+(rf/reg-event-fx
+ :new-load-shifts
+ (fn [{db :db} [_]]
+   {:json/fetch->path {:path [::shift :new-list]
+                       :uri (get-url db "/api/shifts/shift/")
+                       :token @(rf/subscribe [:token])}}))
+
 (rf/reg-sub
  ::shift
  (fn [db path]
@@ -150,6 +168,10 @@
 (rf/reg-sub
  :shifts-data
  #(<sub [::shift :list :data]))
+
+(rf/reg-sub
+ :new-shifts-data
+ #(<sub [::shift :new-list :data]))
 
 ;; API for verbose shift information
 

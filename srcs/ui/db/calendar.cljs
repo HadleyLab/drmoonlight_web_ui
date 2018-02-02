@@ -20,8 +20,6 @@
  :calendar-month-formated
  #(.format (<sub [::calendar :month]) "MMMM YYYY"))
 
-
-
 (rf/reg-event-db
  :inc-calendar-month
  (fn [db [_ month]]
@@ -31,4 +29,3 @@
  :dec-calendar-month
  (fn [db [_ month]]
    (update-in db [::calendar :month] #(.subtract (js/moment %) 1 "month"))))
-

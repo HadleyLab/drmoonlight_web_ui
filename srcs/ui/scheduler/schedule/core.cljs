@@ -94,6 +94,7 @@
 
 (defn Index [params]
   (rf/dispatch [:load-shifts])
+  (rf/dispatch [:new-load-shifts])
   (let [new-shift-form-cursor (<sub [:new-shift-form-cursor])]
     (fn [params]
       (let [calendar-month (<sub [:calendar-month])
