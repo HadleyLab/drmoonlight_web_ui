@@ -109,7 +109,6 @@
        (map (fn [[key value]] [key (count value)]))
        (into {})))
 
-
 (defn get-pred-fn [filter-state]
   (let [pred-fn #(= filter-state (:state %))]
     (->> (if (is-scheduler)
@@ -150,6 +149,13 @@
 (rf/reg-sub
  :shifts-data
  #(<sub [::shift :list :data]))
+
+(rf/reg-sub
+ :plain-shifts-list
+ (fn [db _]
+   (let [filter-state (<sub [:shifts-filter-state])
+         filtered-shifts (<sub [:shifts-filtered-by-state filter-state])]
+     (mapcat second (:data filtered-shifts)))))
 
 ;; API for verbose shift information
 
@@ -211,19 +217,19 @@
    (assoc-in db [::shift :new-shift-modal] false)))
 
 (rf/reg-sub
- :edit-shift-modal
+ :editing-shift-pk
  (fn [db [_ pk]]
-   (get-in db [::shift :edit-shift-modal pk] false)))
+   (get-in db [::shift :editing-shift-pk])))
 
 (rf/reg-event-db
  :open-edit-shift-modal
  (fn [db [_ pk]]
-   (assoc-in db [::shift :edit-shift-modal pk] true)))
+   (assoc-in db [::shift :editing-shift-pk] pk)))
 
 (rf/reg-event-db
  :close-edit-shift-modal
  (fn [db [_ pk]]
-   (assoc-in db [::shift :edit-shift-modal pk] false)))
+   (assoc-in db [::shift :editing-shift-pk] nil)))
 
 (rf/reg-sub
  :edit-shift-popup

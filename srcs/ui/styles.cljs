@@ -187,49 +187,9 @@
     [:&._pending {:background-color "#7874CF"}]
     [:&._rejected {:background-color "#000"}]]
 
-   ; calendar styles
-   [:.calendar__table {:table-layout :fixed}]
-   [:.calendar__table-header [:th {:padding "7px!important"
-                                   :text-align "center!important"}]]
-   [:.calendar__controls {:display "flex"
-                          :align-items "center"
-                          :justify-content "center"}]
-   [:.calendar__button {:display "inline-block"
-                        :color "#8C97B2"
-                        :cursor "pointer"
-                        :transition "color 0.2s"}
-    [:&:hover {:color "#000"}]]
-   [:.calendar__month-name {:font-size (px 18)
-                            :font-weight "bold"
-                            :letter-spacing (px -0.12)
-                            :margin "0 10px"}]
-   [:.calendar__cell {:position "relative"
-                      :width "14.28%"
-                      :max-width "14.28%"
-                      :padding "0!important"
-                      :vertical-align "top"}]
-   [:.calendar__cell-inner {:height "inherit"
-                            :width "100%"
-                            :padding "22px 7px 5px"
-                            :min-height (px 105)}]
-   [:.calendar__date {:position "absolute"
-                      :right (px 7)
-                      :top (px 6)
-                      :color "rgba(140,151,178,0.3)"
-                      :font-size (px 12)}]
-   [:.calendar__cell-inner._current-month [:.calendar__date {:color "#888A8C"}]]
-   [:.calendar__cell-inner._today
-    [:.calendar__cell-bg {:position "absolute"
-                          :left 0
-                          :top 0
-                          :right 0
-                          :bottom 0
-                          :background-color "rgba(140,151,178,0.17)"}]
-    [:.calendar__date {:font-weight "bold"
-                       :color "#000"}]]
    ; shifts styles
    [:.shift__label {:position "relative"
-                    :padding "3px 18px 3px 8px"
+                    :padding "3px 8px"
                     :color "#fff"
                     :background-color "#000"
                     :font-size (px 12)
@@ -237,17 +197,37 @@
                     :border-radius (px 4)
                     :margin-top (px 2)
                     :cursor "default"
-                    :word-wrap "break-word"}
-    [:&._completed {:background-color "#00BFDD"}]
-    [:&._failed {:background-color "#000"}]
-    [:&._active {:background-color "#FFAB00"}]
-    [:&._without_applies {:background-color "#E64C66"}]
-    [:&._coverage_completed {:background-color "#44BE8D"}]
-    [:&._require_approval {:background-color "#7874CF"}]
-    [:&._available {:background-color "#E64C66"}]
-    [:&._approved {:background-color "#44BE8D"}]
-    [:&._pending {:background-color "#7874CF"}]
-    [:&._rejected {:background-color "#000"}]
+                    :word-wrap "break-word"
+                    :transition "background-color .2s"}
+    [:&._hovered {:background-color "#444"}]
+    [:&._completed {:background-color "#00BFDD"}
+     [:&._hovered {:background-color "#00A6C4"}]]
+    [:&._failed {:background-color "#000"}
+     [:&._hovered {:background-color "#444"}]]
+    [:&._active {:background-color "#FFAB00"}
+     [:&._hovered {:background-color "#E69200"}]]
+    [:&._without_applies {:background-color "#E64C66"}
+     [:&._hovered {:background-color "#CD334D"}]]
+    [:&._coverage_completed {:background-color "#44BE8D"}
+     [:&._hovered {:background-color "#2BA574"}]]
+    [:&._require_approval {:background-color "#7874CF"}
+     [:&._hovered {:background-color "#5F5BB6"}]]
+    [:&._available {:background-color "#E64C66"}
+     [:&._hovered {:background-color "#CD334D"}]]
+    [:&._approved {:background-color "#44BE8D"}
+     [:&._hovered {:background-color "#2BA574"}]]
+    [:&._pending {:background-color "#7874CF"}
+     [:&._hovered {:background-color "#5F5BB6"}]]
+    [:&._rejected {:background-color "#000"}
+     [:&._hovered {:background-color "#444"}]]
+    [:&._starts-on-prev-week {:border-top-left-radius 0
+                              :border-bottom-left-radius 0
+                              :margin-left "-7px"
+                              :padding-left "15px"}]
+    [:&._ends-on-next-week {:border-top-right-radius 0
+                            :border-bottom-right-radius 0
+                            :margin-right "-7px"
+                            :padding-right "15px"}]
     [:.icon {:position "absolute"
              :top "3px"
              :right "0"}]]
@@ -420,8 +400,8 @@
                                :position "relative"}
     [:&:last-child {:border-bottom 0}]]
    [:.chat__message-avatar {:position "absolute"
-                           :top "5px"
-                           :left "-45px"}]
+                            :top "5px"
+                            :left "-45px"}]
    [:.chat__message-time {:color "#8C97B2"
                           :margin-top (px 5)}]
    [:.chat__form-container {:border-top "1px solid rgba(34,36,38,.15)"
@@ -463,5 +443,4 @@
    [:.avatar_label {:width "100px"
                     :text-align "center"}]
    [:.attached-file-label {:margin "-1em 0 1em 0"}]
-   [:.attachment-image {:margin-top "5px"}]
-   ))
+   [:.attachment-image {:margin-top "5px"}]))
