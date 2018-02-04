@@ -41,7 +41,6 @@
 (def schema
   {::shift
    {:list {:status :not-asked}
-    :plain-shifts-list []
     :detail {}
     :filter-value nil
     :apply-requests {}
@@ -82,14 +81,7 @@
    {:json/fetch->path {:path [::shift :list]
                        :uri (get-url db "/api/shifts/shift/")
                        :token @(rf/subscribe [:token])
-                       :map-result convert-shifts
-                       :succeed-fx [:get-plain-shifts-list]}}))
-
-(rf/reg-event-db
- :get-plain-shifts-list
- (fn [db _]
-   (assoc-in db [::shift :plain-shifts-list]
-             (flatten (map (fn [[_ item]] item) (get-in db [::shift :list :data]))))))
+                       :map-result convert-shifts}}))
 
 (rf/reg-sub
  ::shift
@@ -160,7 +152,10 @@
 
 (rf/reg-sub
  :plain-shifts-list
- #(<sub [::shift :plain-shifts-list]))
+ (fn [db _]
+   (let [filter-state (<sub [:shifts-filter-state])
+         filtered-shifts (<sub [:shifts-filtered-by-state filter-state])]
+     (mapcat second (:data filtered-shifts)))))
 
 ;; API for verbose shift information
 

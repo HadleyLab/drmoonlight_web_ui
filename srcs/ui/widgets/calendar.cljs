@@ -102,9 +102,7 @@
 
 (defn Calendar [current-month ShiftLabel]
   (fn [current-month ShiftLabel]
-    (let [filter-state (<sub [:shifts-filter-state])
-          filtered-shifts (<sub [:shifts-filtered-by-state filter-state])
-          shifts (flatten (map (fn [[_ item]] item) (:data filtered-shifts)))]
+    (let [plain-shifts (<sub [:plain-shifts-list])]
       [:div {:style {:padding-bottom "100px"}}
        [:div.calendar calendar-styles
         (concatv [:div.header] (mapv (fn [day] [:div day]) days-of-week))
@@ -117,11 +115,11 @@
                                              [render-calendar-cell current-month week-bounds day-index])
                                            (range 7)))
                             [:div.shifts
-                             (let [week-shifts (get-week-shifts shifts week-bounds)
-                                   prepared-shifts (prepare-shifts-data week-shifts week-bounds)]
-                               (when-not (empty? prepared-shifts)
+                             (let [week-shifts (get-week-shifts plain-shifts week-bounds)
+                                   shifts (prepare-shifts-data week-shifts week-bounds)]
+                               (when-not (empty? shifts)
                                  (concatv [:div.shifts-row]
-                                          (mapv #(draw-shift % ShiftLabel) prepared-shifts))))]]))
+                                          (mapv #(draw-shift % ShiftLabel) shifts))))]]))
                        (range (get-weeks-number current-month))))]])))
 
 (defn CalendarMonthControl [parent]

@@ -189,7 +189,7 @@
 
    ; shifts styles
    [:.shift__label {:position "relative"
-                    :padding "3px 18px 3px 8px"
+                    :padding "3px 8px"
                     :color "#fff"
                     :background-color "#000"
                     :font-size (px 12)
@@ -221,9 +221,13 @@
     [:&._rejected {:background-color "#000"}
      [:&._hovered {:background-color "#444"}]]
     [:&._starts-on-prev-week {:border-top-left-radius 0
-                              :border-bottom-left-radius 0}]
+                              :border-bottom-left-radius 0
+                              :margin-left "-7px"
+                              :padding-left "15px"}]
     [:&._ends-on-next-week {:border-top-right-radius 0
-                            :border-bottom-right-radius 0}]
+                            :border-bottom-right-radius 0
+                            :margin-right "-7px"
+                            :padding-right "15px"}]
     [:.icon {:position "absolute"
              :top "3px"
              :right "0"}]]
