@@ -28,6 +28,7 @@
                         (fn [item]
                           [:span.profile-detail__select (str item)])
                         (field data))
+         :avatar [:img.avatar {:src (field data)}]
          [:b (field data)]))]]]))
 
 (defn Details [data field-sets]
