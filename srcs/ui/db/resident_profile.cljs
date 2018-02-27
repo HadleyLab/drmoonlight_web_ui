@@ -1,5 +1,6 @@
 (ns ui.db.resident-profile
   (:require
+   [clojure.string :as str]
    [reagent.core :as reagent]
    [ui.db.misc :refer [get-url <sub fields->schema
                        setup-form-initial-values get-timezone-str]]
@@ -105,6 +106,7 @@
          body (if (string? (:avatar body))
                 (dissoc body :avatar)
                 body)
+         body (update body :specialities #(str "\"" (str/join "," %) "\""))
          is-new-or-rejected (or (= state :new) (= state :rejected))
          url (if is-new-or-rejected
                (get-url db "/api/accounts/resident/" pk "/fill_profile/")
