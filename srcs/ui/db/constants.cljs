@@ -17,7 +17,7 @@
                        :map-result #(into {} (map (fn [[key values]] [key (list->map values)]) %))}}))
 
 (defn as-options [get-text data]
-  (map (fn [[key value]] {:key key :text (get-text value) :value key}) data))
+  (sort-by :text (map (fn [[key value]] {:key key :text (get-text value) :value key}) data)))
 
 (rf/reg-sub
  :speciality
